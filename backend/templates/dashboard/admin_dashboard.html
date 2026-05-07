@@ -2,457 +2,172 @@
 
 {% block content %}
 
-<h1>Admin Dashboard</h1>
+<h1><i class="fas fa-chart-pie"></i> Admin Dashboard</h1>
 
 <!-- =========================
 STATS SECTION
 ========================= -->
-
 <div class="stats-grid">
-
     <!-- TOTAL STUDENTS -->
-
     <div class="stats-card">
-
-        <h2>Total Students</h2>
-
+        <h2><i class="fas fa-users" style="margin-right: 10px; color: var(--neon-cyan);"></i> Total Students</h2>
         <p>{{ total_students }}</p>
-
     </div>
-
 
     <!-- TOTAL ATTENDANCE -->
-
     <div class="stats-card">
-
-        <h2>Total Attendance</h2>
-
+        <h2><i class="fas fa-clipboard-list" style="margin-right: 10px; color: var(--neon-cyan);"></i> Total Attendance</h2>
         <p>{{ total_attendance }}</p>
-
     </div>
-
 
     <!-- PRESENT STUDENTS -->
-
     <div class="stats-card">
-
-        <h2>Present Students</h2>
-
-        <p>{{ present_count }}</p>
-
+        <h2><i class="fas fa-user-check" style="margin-right: 10px; color: var(--success);"></i> Present Students</h2>
+        <p style="color: var(--success);">{{ present_count }}</p>
     </div>
-
 
     <!-- ABSENT STUDENTS -->
-
     <div class="stats-card">
-
-        <h2>Absent Students</h2>
-
-        <p>{{ absent_count }}</p>
-
+        <h2><i class="fas fa-user-times" style="margin-right: 10px; color: var(--danger);"></i> Absent Students</h2>
+        <p style="color: var(--danger);">{{ absent_count }}</p>
     </div>
-
 </div>
-
-<br>
-
 
 <!-- =========================
-DOUGHNUT CHART
+CHARTS GRID
 ========================= -->
-
-<div class="card">
-
-    <h2 style="
-            margin-bottom:20px;
-            color:cyan;
-            text-align:center;
-        ">
-
-        Attendance Analytics
-
-    </h2>
-
-    <div style="
-            width:450px;
-            margin:auto;
-        ">
-
-        <canvas id="attendanceChart"></canvas>
-
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; margin-bottom: 30px;">
+    
+    <!-- DOUGHNUT CHART -->
+    <div class="card" style="margin-bottom: 0;">
+        <h2 style="color: var(--neon-cyan); text-align: center; margin-bottom: 25px; font-size: 20px; text-transform: uppercase; letter-spacing: 1px;">
+            <i class="fas fa-chart-doughnut"></i> Attendance Analytics
+        </h2>
+        <div style="width: 100%; max-width: 400px; margin: auto; height: 300px;">
+            <canvas id="attendanceChart"></canvas>
+        </div>
     </div>
 
-</div>
-
-<br>
-
-
-<!-- =========================
-BAR GRAPH
-========================= -->
-
-<div class="card">
-
-    <h2 style="
-            margin-bottom:20px;
-            color:cyan;
-            text-align:center;
-        ">
-
-        Attendance Bar Analytics
-
-    </h2>
-
-    <div style="
-            width:700px;
-            margin:auto;
-        ">
-
-        <canvas id="barChart"></canvas>
-
+    <!-- BAR GRAPH -->
+    <div class="card" style="margin-bottom: 0;">
+        <h2 style="color: var(--neon-cyan); text-align: center; margin-bottom: 25px; font-size: 20px; text-transform: uppercase; letter-spacing: 1px;">
+            <i class="fas fa-chart-bar"></i> Attendance Bar Analytics
+        </h2>
+        <div style="width: 100%; margin: auto; height: 300px;">
+            <canvas id="barChart"></canvas>
+        </div>
     </div>
-
 </div>
-
-<br>
 
 <!-- MONTHLY ANALYTICS -->
-
 <div class="card">
-
-    <h2
-        style="
-            color:cyan;
-            margin-bottom:20px;
-            text-align:center;
-        "
-    >
-
-        Monthly Attendance Trends
-
+    <h2 style="color: var(--neon-cyan); text-align: center; margin-bottom: 25px; font-size: 20px; text-transform: uppercase; letter-spacing: 1px;">
+        <i class="fas fa-chart-line"></i> Monthly Attendance Trends
     </h2>
-
-    <div
-        style="
-            width:900px;
-            margin:auto;
-        "
-    >
-
+    <div style="width: 100%; margin: auto; height: 350px;">
         <canvas id="monthlyChart"></canvas>
-
     </div>
-
 </div>
 
+<!-- =========================
+CHART DATA (JSON SCRIPT)
+========================= -->
+{{ present_count|json_script:"present-count" }}
+{{ absent_count|json_script:"absent-count" }}
+{{ monthly_labels|json_script:"monthly-labels" }}
+{{ monthly_values|json_script:"monthly-values" }}
 
 <!-- =========================
-CHART JS CDN
+CHART JS SCRIPT
 ========================= -->
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-
-<!-- =========================
-DOUGHNUT CHART SCRIPT
-========================= -->
-
 <script>
+    const presentCount = JSON.parse(document.getElementById('present-count').textContent);
+    const absentCount = JSON.parse(document.getElementById('absent-count').textContent);
+    const monthlyLabels = JSON.parse(document.getElementById('monthly-labels').textContent);
+    const monthlyValues = JSON.parse(document.getElementById('monthly-values').textContent);
 
-    const ctx = document.getElementById(
-
-        'attendanceChart'
-
-    );
-
+    // DOUGHNUT CHART
+    const ctx = document.getElementById('attendanceChart');
     new Chart(ctx, {
-
         type: 'doughnut',
-
         data: {
-
-            labels: [
-
-                'Present',
-
-                'Absent'
-
-            ],
-
+            labels: ['Present', 'Absent'],
             datasets: [{
-
                 label: 'Attendance',
-
-                data: [
-
-                    {{ present_count }},
-
-            {{ absent_count }}
-
-                ],
-
-        backgroundColor: [
-
-            '#22c55e',
-
-            '#ef4444'
-
-        ],
-
-        borderColor: [
-
-            '#22c55e',
-
-            '#ef4444'
-
-        ],
-
-        borderWidth: 1
-
-    }]
-
-        },
-
-        options: {
-
-        responsive: true,
-
-        plugins: {
-
-            legend: {
-
-                labels: {
-
-                    color: 'white',
-
-                    font: {
-
-                        size: 14
-
-                    }
-
-                }
-
-            }
-
-        }
-
-    }
-
-    });
-
-</script>
-
-
-<!-- =========================
-BAR GRAPH SCRIPT
-========================= -->
-
-<script>
-
-    const barCtx = document.getElementById(
-
-        'barChart'
-
-    );
-
-    new Chart(barCtx, {
-
-        type: 'bar',
-
-        data: {
-
-            labels: [
-
-                'Present',
-
-                'Absent'
-
-            ],
-
-            datasets: [{
-
-                label: 'Attendance Count',
-
-                data: [
-
-                    {{ present_count }},
-
-            {{ absent_count }}
-
-                ],
-
-        backgroundColor: [
-
-            '#22c55e',
-
-            '#ef4444'
-
-        ],
-
-        borderColor: [
-
-            '#22c55e',
-
-            '#ef4444'
-
-        ],
-
-        borderWidth: 1
-
-    }]
-
-        },
-
-        options: {
-
-        responsive: true,
-
-        scales: {
-
-            y: {
-
-                beginAtZero: true,
-
-                ticks: {
-
-                    color: 'white'
-
-                }
-
-            },
-
-            x: {
-
-                ticks: {
-
-                    color: 'white'
-
-                }
-
-            }
-
-        },
-
-        plugins: {
-
-            legend: {
-
-                labels: {
-
-                    color: 'white'
-
-                }
-
-            }
-
-        }
-
-    }
-
-    });
-
-</script>
-
-<script>
-
-    const monthlyCtx = document.getElementById(
-
-        'monthlyChart'
-
-    );
-
-    new Chart(monthlyCtx, {
-
-        type: 'line',
-
-        data: {
-
-            labels: [
-
-                {% for label in monthly_labels %}
-
-                    "{{ label }}",
-
-                {% endfor %}
-
-            ],
-
-            datasets: [{
-
-                label: 'Monthly Attendance',
-
-                data: [
-
-                    {% for value in monthly_values %}
-
-                        {{ value }},
-
-                    {% endfor %}
-
-                ],
-
-                borderColor: '#22c55e',
-
-                backgroundColor: '#22c55e',
-
-                tension: 0.4,
-
-                fill: false
-
+                data: [presentCount, absentCount],
+                backgroundColor: ['rgba(0, 255, 136, 0.8)', 'rgba(255, 0, 85, 0.8)'],
+                borderColor: ['#00ff88', '#ff0055'],
+                borderWidth: 2,
+                hoverOffset: 10
             }]
-
         },
-
         options: {
-
             responsive: true,
-
-            scales: {
-
-                y: {
-
-                    beginAtZero: true,
-
-                    ticks: {
-
-                        color: 'white'
-
-                    }
-
-                },
-
-                x: {
-
-                    ticks: {
-
-                        color: 'white'
-
-                    }
-
-                }
-
-            },
-
+            maintainAspectRatio: false,
             plugins: {
-
-                legend: {
-
-                    labels: {
-
-                        color: 'white'
-
-                    }
-
-                }
-
+                legend: { labels: { color: 'white', font: { size: 14 } } }
             }
-
         }
-
     });
 
+    // BAR CHART
+    const barCtx = document.getElementById('barChart');
+    new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Present', 'Absent'],
+            datasets: [{
+                label: 'Attendance Count',
+                data: [presentCount, absentCount],
+                backgroundColor: ['rgba(0, 255, 136, 0.8)', 'rgba(255, 0, 85, 0.8)'],
+                borderColor: ['#00ff88', '#ff0055'],
+                borderWidth: 2,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: 'white' } },
+                x: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: 'white' } }
+            },
+            plugins: { legend: { labels: { color: 'white' } } }
+        }
+    });
+
+    // MONTHLY CHART
+    const monthlyCtx = document.getElementById('monthlyChart');
+    new Chart(monthlyCtx, {
+        type: 'line',
+        data: {
+            labels: monthlyLabels,
+            datasets: [{
+                label: 'Monthly Attendance',
+                data: monthlyValues,
+                borderColor: '#00f3ff',
+                backgroundColor: 'rgba(0, 243, 255, 0.1)',
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: 'white',
+                pointBorderColor: '#00f3ff',
+                pointRadius: 5,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: 'white' } },
+                x: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: 'white' } }
+            },
+            plugins: { legend: { labels: { color: 'white' } } }
+        }
+    });
 </script>
 
 {% endblock %}

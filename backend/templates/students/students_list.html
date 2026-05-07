@@ -2,144 +2,94 @@
 
 {% block content %}
 
-<h1>Students List</h1>
+<h1><i class="fas fa-users"></i> Students List</h1>
 
 <!-- SEARCH -->
-
-<div class="card">
-
-    <form method="GET" class="search-box">
-
-        <input type="text" name="search" placeholder="Search Student...">
-
-        <button type="submit">
-
-            Search
-
-        </button>
-
-    </form>
-
-</div>
-
+<form method="GET" class="search-box">
+    <div style="position: relative; flex: 1; display: flex; align-items: center;">
+        <i class="fas fa-search" style="position: absolute; left: 15px; color: var(--text-secondary);"></i>
+        <input type="text" name="search" placeholder="Search Student..." style="padding-left: 45px; width: 100%; border-color: rgba(255,255,255,0.1);">
+    </div>
+    <button type="submit" class="btn"><i class="fas fa-search"></i> Search</button>
+</form>
 
 <!-- TABLE -->
-
-<div class="card">
-
+<div class="table-container">
     <table>
-
         <tr>
-
             <th>Name</th>
-
             <th>Course</th>
-
             <th>Age</th>
-
             <th>Attendance %</th>
-
             <th>Status</th>
-
             <th>Actions</th>
-
         </tr>
-
+        
         {% for student in students %}
-
         <tr>
-
             <!-- STUDENT NAME -->
-
-            <td>
-
+            <td style="font-weight: 500;">
                 <a href="/student/{{ student.id }}/">
-
-                    {{ student.name }}
-
+                    <i class="fas fa-user-circle" style="margin-right: 8px;"></i>{{ student.name }}
                 </a>
-
             </td>
-
 
             <!-- COURSE -->
-
-            <td>
-
-                {{ student.course }}
-
-            </td>
-
+            <td>{{ student.course }}</td>
 
             <!-- AGE -->
-
-            <td>
-
-                {{ student.age }}
-
-            </td>
-
+            <td>{{ student.age }}</td>
 
             <!-- ATTENDANCE PERCENTAGE -->
-
             <td>
-
-                {{ student.attendance_percentage }}%
-
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span>{{ student.attendance_percentage }}%</span>
+                    <div style="flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; min-width: 60px;">
+                        <div class="attendance-bar-fill" data-percentage="{{ student.attendance_percentage }}" data-status="{{ student.attendance_alert }}" style="height: 100%;"></div>
+                    </div>
+                </div>
             </td>
-
 
             <!-- ATTENDANCE STATUS -->
-
             <td>
-
                 {% if student.attendance_alert == "Low Attendance" %}
-
-                <span style="color:red; font-weight:bold;">
-
-                    ⚠ Low Attendance
-
+                <span class="badge badge-absent">
+                    <i class="fas fa-exclamation-triangle"></i> Low
                 </span>
-
                 {% else %}
-
-                <span style="color:lightgreen; font-weight:bold;">
-
-                    ✓ Good
-
+                <span class="badge badge-present">
+                    <i class="fas fa-check-circle"></i> Good
                 </span>
-
                 {% endif %}
-
             </td>
-
 
             <!-- ACTIONS -->
-
             <td>
-
-                <a href="/update-student/{{ student.id }}/">
-
-                    Update
-
-                </a>
-
-                |
-
-                <a href="/delete-student/{{ student.id }}/">
-
-                    Delete
-
-                </a>
-
+                <div style="display: flex; gap: 10px;">
+                    <a href="/update-student/{{ student.id }}/" style="color: var(--text-secondary); background: rgba(255,255,255,0.05); padding: 6px 10px; border-radius: 6px; font-size: 13px;" title="Update">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="/delete-student/{{ student.id }}/" style="color: var(--danger); background: rgba(255,0,85,0.1); padding: 6px 10px; border-radius: 6px; font-size: 13px;" title="Delete">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                </div>
             </td>
-
         </tr>
-
         {% endfor %}
-
     </table>
-
 </div>
+
+<script>
+    document.querySelectorAll('.attendance-bar-fill').forEach(bar => {
+        const pct = bar.getAttribute('data-percentage');
+        const status = bar.getAttribute('data-status');
+        bar.style.width = pct + '%';
+        if (status === 'Low Attendance') {
+            bar.style.backgroundColor = 'var(--danger)';
+        } else {
+            bar.style.backgroundColor = 'var(--success)';
+        }
+    });
+</script>
 
 {% endblock %}

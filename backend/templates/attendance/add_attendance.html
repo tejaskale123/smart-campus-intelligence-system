@@ -2,59 +2,50 @@
 
 {% block content %}
 
-<h1>Add Attendance</h1>
+<div style="display: flex; justify-content: center; align-items: flex-start; min-height: 80vh; padding-top: 20px;">
+    
+    <div class="card" style="width: 100%; max-width: 550px; padding: 40px; border-top: 4px solid var(--neon-blue);">
 
-<div class="card">
+        <div style="margin-bottom: 30px;">
+            <h2 style="font-size: 24px; margin-bottom: 8px; color: var(--text-primary);">
+                <i class="fas fa-calendar-plus" style="color: var(--neon-blue); margin-right: 10px;"></i> Record Attendance
+            </h2>
+            <p style="color: var(--text-secondary); font-size: 14px;">Log daily attendance status for students.</p>
+        </div>
 
-    <form method="POST">
+        <form method="POST">
+            {% csrf_token %}
 
-        {% csrf_token %}
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label><i class="fas fa-user" style="color: var(--neon-blue); margin-right: 5px;"></i> Student Name</label>
+                <input type="text" name="student_name" required placeholder="Enter student name" style="padding-left: 15px;">
+            </div>
 
-        <label>Student Name</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                <div class="form-group">
+                    <label><i class="far fa-calendar-alt" style="color: var(--neon-blue); margin-right: 5px;"></i> Date</label>
+                    <input type="date" name="attendance_date" required style="padding-left: 15px; color: var(--text-primary);">
+                </div>
 
-        <br><br>
+                <div class="form-group">
+                    <label><i class="fas fa-clipboard-check" style="color: var(--neon-blue); margin-right: 5px;"></i> Status</label>
+                    <div style="position: relative;">
+                        <select name="status" required style="appearance: none; -webkit-appearance: none; background-color: rgba(15, 23, 42, 0.5); padding-left: 15px; color: var(--text-primary); border-color: rgba(255,255,255,0.1);">
+                            <option value="Present" style="background-color: #0f172a;">Present</option>
+                            <option value="Absent" style="background-color: #0f172a;">Absent</option>
+                        </select>
+                        <i class="fas fa-chevron-down" style="position: absolute; right: 15px; top: 16px; color: var(--text-secondary); pointer-events: none;"></i>
+                    </div>
+                </div>
+            </div>
 
-        <input type="text" name="student_name" required>
+            <button type="submit" class="btn" style="width: 100%; font-size: 15px; padding: 15px;">
+                <i class="fas fa-save" style="margin-right: 8px;"></i> Save Record
+            </button>
 
-        <br><br>
+        </form>
 
-        <label>Date</label>
-
-        <br><br>
-
-        <input type="date" name="attendance_date" required>
-
-        <br><br>
-
-        <label>Status</label>
-
-        <br><br>
-
-        <select name="status">
-
-            <option value="Present">
-
-                Present
-
-            </option>
-
-            <option value="Absent">
-
-                Absent
-
-            </option>
-
-        </select>
-
-        <br><br>
-
-        <button type="submit">
-
-            Save Attendance
-
-        </button>
-
-    </form>
+    </div>
 
 </div>
 

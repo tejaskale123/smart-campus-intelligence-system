@@ -2,7 +2,6 @@ from django.urls import path
 
 from .views import (
 
-    home,
     login_page,
     dashboard,
 
@@ -27,13 +26,13 @@ from .views import (
 urlpatterns = [
 
     # ==========================
-    # HOME
+    # LOGIN (ROOT)
     # ==========================
 
     path(
         '',
-        home,
-        name='home'
+        login_page,
+        name='login'
     ),
 
 

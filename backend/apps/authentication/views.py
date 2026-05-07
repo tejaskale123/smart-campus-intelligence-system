@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+
+from django.conf import settings
 from bson import ObjectId
 from .decorators import admin_only
 
@@ -273,6 +276,8 @@ def add_student(request):
 
             "age": request.POST.get("age"),
 
+            "email": request.POST.get("email"),
+
             "profile_image": profile_image.name if profile_image else ""
 
         }
@@ -377,7 +382,31 @@ def students_list(request):
 
     if percentage < 75:
 
-            student['attendance_alert'] = "Low Attendance"
+        student['attendance_alert'] = "Low Attendance"
+
+        # SEND EMAIL ALERT
+
+        send_mail(
+
+            'Low Attendance Warning',
+
+            f'''
+
+            Hello {student_name},
+
+            Your attendance is below 75%.
+
+            Please improve your attendance.
+
+            ''',
+
+            settings.EMAIL_HOST_USER,
+
+            [student['email']],
+
+            fail_silently=True
+
+        )
 
     else:
 
@@ -406,11 +435,7 @@ def students_list(request):
 
 def update_student(request, student_id):
 
-    student = get_student(student_id){
-
-        "_id": ObjectId(student_id)
-
-    })
+    student = get_student(student_id)
 
     if request.method == "POST":
 

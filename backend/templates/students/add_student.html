@@ -2,54 +2,56 @@
 
 {% block content %}
 
-<h1>Add Student</h1>
+<div style="display: flex; justify-content: center; align-items: flex-start; min-height: 80vh; padding-top: 20px;">
+    
+    <div class="card" style="width: 100%; max-width: 650px; padding: 40px; border-top: 4px solid var(--neon-blue);">
 
-<div class="card">
+        <div style="margin-bottom: 30px;">
+            <h2 style="font-size: 24px; margin-bottom: 8px; color: var(--text-primary);">
+                <i class="fas fa-user-plus" style="color: var(--neon-blue); margin-right: 10px;"></i> Add New Student
+            </h2>
+            <p style="color: var(--text-secondary); font-size: 14px;">Enter the student's details to register them in the ERP system.</p>
+        </div>
 
-    <form method="POST" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
 
-        {% csrf_token %}
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label><i class="fas fa-user" style="color: var(--neon-blue); margin-right: 5px;"></i> Student Name</label>
+                <input type="text" name="name" required placeholder="Enter full name" style="padding-left: 15px;">
+            </div>
 
-        <label>Student Name</label>
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label><i class="fas fa-book" style="color: var(--neon-blue); margin-right: 5px;"></i> Course</label>
+                <input type="text" name="course" required placeholder="Enter enrolled course" style="padding-left: 15px;">
+            </div>
 
-        <br><br>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-alt" style="color: var(--neon-blue); margin-right: 5px;"></i> Age</label>
+                    <input type="number" name="age" required placeholder="Enter age" style="padding-left: 15px;">
+                </div>
 
-        <input type="text" name="name" required>
+                <div class="form-group">
+                    <label><i class="fas fa-envelope" style="color: var(--neon-blue); margin-right: 5px;"></i> Email Address</label>
+                    <input type="email" name="email" required placeholder="Enter email" style="padding-left: 15px;">
+                </div>
+            </div>
 
-        <br><br>
+            <div class="form-group" style="margin-bottom: 30px;">
+                <label><i class="fas fa-image" style="color: var(--neon-blue); margin-right: 5px;"></i> Profile Image</label>
+                <div style="background: rgba(15, 23, 42, 0.5); border: 1px dashed rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; transition: var(--transition);">
+                    <input type="file" name="profile_image" accept="image/*" style="background: transparent; border: none; padding: 0; box-shadow: none; width: 100%; color: var(--text-secondary);">
+                </div>
+            </div>
 
-        <label>Course</label>
+            <button type="submit" class="btn" style="width: 100%; font-size: 15px; padding: 15px;">
+                <i class="fas fa-save" style="margin-right: 8px;"></i> Register Student
+            </button>
 
-        <br><br>
+        </form>
 
-        <input type="text" name="course" required>
-
-        <br><br>
-
-        <label>Age</label>
-
-        <br><br>
-
-        <input type="number" name="age" required>
-
-        <br><br>
-
-        <label>Profile Image</label>
-
-        <br><br>
-
-        <input type="file" name="profile_image">
-
-        <br><br>
-
-        <button type="submit">
-
-            Add Student
-
-        </button>
-
-    </form>
-
+    </div>
 </div>
 
 {% endblock %}

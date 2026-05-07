@@ -2,84 +2,59 @@
 
 {% block content %}
 
-<h1>Attendance List</h1>
-
-<!-- SEARCH -->
-
-<div class="card">
-
-    <form method="GET" class="search-box">
-
-        <input type="text" name="search" placeholder="Search Student...">
-
-        <button type="submit">
-
-            Search
-
-        </button>
-
-    </form>
-
+<div style="margin-bottom: 30px;">
+    <h1 style="font-size: 26px; margin-bottom: 5px; color: var(--text-primary); border-bottom: none;">
+        <i class="fas fa-list-alt" style="color: var(--neon-blue); margin-right: 10px;"></i> Attendance Records
+    </h1>
+    <p style="color: var(--text-secondary); font-size: 14px;">View and search through all student attendance logs.</p>
 </div>
-
 
 <!-- COUNTS -->
-
 <div class="stats-grid">
-
     <div class="stats-card">
-
-        <h2>Present</h2>
-
-        <p>{{ present_count }}</p>
-
+        <h2><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> Total Present</h2>
+        <p style="color: var(--success);">{{ present_count }}</p>
     </div>
-
     <div class="stats-card">
-
-        <h2>Absent</h2>
-
-        <p>{{ absent_count }}</p>
-
+        <h2><i class="fas fa-times-circle" style="color: var(--danger); margin-right: 8px;"></i> Total Absent</h2>
+        <p style="color: var(--danger);">{{ absent_count }}</p>
     </div>
-
 </div>
 
-<br>
-
+<!-- SEARCH -->
+<form method="GET" class="search-box" style="margin-bottom: 30px;">
+    <div style="position: relative; flex: 1; display: flex; align-items: center;">
+        <i class="fas fa-search" style="position: absolute; left: 15px; color: var(--text-secondary);"></i>
+        <input type="text" name="search" placeholder="Search by Student Name..." style="padding-left: 45px; width: 100%; border-color: rgba(255,255,255,0.1);">
+    </div>
+    <button type="submit" class="btn"><i class="fas fa-search" style="margin-right: 8px;"></i> Search</button>
+</form>
 
 <!-- TABLE -->
-
-<div class="card">
-
+<div class="table-container">
     <table>
-
         <tr>
-
             <th>Student Name</th>
-
             <th>Date</th>
-
             <th>Status</th>
-
         </tr>
-
         {% for attendance in attendance_records %}
-
         <tr>
-
-            <td>{{ attendance.student_name }}</td>
-
-            <td>{{ attendance.attendance_date }}</td>
-
-            <td>{{ attendance.status }}</td>
-
+            <td style="font-weight: 500;">
+                <i class="fas fa-user-circle" style="margin-right: 8px; color: var(--neon-blue);"></i>
+                {{ attendance.student_name }}
+            </td>
+            <td><i class="far fa-calendar-alt" style="margin-right: 8px; color: var(--text-secondary);"></i> {{ attendance.attendance_date }}</td>
+            <td>
+                {% if attendance.status == 'Present' %}
+                <span class="badge badge-present"><i class="fas fa-check-circle" style="margin-right: 4px;"></i> Present</span>
+                {% else %}
+                <span class="badge badge-absent"><i class="fas fa-times-circle" style="margin-right: 4px;"></i> Absent</span>
+                {% endif %}
+            </td>
         </tr>
-
         {% endfor %}
-
     </table>
-
 </div>
 
 {% endblock %}
