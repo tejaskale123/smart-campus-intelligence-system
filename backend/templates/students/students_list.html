@@ -1,0 +1,145 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+<h1>Students List</h1>
+
+<!-- SEARCH -->
+
+<div class="card">
+
+    <form method="GET" class="search-box">
+
+        <input type="text" name="search" placeholder="Search Student...">
+
+        <button type="submit">
+
+            Search
+
+        </button>
+
+    </form>
+
+</div>
+
+
+<!-- TABLE -->
+
+<div class="card">
+
+    <table>
+
+        <tr>
+
+            <th>Name</th>
+
+            <th>Course</th>
+
+            <th>Age</th>
+
+            <th>Attendance %</th>
+
+            <th>Status</th>
+
+            <th>Actions</th>
+
+        </tr>
+
+        {% for student in students %}
+
+        <tr>
+
+            <!-- STUDENT NAME -->
+
+            <td>
+
+                <a href="/student/{{ student.id }}/">
+
+                    {{ student.name }}
+
+                </a>
+
+            </td>
+
+
+            <!-- COURSE -->
+
+            <td>
+
+                {{ student.course }}
+
+            </td>
+
+
+            <!-- AGE -->
+
+            <td>
+
+                {{ student.age }}
+
+            </td>
+
+
+            <!-- ATTENDANCE PERCENTAGE -->
+
+            <td>
+
+                {{ student.attendance_percentage }}%
+
+            </td>
+
+
+            <!-- ATTENDANCE STATUS -->
+
+            <td>
+
+                {% if student.attendance_alert == "Low Attendance" %}
+
+                <span style="color:red; font-weight:bold;">
+
+                    ⚠ Low Attendance
+
+                </span>
+
+                {% else %}
+
+                <span style="color:lightgreen; font-weight:bold;">
+
+                    ✓ Good
+
+                </span>
+
+                {% endif %}
+
+            </td>
+
+
+            <!-- ACTIONS -->
+
+            <td>
+
+                <a href="/update-student/{{ student.id }}/">
+
+                    Update
+
+                </a>
+
+                |
+
+                <a href="/delete-student/{{ student.id }}/">
+
+                    Delete
+
+                </a>
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+<h1>Add Attendance</h1>
+
+<div class="card">
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <label>Student Name</label>
+
+        <br><br>
+
+        <input type="text" name="student_name" required>
+
+        <br><br>
+
+        <label>Date</label>
+
+        <br><br>
+
+        <input type="date" name="attendance_date" required>
+
+        <br><br>
+
+        <label>Status</label>
+
+        <br><br>
+
+        <select name="status">
+
+            <option value="Present">
+
+                Present
+
+            </option>
+
+            <option value="Absent">
+
+                Absent
+
+            </option>
+
+        </select>
+
+        <br><br>
+
+        <button type="submit">
+
+            Save Attendance
+
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

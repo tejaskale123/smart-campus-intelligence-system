@@ -1,0 +1,66 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+<h1>Student Detail</h1>
+
+<div class="card">
+    <img src="/media/{{ student.profile_image }}" width="200" style="border-radius: 10px;">
+
+    <h2>{{ student.name }}</h2>
+    <p>Course: {{ student.course }}</p>
+
+    <p>Age: {{ student.age }}</p>
+
+    <p>
+
+        Attendance Percentage:
+
+        {{ attendance_percentage }}%
+
+    </p>
+
+</div>
+
+
+<!-- ATTENDANCE HISTORY -->
+
+<div class="card">
+
+    <h2>Attendance History</h2>
+
+    <table>
+
+        <tr>
+
+            <th>Date</th>
+
+            <th>Status</th>
+
+        </tr>
+
+        {% for attendance in attendance_records %}
+
+        <tr>
+
+            <td>
+
+                {{ attendance.attendance_date }}
+
+            </td>
+
+            <td>
+
+                {{ attendance.status }}
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+</div>
+
+{% endblock %}

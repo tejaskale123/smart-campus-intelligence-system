@@ -1,0 +1,85 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+<h1>Attendance List</h1>
+
+<!-- SEARCH -->
+
+<div class="card">
+
+    <form method="GET" class="search-box">
+
+        <input type="text" name="search" placeholder="Search Student...">
+
+        <button type="submit">
+
+            Search
+
+        </button>
+
+    </form>
+
+</div>
+
+
+<!-- COUNTS -->
+
+<div class="stats-grid">
+
+    <div class="stats-card">
+
+        <h2>Present</h2>
+
+        <p>{{ present_count }}</p>
+
+    </div>
+
+    <div class="stats-card">
+
+        <h2>Absent</h2>
+
+        <p>{{ absent_count }}</p>
+
+    </div>
+
+</div>
+
+<br>
+
+
+<!-- TABLE -->
+
+<div class="card">
+
+    <table>
+
+        <tr>
+
+            <th>Student Name</th>
+
+            <th>Date</th>
+
+            <th>Status</th>
+
+        </tr>
+
+        {% for attendance in attendance_records %}
+
+        <tr>
+
+            <td>{{ attendance.student_name }}</td>
+
+            <td>{{ attendance.attendance_date }}</td>
+
+            <td>{{ attendance.status }}</td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+</div>
+
+{% endblock %}
