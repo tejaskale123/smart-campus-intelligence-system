@@ -573,11 +573,7 @@ def attendance_list(request):
 @login_required
 def student_detail(request, student_id):
 
-    student = db["students"].find_one({
-
-        "_id": ObjectId(student_id)
-
-    })
+    student = get_student(student_id)
 
     student['id'] = str(student['_id'])
 
