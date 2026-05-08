@@ -1,41 +1,27 @@
 # Smart Campus Intelligence System
 
-A Django-based campus management project for role-based dashboards, student management, attendance tracking, analytics summaries, and low-attendance notifications.
+A Django-based campus management system with role-based dashboards for admins, teachers, and students. The project includes student management, teacher management, attendance marking, attendance records, analytics pages, reports, and responsive dashboard UI.
 
-## Project Overview
+## Features
 
-Smart Campus Intelligence System helps campus users manage students and attendance through separate dashboards for admins, teachers, and students.
-
-- Admins can manage students, view dashboards, access reports, analytics, and settings pages.
-- Teachers can view students, add attendance, and review attendance records.
-- Students can view their own dashboard, attendance history, performance, and profile.
-- Attendance and student data are stored in MongoDB.
-- Django authentication and user roles are stored in SQLite.
+- Role-based login for admin, teacher, and student users
+- Admin dashboard with student, teacher, attendance, analytics, reports, and settings links
+- Teacher dashboard with student list and attendance tools
+- Student dashboard with attendance, performance, and profile pages
+- Teacher management: add, edit, delete, and list teachers
+- Student management backed by MongoDB student records
+- Attendance system backed by Django SQLite models
+- Professional attendance add/list pages with Present/Absent badges
+- Responsive sidebar layout and dashboard styling
 
 ## Tech Stack
 
 - Python
 - Django 5.2
-- SQLite for Django auth and user profile data
-- MongoDB with PyMongo for students and attendance records
+- SQLite for Django users, roles, sessions, and attendance records
+- MongoDB with PyMongo for student records used by the student management module
 - HTML, CSS, JavaScript
 - Font Awesome icons
-- Chart-ready dashboard scripts
-
-## Main Features
-
-- Login, logout, and registration
-- Role-based access control
-- Admin dashboard
-- Teacher dashboard
-- Student dashboard
-- Student add, update, delete, list, search, and detail views
-- Attendance add and attendance list views
-- Student-specific attendance filtering
-- Weekly and monthly attendance summaries
-- Low attendance alert below 75%
-- Email warning support for low attendance
-- Responsive sidebar layout
 
 ## Project Structure
 
@@ -44,24 +30,24 @@ smart-campus-intelligence-system/
 |-- backend/
 |   |-- apps/
 |   |   |-- authentication/
-|   |   |-- students/
 |   |   |-- attendance/
+|   |   |-- students/
+|   |   |-- teachers/
 |   |   |-- analytics/
 |   |   |-- canteen/
 |   |   |-- devices/
 |   |   |-- library/
 |   |   |-- notifications/
 |   |   |-- realtime/
-|   |   |-- security/
-|   |   `-- teachers/
+|   |   `-- security/
 |   |-- config/
 |   |   |-- settings.py
 |   |   `-- urls.py
 |   |-- database/
 |   |   `-- mongo.py
-|   |-- media/
 |   |-- static/
 |   |-- templates/
+|   |-- media/
 |   |-- db.sqlite3
 |   |-- manage.py
 |   `-- requirements.txt
@@ -70,155 +56,126 @@ smart-campus-intelligence-system/
 `-- README.md
 ```
 
-## Prerequisites
+## Setup
 
-Install these before running the project:
-
-- Python 3.11 or newer
-- MongoDB Community Server
-- Git
-- C++ build tools may be required for `dlib` and `face-recognition`
-
-## Setup Instructions
-
-### 1. Clone the Project
-
-```bash
-git clone <your-repository-url>
-cd smart-campus-intelligence-system
-```
-
-### 2. Create and Activate Virtual Environment
-
-Windows PowerShell:
+### 1. Go to Backend
 
 ```powershell
 cd backend
+```
+
+### 2. Create and Activate Environment
+
+```powershell
 python -m venv venv
 .\venv\Scripts\Activate.ps1
 ```
 
-Command Prompt:
+If you are using the existing conda environment on this machine:
 
-```cmd
-cd backend
-python -m venv venv
-venv\Scripts\activate
-```
-
-Linux or macOS:
-
-```bash
-cd backend
-python3 -m venv venv
-source venv/bin/activate
+```powershell
+C:\Users\admin\miniconda3\envs\campus_env\python.exe manage.py runserver
 ```
 
 ### 3. Install Dependencies
 
-```bash
+```powershell
 pip install -r requirements.txt
 ```
 
-If `dlib` or `face-recognition` fails to install, install the required C++ build tools first, then run the command again.
+### 4. Run Migrations
 
-### 4. Start MongoDB
-
-Make sure MongoDB is running locally on:
-
-```text
-mongodb://localhost:27017/
-```
-
-The project uses this database:
-
-```text
-smart_campus_db
-```
-
-MongoDB collections used:
-
-```text
-students
-attendance_logs
-```
-
-### 5. Run Django Migrations
-
-```bash
+```powershell
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-### 6. Create Admin User
+### 5. Start Server
 
-```bash
-python manage.py createsuperuser
-```
-
-Superusers automatically get the `admin` role through `UserProfile`.
-
-### 7. Run Development Server
-
-```bash
+```powershell
 python manage.py runserver
 ```
 
-Open the project in your browser:
+Open:
 
 ```text
 http://127.0.0.1:8000/
 ```
 
-## User Roles
+## Sample Users
 
-### Admin
+These users are useful for local testing if present in `db.sqlite3`:
 
-Default access after creating a superuser.
+| Role | Username | Password |
+| --- | --- | --- |
+| Teacher | `teacher1` | `teacher123` |
+| Student | `student1` | `student123` |
+| Student | `student2` | `student123` |
+| Student | `student3` | `student123` |
 
-Admin can access:
+To create or repair the sample teacher/student users:
 
-- `/admin-dashboard/`
-- `/add-student/`
-- `/students-list/`
-- `/teachers/`
-- `/analytics/`
-- `/reports/`
-- `/settings/`
-
-### Teacher
-
-Teacher users can access:
-
-- `/teacher-dashboard/`
-- `/add-attendance/`
-- `/attendance-list/`
-- `/students-list/`
-
-To make a user a teacher, update the user role in Django admin or shell:
-
-```bash
+```powershell
 python manage.py shell
 ```
 
 ```python
 from django.contrib.auth.models import User
-user = User.objects.get(username="teacher_username")
-user.userprofile.role = "teacher"
-user.userprofile.save()
+
+users = [
+    ("teacher1", "teacher123", "teacher1@gmail.com", "teacher"),
+    ("student1", "student123", "student1@gmail.com", "student"),
+    ("student2", "student123", "student2@gmail.com", "student"),
+    ("student3", "student123", "student3@gmail.com", "student"),
+]
+
+for username, password, email, role in users:
+    user, _ = User.objects.get_or_create(username=username, defaults={"email": email})
+    user.email = email
+    user.set_password(password)
+    user.save()
+    user.userprofile.role = role
+    user.userprofile.save()
 ```
 
-### Student
+## Attendance Flow
 
-New registered users are assigned the `student` role by default.
+1. Login as teacher:
 
-Student users can access:
+```text
+teacher1 / teacher123
+```
 
-- `/student-dashboard/`
-- `/student-profile/`
-- `/attendance-list/`
+2. Open Add Attendance:
 
-For a student dashboard to show personal data, the Django username or email should match the MongoDB student record name or email.
+```text
+http://127.0.0.1:8000/add-attendance/
+```
+
+3. Select a student from the dropdown:
+
+```text
+student1 - student1@gmail.com
+student2 - student2@gmail.com
+student3 - student3@gmail.com
+```
+
+4. Select status:
+
+```text
+Present
+Absent
+```
+
+5. Save attendance.
+
+6. Open attendance records:
+
+```text
+http://127.0.0.1:8000/attendance-list/
+```
+
+The attendance record is saved in the Django SQLite database using `apps.attendance.models.Attendance`.
 
 ## Important Routes
 
@@ -226,41 +183,28 @@ For a student dashboard to show personal data, the Django username or email shou
 | --- | --- |
 | `/` | Login page |
 | `/login/` | Login page |
-| `/register/` | Register page |
 | `/logout/` | Logout |
-| `/dashboard/` | Redirects user to role dashboard |
+| `/register/` | Register |
+| `/dashboard/` | Role-based dashboard redirect |
 | `/admin-dashboard/` | Admin dashboard |
 | `/teacher-dashboard/` | Teacher dashboard |
 | `/student-dashboard/` | Student dashboard |
+| `/students/` | Student list |
 | `/add-student/` | Add student |
-| `/students-list/` | Student list |
-| `/student/<student_id>/` | Student detail |
+| `/teachers/` | Teacher list |
+| `/add-teacher/` | Add teacher |
 | `/add-attendance/` | Add attendance |
 | `/attendance-list/` | Attendance records |
+| `/analytics/` | Analytics |
+| `/reports/` | Reports |
+| `/settings/` | Settings |
 
-## Email Configuration
+## Databases
 
-Low-attendance warning emails use Gmail SMTP settings from:
+The project currently uses both SQLite and MongoDB:
 
-```text
-backend/config/settings.py
-```
-
-Update these values before using email alerts:
-
-```python
-EMAIL_HOST_USER = "yourgmail@gmail.com"
-EMAIL_HOST_PASSWORD = "your_app_password"
-```
-
-Use a Gmail app password instead of your normal Gmail password.
-
-## Database Notes
-
-This project uses two databases:
-
-- SQLite: Django users, sessions, admin, and `UserProfile`
-- MongoDB: students and attendance logs
+- SQLite stores Django auth users, `UserProfile`, sessions, teachers, and attendance records.
+- MongoDB stores student-management records used by the students module.
 
 MongoDB connection file:
 
@@ -268,71 +212,78 @@ MongoDB connection file:
 backend/database/mongo.py
 ```
 
-Current connection:
-
-```python
-client = MongoClient("mongodb://localhost:27017/")
-db = client["smart_campus_db"]
-```
-
-## Static and Media Files
-
-Static files:
+Default MongoDB URL:
 
 ```text
-backend/static/
+mongodb://localhost:27017/
 ```
-
-Templates:
-
-```text
-backend/templates/
-```
-
-Uploaded media files:
-
-```text
-backend/media/
-```
-
-During development, media files are served automatically when `DEBUG=True`.
 
 ## Common Commands
 
-```bash
-python manage.py runserver
+```powershell
+python manage.py check
 python manage.py makemigrations
 python manage.py migrate
 python manage.py createsuperuser
-python manage.py collectstatic
+python manage.py runserver
+```
+
+Using the existing `campus_env`:
+
+```powershell
+C:\Users\admin\miniconda3\envs\campus_env\python.exe manage.py check
+C:\Users\admin\miniconda3\envs\campus_env\python.exe manage.py migrate
+C:\Users\admin\miniconda3\envs\campus_env\python.exe manage.py runserver
 ```
 
 ## Troubleshooting
 
-### MongoDB Connection Error
+### Student Dropdown Is Empty
 
-Check that MongoDB is installed and running on `localhost:27017`.
+Create users with `userprofile.role = "student"`:
 
-### Student Dashboard Shows No Profile
+```python
+from django.contrib.auth.models import User
 
-Make sure the logged-in user's username or email matches the student's `name` or `email` in MongoDB.
+user = User.objects.create_user(
+    username="student1",
+    password="student123",
+    email="student1@gmail.com",
+)
+user.userprofile.role = "student"
+user.userprofile.save()
+```
 
-### Low Attendance Email Not Sending
+### Attendance Is Not Showing
 
-Check Gmail SMTP settings and use an app password.
+Check that records exist:
 
-### Dependency Installation Fails
+```powershell
+python manage.py shell
+```
 
-If `dlib` or `face-recognition` fails, install Visual Studio Build Tools on Windows or required compiler packages on Linux/macOS.
+```python
+from apps.attendance.models import Attendance
+Attendance.objects.count()
+```
 
-## Development Notes
+### MongoDB Error
 
-- Keep secrets such as `SECRET_KEY` and email passwords out of production code.
-- Set `DEBUG=False` before deployment.
-- Configure `ALLOWED_HOSTS` before deployment.
+Make sure MongoDB is running locally before using MongoDB-backed student features.
+
+### Login Redirects Unexpectedly
+
+Check the user's role:
+
+```python
+from django.contrib.auth.models import User
+user = User.objects.get(username="teacher1")
+user.userprofile.role
+```
+
+## Notes
+
+- Keep `SECRET_KEY`, email passwords, and other secrets out of production code.
 - Use environment variables for production settings.
-- Do not commit local database files, media uploads, virtual environments, or cache files in production repositories.
-
-## Project Status
-
-The current implementation includes the main Django authentication flow, role dashboards, MongoDB-backed student records, and attendance tracking. Some app folders such as library, canteen, realtime, security, devices, notifications, and analytics are present as future modules or placeholders.
+- Set `DEBUG=False` and configure `ALLOWED_HOSTS` before deployment.
+- Do not commit local database files, virtual environments, cache files, or media uploads in production repositories.

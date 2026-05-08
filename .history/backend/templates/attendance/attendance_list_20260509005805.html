@@ -1,0 +1,161 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+<div class="attendance-page">
+
+    <div class="page-header">
+
+        <div>
+
+            <p class="page-tag">
+                ATTENDANCE MANAGEMENT
+            </p>
+
+            <h1>
+                Attendance Records
+            </h1>
+
+            <p class="page-subtitle">
+                Monitor all student attendance activity.
+            </p>
+
+        </div>
+
+        <a href="/add-attendance/" class="add-btn">
+
+            + Add Attendance
+
+        </a>
+
+    </div>
+
+    <div class="attendance-stats">
+
+        <div class="attendance-stat-card">
+
+            <h2>
+                {{ attendance_records|length }}
+            </h2>
+
+            <p>
+                Total Records
+            </p>
+
+        </div>
+
+        <div class="attendance-stat-card">
+
+            <h2>
+                Present
+            </h2>
+
+            <p>
+                Active Attendance
+            </p>
+
+        </div>
+
+        <div class="attendance-stat-card">
+
+            <h2>
+                Live
+            </h2>
+
+            <p>
+                Real Time Data
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="attendance-table-card">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Student
+                    </th>
+
+                    <th>
+                        Date
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for record in attendance_records %}
+
+                <tr>
+
+                    <td>
+
+                        {{ record.student.username }}
+
+                    </td>
+
+                    <td>
+
+                        {{ record.date }}
+
+                    </td>
+
+                    <td>
+
+                        {% if record.status == 'Present' %}
+
+                        <span class="present-badge">
+
+                            Present
+
+                        </span>
+
+                        {% else %}
+
+                        <span class="absent-badge">
+
+                            Absent
+
+                        </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="3" class="empty-row">
+
+                        No attendance records found.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

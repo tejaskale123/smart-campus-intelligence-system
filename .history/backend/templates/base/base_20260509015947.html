@@ -1,0 +1,201 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Campus Intelligence System</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+</head>
+
+<body>
+    <div class="mobile-header">
+        <h2>Smart Campus</h2>
+        <button id="sidebarToggle" class="mobile-toggle" aria-label="Open navigation">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+
+    <aside class="sidebar" id="sidebar">
+        <button id="sidebarClose" class="mobile-close" aria-label="Close navigation">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <h2>Smart Campus</h2>
+
+        <ul class="sidebar-menu">
+            {% if request.user.is_authenticated %}
+                {% with role=request.user.userprofile.role current=request.resolver_match.url_name %}
+                    {% if request.user.userprofile.role == 'admin' %}
+                        <li>
+                            <a class="{% if current == 'admin_dashboard' or current == 'dashboard' %}active{% endif %}" href="{% url 'admin_dashboard' %}">
+                                <i class="fas fa-chart-pie"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="{% if current == 'students_list' or current == 'students_page' or current == 'student_detail' %}active{% endif %}" href="{% url 'students_page' %}">
+                                <i class="fas fa-user-graduate"></i>
+                                <span>Students</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="{% if current == 'admin_teachers' or current == 'add_teacher' %}active{% endif %}" href="{% url 'admin_teachers' %}">
+                                <i class="fas fa-chalkboard-user"></i>
+                                <span>Teachers</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="{% if current == 'attendance_list' or current == 'add_attendance' %}active{% endif %}" href="{% url 'attendance_list' %}">
+                                <i class="fas fa-calendar-check"></i>
+                                <span>Attendance</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="{% if current == 'analytics' %}active{% endif %}" href="{% url 'analytics' %}">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Analytics</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="{% if current == 'reports' %}active{% endif %}" href="{% url 'reports' %}">
+                                <i class="fas fa-file-lines"></i>
+                                <span>Reports</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="{% if current == 'settings' %}active{% endif %}" href="{% url 'settings' %}">
+                                <i class="fas fa-gear"></i>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'logout' %}">
+                                <i class="fas fa-right-from-bracket"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    {% elif role == 'teacher' %}
+                        <li>
+                            <a class="{% if current == 'teacher_dashboard' or current == 'dashboard' %}active{% endif %}" href="{% url 'teacher_dashboard' %}">
+                                <i class="fas fa-chart-pie"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="{% if current == 'add_attendance' %}active{% endif %}" href="{% url 'add_attendance' %}">
+                                <i class="fas fa-calendar-plus"></i>
+                                <span>Add Attendance</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="{% if current == 'attendance_list' %}active{% endif %}" href="{% url 'attendance_list' %}">
+                                <i class="fas fa-list-check"></i>
+                                <span>Attendance List</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="{% if current == 'students_list' or current == 'students_page' or current == 'student_detail' %}active{% endif %}" href="{% url 'students_page' %}">
+                                <i class="fas fa-users"></i>
+                                <span>Students List</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'logout' %}">
+                                <i class="fas fa-right-from-bracket"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    {% elif role == 'student' %}
+                        <li>
+                            <a class="{% if current == 'student_dashboard' or current == 'dashboard' %}active{% endif %}" href="{% url 'student_dashboard' %}">
+                                <i class="fas fa-house-user"></i>
+                                <span>My Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="{% if current == 'my_attendance' %}active{% endif %}" href="{% url 'my_attendance' %}">
+                                <i class="fas fa-calendar-days"></i>
+                                <span>My Attendance</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="{% if current == 'performance' %}active{% endif %}" href="{% url 'performance' %}">
+                                <i class="fas fa-chart-simple"></i>
+                                <span>Performance</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="{% if current == 'my_profile' %}active{% endif %}" href="{% url 'my_profile' %}">
+                                <i class="fas fa-user"></i>
+                                <span>My Profile</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'logout' %}">
+                                <i class="fas fa-right-from-bracket"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endwith %}
+            {% else %}
+                <li>
+                    <a href="{% url 'login' %}">
+                        <i class="fas fa-right-to-bracket"></i>
+                        <span>Login</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'register' %}">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Register</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        {% if messages %}
+            <div class="message-stack">
+                {% for message in messages %}
+                    <div class="system-message {{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarClose = document.getElementById('sidebarClose');
+
+        if (sidebarToggle && sidebarClose && sidebar) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.add('active');
+            });
+
+            sidebarClose.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+            });
+        }
+    </script>
+</body>
+
+</html>

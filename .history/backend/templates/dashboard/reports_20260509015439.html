@@ -1,0 +1,206 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="dashboard-content">
+
+    <div class="page-header">
+
+        <div>
+
+            <p class="page-subtitle">
+
+                REPORTS & ANALYTICS
+
+            </p>
+
+            <h1 class="page-title">
+
+                Attendance Reports
+
+            </h1>
+
+            <div class="title-underline"></div>
+
+            <p class="page-description">
+
+                Monitor attendance reports and analytics.
+
+            </p>
+
+        </div>
+
+        <div class="report-buttons">
+
+            <button class="export-btn">
+
+                Download PDF
+
+            </button>
+
+            <button class="export-btn">
+
+                Export CSV
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="attendance-summary-grid">
+
+        <div class="summary-card">
+
+            <h2>
+
+                {{ total_attendance }}
+
+            </h2>
+
+            <p>
+
+                Total Attendance
+
+            </p>
+
+        </div>
+
+        <div class="summary-card">
+
+            <h2>
+
+                {{ present_count }}
+
+            </h2>
+
+            <p>
+
+                Present
+
+            </p>
+
+        </div>
+
+        <div class="summary-card">
+
+            <h2>
+
+                {{ absent_count }}
+
+            </h2>
+
+            <p>
+
+                Absent
+
+            </p>
+
+        </div>
+
+        <div class="summary-card">
+
+            <h2>
+
+                {{ attendance_percentage }}%
+
+            </h2>
+
+            <p>
+
+                Attendance Rate
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="attendance-table-card">
+
+        <table class="attendance-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Student</th>
+
+                    <th>Email</th>
+
+                    <th>Course</th>
+
+                    <th>Date</th>
+
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for attendance in attendance_records %}
+
+                <tr>
+
+                    <td>
+
+                        {{ attendance.student_name }}
+
+                    </td>
+
+                    <td>
+
+                        {{ attendance.student_email }}
+
+                    </td>
+
+                    <td>
+
+                        {{ attendance.student_course }}
+
+                    </td>
+
+                    <td>
+
+                        {{ attendance.attendance_date }}
+
+                    </td>
+
+                    <td>
+
+                        {% if attendance.status == "Present" %}
+
+                        <span class="present-badge">
+
+                            Present
+
+                        </span>
+
+                        {% else %}
+
+                        <span class="absent-badge">
+
+                            Absent
+
+                        </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

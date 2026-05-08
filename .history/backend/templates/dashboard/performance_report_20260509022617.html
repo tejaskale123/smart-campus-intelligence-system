@@ -1,0 +1,194 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="reports-page">
+
+    <!-- HEADER -->
+
+    <div class="reports-header">
+
+        <div>
+
+            <p class="reports-subtitle">
+
+                PERFORMANCE ANALYTICS
+
+            </p>
+
+            <h1 class="reports-title">
+
+                Performance Report
+
+            </h1>
+
+            <p class="reports-description">
+
+                Student attendance and analytics overview.
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- STATS -->
+
+    <div class="reports-grid">
+
+        <!-- TOTAL -->
+
+        <div class="report-card">
+
+            <div class="report-icon">
+
+                <i class="fa-solid fa-users"></i>
+
+            </div>
+
+            <h2>
+
+                {{ total_students }}
+
+            </h2>
+
+            <p>
+
+                Total Students
+
+            </p>
+
+        </div>
+
+        <!-- PRESENT -->
+
+        <div class="report-card">
+
+            <div class="report-icon">
+
+                <i class="fa-solid fa-user-check"></i>
+
+            </div>
+
+            <h2>
+
+                {{ present_count }}
+
+            </h2>
+
+            <p>
+
+                Present Students
+
+            </p>
+
+        </div>
+
+        <!-- ABSENT -->
+
+        <div class="report-card">
+
+            <div class="report-icon">
+
+                <i class="fa-solid fa-user-xmark"></i>
+
+            </div>
+
+            <h2>
+
+                {{ absent_count }}
+
+            </h2>
+
+            <p>
+
+                Absent Students
+
+            </p>
+
+        </div>
+
+        <!-- PERCENTAGE -->
+
+        <div class="report-card">
+
+            <div class="report-icon">
+
+                <i class="fa-solid fa-chart-pie"></i>
+
+            </div>
+
+            <h2>
+
+                {{ attendance_percentage }}%
+
+            </h2>
+
+            <p>
+
+                Attendance Percentage
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- TABLE -->
+
+    <div class="attendance-table-wrapper">
+
+        <table class="attendance-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Name</th>
+
+                    <th>Course</th>
+
+                    <th>Email</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for student in students %}
+
+                <tr>
+
+                    <td>
+
+                        {{ student.name }}
+
+                    </td>
+
+                    <td>
+
+                        {{ student.course }}
+
+                    </td>
+
+                    <td>
+
+                        {{ student.email }}
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+<div class="dashboard-container">
+
+    <div class="dashboard-header">
+        <div>
+            <p class="dashboard-kicker">Admin Reports</p>
+            <h1 class="dashboard-title">
+                Reports Center
+            </h1>
+            <p class="dashboard-subtitle">
+                Export, review and manage attendance reports.
+            </p>
+        </div>
+    </div>
+
+    <div class="report-grid">
+        <div class="report-card">
+            <div class="report-icon">
+                <i class="fas fa-file-pdf"></i>
+            </div>
+            <h3>Attendance Report</h3>
+            <p>Download a complete attendance summary for review.</p>
+            <a href="#" class="dashboard-btn">
+                <i class="fas fa-download"></i>
+                <span>Download PDF</span>
+            </a>
+        </div>
+
+        <div class="report-card">
+            <div class="report-icon">
+                <i class="fas fa-file-csv"></i>
+            </div>
+            <h3>CSV Export</h3>
+            <p>Export attendance logs for spreadsheet processing.</p>
+            <a href="#" class="dashboard-btn">
+                <i class="fas fa-table"></i>
+                <span>Export CSV</span>
+            </a>
+        </div>
+
+        <div class="report-card">
+            <div class="report-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h3>Performance Report</h3>
+            <p>Generate student performance and attendance analytics.</p>
+            <a href="#" class="dashboard-btn">
+                <i class="fas fa-wand-magic-sparkles"></i>
+                <span>Generate Report</span>
+            </a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="reports-container">
+
+    <!-- HEADER -->
+    <div class="reports-header">
+
+        <div>
+
+            <p class="reports-subtitle">
+                ADMIN REPORTS
+            </p>
+
+            <h1 class="reports-title">
+                Reports Center
+            </h1>
+
+            <p class="reports-description">
+                Export, review and manage attendance reports.
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- REPORT CARDS -->
+    <div class="reports-grid">
+
+        <!-- PDF -->
+        <div class="report-card">
+
+            <div class="report-icon">
+                <i class="fas fa-file-pdf"></i>
+            </div>
+
+            <h2>
+                Attendance Report
+            </h2>
+
+            <p>
+                Download a complete attendance summary for review.
+            </p>
+
+            <a href="{% url 'download_pdf_report' %}" class="report-btn">
+
+                <i class="fas fa-download"></i>
+
+                Download PDF
+
+            </a>
+
+        </div>
+
+        <!-- CSV -->
+        <div class="report-card">
+
+            <div class="report-icon">
+                <i class="fas fa-file-csv"></i>
+            </div>
+
+            <h2>
+                CSV Export
+            </h2>
+
+            <p>
+                Export attendance logs for spreadsheet processing.
+            </p>
+
+            <a href="{% url 'export_csv_report' %}" class="report-btn">
+
+                <i class="fas fa-table"></i>
+
+                Export CSV
+
+            </a>
+
+        </div>
+
+        <!-- ANALYTICS -->
+        <div class="report-card">
+
+            <div class="report-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+
+            <h2>
+                Performance Report
+            </h2>
+
+            <p>
+                Generate student performance and attendance analytics.
+            </p>
+
+            <button class="report-btn">
+
+                <i class="fas fa-wand-magic-sparkles"></i>
+
+                Generate Report
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

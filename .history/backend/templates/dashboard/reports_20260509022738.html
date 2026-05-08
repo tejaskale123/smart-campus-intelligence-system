@@ -1,0 +1,149 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="reports-page">
+
+    <!-- HEADER -->
+
+    <div class="reports-header">
+
+        <div>
+
+            <p class="reports-subtitle">
+
+                ADMIN REPORTS
+
+            </p>
+
+            <h1 class="reports-title">
+
+                Reports Center
+
+            </h1>
+
+            <p class="reports-description">
+
+                Export, review and manage attendance reports.
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- REPORT CARDS -->
+
+    <div class="reports-grid">
+
+        <!-- PDF REPORT -->
+
+        <div class="report-card">
+
+            <div class="report-icon">
+
+                <i class="fa-solid fa-file-pdf"></i>
+
+            </div>
+
+            <h2>
+
+                Attendance Report
+
+            </h2>
+
+            <p>
+
+                Download a complete attendance summary for review.
+
+            </p>
+
+            <a href="{% url 'download_pdf_report' %}" class="report-btn">
+
+                <i class="fa-solid fa-download"></i>
+
+                Download PDF
+
+            </a>
+
+        </div>
+
+        <!-- CSV EXPORT -->
+
+        <div class="report-card">
+
+            <div class="report-icon">
+
+                <i class="fa-solid fa-file-csv"></i>
+
+            </div>
+
+            <h2>
+
+                CSV Export
+
+            </h2>
+
+            <p>
+
+                Export attendance logs for spreadsheet processing.
+
+            </p>
+
+            <a href="{% url 'export_csv_report' %}" class="report-btn">
+
+                <i class="fa-solid fa-table"></i>
+
+                Export CSV
+
+            </a>
+
+        </div>
+
+        <!-- PERFORMANCE REPORT -->
+
+        <div class="report-card">
+
+            <div class="report-icon">
+
+                <i class="fa-solid fa-chart-line"></i>
+
+            </div>
+
+            <h2>
+
+                Performance Report
+
+            </h2>
+
+            <p>
+
+                Generate student performance and attendance analytics.
+
+            </p>
+
+          <a
+           href="{% url 'performance_report' %}"
+        class="report-btn"
+        >
+
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+
+        Generate Report
+
+        </a>
+
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+
+                Generate Report
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

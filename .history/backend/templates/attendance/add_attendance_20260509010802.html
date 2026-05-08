@@ -1,0 +1,108 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+<div class="attendance-form-page">
+
+    <div class="form-header">
+
+        <div>
+
+            <p class="page-tag">
+
+                ATTENDANCE MANAGEMENT
+
+            </p>
+
+            <h1>
+
+                Add Attendance
+
+            </h1>
+
+            <p class="page-subtitle">
+
+                Mark student attendance records.
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="attendance-form-card">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="form-group">
+
+                <label>
+
+                    Select Student
+
+                </label>
+
+                <select name="student" required>
+
+                    <option value="">
+
+                        Select Student
+
+                    </option>
+
+                    {% for student in students %}
+
+                    <option value="{{ student.id }}">
+
+                        {{ student.username }} -
+                        {{ student.email }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+
+                    Attendance Status
+
+                </label>
+
+                <select name="status">
+
+                    <option value="Present">
+
+                        Present
+
+                    </option>
+
+                    <option value="Absent">
+
+                        Absent
+
+                    </option>
+
+                </select>
+
+            </div>
+
+            <button type="submit" class="save-btn">
+
+                Save Attendance
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
