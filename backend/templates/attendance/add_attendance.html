@@ -2,48 +2,107 @@
 
 {% block content %}
 
-<section class="form-shell">
-    <div class="dashboard-card form-card">
-        <div class="section-title">
-            <div>
-                <h1>Record Attendance</h1>
-                <span>Select an existing student from MongoDB before saving.</span>
-            </div>
+<div class="attendance-form-page">
+
+    <div class="form-header">
+
+        <div>
+
+            <p class="page-tag">
+
+                ATTENDANCE MANAGEMENT
+
+            </p>
+
+            <h1>
+
+                Add Attendance
+
+            </h1>
+
+            <p class="page-subtitle">
+
+                Mark student attendance records.
+
+            </p>
+
         </div>
 
+    </div>
+
+    <div class="attendance-form-card">
+
         <form method="POST">
+
             {% csrf_token %}
 
             <div class="form-group">
-                <label><i class="fas fa-user-graduate"></i> Student</label>
-                <select name="student_id" required>
-                    <option value="">Select existing student</option>
+
+                <label>
+
+                    Select Student
+
+                </label>
+
+                <select name="student" required>
+
+                    <option value="">
+
+                        Select Student
+
+                    </option>
+
                     {% for student in students %}
-                        <option value="{{ student.id }}">{{ student.name }}{% if student.course %} - {{ student.course }}{% endif %}</option>
+
+                    <option value="{{ student.id }}">
+
+                        {{ student.username }} -
+                        {{ student.email }}
+
+                    </option>
+
                     {% endfor %}
+
                 </select>
+
             </div>
 
-            <div class="form-grid">
-                <div class="form-group">
-                    <label><i class="far fa-calendar-alt"></i> Date</label>
-                    <input type="date" name="attendance_date" required>
-                </div>
+            <div class="form-group">
 
-                <div class="form-group">
-                    <label><i class="fas fa-clipboard-check"></i> Status</label>
-                    <select name="status" required>
-                        <option value="Present">Present</option>
-                        <option value="Absent">Absent</option>
-                    </select>
-                </div>
+                <label>
+
+                    Attendance Status
+
+                </label>
+
+                <select name="status">
+
+                    <option value="Present">
+
+                        Present
+
+                    </option>
+
+                    <option value="Absent">
+
+                        Absent
+
+                    </option>
+
+                </select>
+
             </div>
 
-            <button type="submit" class="btn neon-btn">
-                <i class="fas fa-save"></i> Save Attendance
+            <button type="submit" class="save-btn">
+
+                Save Attendance
+
             </button>
+
         </form>
+
     </div>
-</section>
+
+</div>
 
 {% endblock %}

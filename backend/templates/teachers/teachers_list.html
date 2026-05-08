@@ -4,20 +4,20 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 
-<div class="students-container">
+<div class="teachers-container">
 
-    <div class="students-header">
+    <div class="teachers-header">
         <div>
-            <p class="students-kicker">Faculty Records</p>
-            <h1 class="students-title">
+            <p class="teachers-kicker">Faculty Records</p>
+            <h1 class="teachers-title">
                 Teacher Management
             </h1>
-            <p class="students-subtitle">
+            <p class="teachers-subtitle">
                 Manage all teachers, departments and permissions.
             </p>
         </div>
 
-        <a href="{% url 'add_teacher' %}" class="add-student-btn">
+        <a href="{% url 'add_teacher' %}" class="add-teacher-btn">
             <i class="fas fa-chalkboard-user"></i>
             <span>Add Teacher</span>
         </a>
