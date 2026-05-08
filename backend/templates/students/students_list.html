@@ -1,95 +1,148 @@
 {% extends 'base/base.html' %}
+{% load static %}
 
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 
-<h1><i class="fas fa-users"></i> Students List</h1>
+<div class="students-container">
 
-<!-- SEARCH -->
-<form method="GET" class="search-box">
-    <div style="position: relative; flex: 1; display: flex; align-items: center;">
-        <i class="fas fa-search" style="position: absolute; left: 15px; color: var(--text-secondary);"></i>
-        <input type="text" name="search" placeholder="Search Student..." style="padding-left: 45px; width: 100%; border-color: rgba(255,255,255,0.1);">
+    <div class="students-header">
+        <div>
+            <p class="students-kicker">Campus Records</p>
+            <h1 class="students-title">
+                Student Management
+            </h1>
+            <p class="students-subtitle">
+                Manage all students and attendance records.
+            </p>
+        </div>
+
+        <a href="{% url 'add_student' %}" class="add-student-btn">
+            <i class="fas fa-user-plus"></i>
+            <span>Add Student</span>
+        </a>
     </div>
-    <button type="submit" class="btn"><i class="fas fa-search"></i> Search</button>
-</form>
 
-<!-- TABLE -->
-<div class="table-container">
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>Course</th>
-            <th>Age</th>
-            <th>Attendance %</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-        
-        {% for student in students %}
-        <tr>
-            <!-- STUDENT NAME -->
-            <td style="font-weight: 500;">
-                <a href="/student/{{ student.id }}/">
-                    <i class="fas fa-user-circle" style="margin-right: 8px;"></i>{{ student.name }}
-                </a>
-            </td>
+    <form method="GET" class="search-box">
+        <i class="fas fa-search"></i>
+        <input
+            type="text"
+            id="studentSearch"
+            name="search"
+            value="{{ request.GET.search }}"
+            placeholder="Search Student..."
+            autocomplete="off"
+        >
+    </form>
 
-            <!-- COURSE -->
-            <td>{{ student.course }}</td>
+    <div class="students-table-card">
+        <div class="students-table-wrap">
+            <table id="studentsTable">
+                <thead>
+                    <tr>
+                        <th>Photo</th>
+                        <th>Name</th>
+                        <th>Course</th>
+                        <th>Email</th>
+                        <th>Attendance %</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
 
-            <!-- AGE -->
-            <td>{{ student.age }}</td>
+                <tbody>
+                    {% for student in students %}
+                        <tr>
+                            <td>
+                                <div class="student-avatar">
+                                    {{ student.name|default:"S"|slice:":1" }}
+                                </div>
+                            </td>
 
-            <!-- ATTENDANCE PERCENTAGE -->
-            <td>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span>{{ student.attendance_percentage }}%</span>
-                    <div style="flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; min-width: 60px;">
-                        <div class="attendance-bar-fill" data-percentage="{{ student.attendance_percentage }}" data-status="{{ student.attendance_alert }}" style="height: 100%;"></div>
-                    </div>
-                </div>
-            </td>
+                            <td>
+                                <a href="{% url 'student_detail' student.id %}" class="student-name-link">
+                                    {{ student.name }}
+                                </a>
+                            </td>
 
-            <!-- ATTENDANCE STATUS -->
-            <td>
-                {% if student.attendance_alert == "Low Attendance" %}
-                <span class="badge badge-absent">
-                    <i class="fas fa-exclamation-triangle"></i> Low
-                </span>
-                {% else %}
-                <span class="badge badge-present">
-                    <i class="fas fa-check-circle"></i> Good
-                </span>
-                {% endif %}
-            </td>
+                            <td>{{ student.course|default:"-" }}</td>
 
-            <!-- ACTIONS -->
-            <td>
-                <div style="display: flex; gap: 10px;">
-                    <a href="/update-student/{{ student.id }}/" style="color: var(--text-secondary); background: rgba(255,255,255,0.05); padding: 6px 10px; border-radius: 6px; font-size: 13px;" title="Update">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <a href="/delete-student/{{ student.id }}/" style="color: var(--danger); background: rgba(255,0,85,0.1); padding: 6px 10px; border-radius: 6px; font-size: 13px;" title="Delete">
-                        <i class="fas fa-trash-alt"></i>
-                    </a>
-                </div>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+                            <td>{{ student.email|default:"-" }}</td>
+
+                            <td>
+                                <div class="attendance-cell">
+                                    <span>{{ student.attendance_percentage }}%</span>
+                                    <div class="attendance-track">
+                                        <div
+                                            class="attendance-fill"
+                                            data-percentage="{{ student.attendance_percentage }}"
+                                            data-status="{{ student.attendance_alert }}"
+                                        ></div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                {% if student.attendance_alert == "Low Attendance" %}
+                                    <span class="status-badge danger">
+                                        Low Attendance
+                                    </span>
+                                {% else %}
+                                    <span class="status-badge success">
+                                        Good
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{% url 'student_detail' student.id %}" class="view-btn">
+                                        View
+                                    </a>
+                                    <a href="{% url 'update_student' student.id %}" class="edit-btn">
+                                        Edit
+                                    </a>
+                                    <a
+                                        href="{% url 'delete_student' student.id %}"
+                                        class="delete-btn"
+                                        onclick="return confirm('Delete this student?');"
+                                    >
+                                        Delete
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                No students found.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>
 
 <script>
-    document.querySelectorAll('.attendance-bar-fill').forEach(bar => {
-        const pct = bar.getAttribute('data-percentage');
-        const status = bar.getAttribute('data-status');
-        bar.style.width = pct + '%';
-        if (status === 'Low Attendance') {
-            bar.style.backgroundColor = 'var(--danger)';
-        } else {
-            bar.style.backgroundColor = 'var(--success)';
-        }
-    });
-</script>
+const searchInput = document.getElementById("studentSearch");
 
+searchInput.addEventListener("keyup", function() {
+    const filter = searchInput.value.toLowerCase();
+    const rows = document.querySelectorAll("#studentsTable tbody tr");
+
+    rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(filter) ? "" : "none";
+    });
+});
+
+document.querySelectorAll(".attendance-fill").forEach(bar => {
+    const percentage = Number(bar.dataset.percentage || 0);
+    bar.style.width = `${Math.max(0, Math.min(percentage, 100))}%`;
+    bar.classList.add(bar.dataset.status === "Low Attendance" ? "is-danger" : "is-success");
+});
+</script>
 {% endblock %}

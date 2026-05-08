@@ -1,0 +1,71 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+<div class="form-container">
+    <div class="form-card">
+        <div class="form-heading">
+            <p class="students-kicker">Teacher Access</p>
+            <h1 class="form-title">
+                {% if is_update %}Edit Teacher{% else %}Add Teacher{% endif %}
+            </h1>
+            <p>
+                {% if is_update %}
+                    Update teacher account details and department.
+                {% else %}
+                    Create a teacher login account with department access.
+                {% endif %}
+            </p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label>Username</label>
+                <input
+                    type="text"
+                    name="username"
+                    value="{{ teacher.user.username }}"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input
+                    type="email"
+                    name="email"
+                    value="{{ teacher.user.email }}"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label>Password{% if is_update %} (leave blank to keep current password){% endif %}</label>
+                <input
+                    type="password"
+                    name="password"
+                    {% if not is_update %}required{% endif %}
+                >
+            </div>
+
+            <div class="form-group">
+                <label>Department</label>
+                <input
+                    type="text"
+                    name="department"
+                    value="{{ teacher.department }}"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="submit-btn">
+                {% if is_update %}Update Teacher{% else %}Create Teacher{% endif %}
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

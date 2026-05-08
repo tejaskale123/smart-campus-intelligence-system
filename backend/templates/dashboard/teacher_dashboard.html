@@ -8,31 +8,23 @@
 
     <div class="dashboard-header">
         <div>
-            <p class="dashboard-kicker">Admin Control Center</p>
+            <p class="dashboard-kicker">Teacher Workspace</p>
             <h1 class="dashboard-title">
-                Smart Campus Admin Dashboard
+                Teacher Dashboard
             </h1>
             <p class="dashboard-subtitle">
-                Manage students, teachers, attendance, analytics and reports.
+                Manage attendance, monitor students and review class analytics.
             </p>
         </div>
 
         <div class="header-buttons">
-            <a href="{% url 'add_student' %}" class="dashboard-btn">
-                <i class="fas fa-user-plus"></i>
-                <span>Add Student</span>
-            </a>
-            <a href="{% url 'add_teacher' %}" class="dashboard-btn">
-                <i class="fas fa-chalkboard-user"></i>
-                <span>Add Teacher</span>
+            <a href="{% url 'add_attendance' %}" class="dashboard-btn">
+                <i class="fas fa-calendar-plus"></i>
+                <span>Add Attendance</span>
             </a>
             <a href="{% url 'attendance_list' %}" class="dashboard-btn dashboard-btn-secondary">
-                <i class="fas fa-calendar-check"></i>
-                <span>Attendance</span>
-            </a>
-            <a href="{% url 'reports' %}" class="dashboard-btn dashboard-btn-secondary">
-                <i class="fas fa-file-lines"></i>
-                <span>Reports</span>
+                <i class="fas fa-list-check"></i>
+                <span>Attendance List</span>
             </a>
         </div>
     </div>
@@ -43,24 +35,19 @@
             <h1>{{ total_students }}</h1>
         </div>
 
-        <div class="stats-card">
-            <h3>Total Teachers</h3>
-            <h1>{{ total_teachers }}</h1>
-        </div>
-
-        <div class="stats-card">
-            <h3>Attendance Logs</h3>
-            <h1>{{ total_attendance }}</h1>
-        </div>
-
         <div class="stats-card stats-card-success">
-            <h3>Present</h3>
+            <h3>Present Students</h3>
             <h1>{{ present_count }}</h1>
         </div>
 
         <div class="stats-card stats-card-danger">
-            <h3>Absent</h3>
+            <h3>Absent Students</h3>
             <h1>{{ absent_count }}</h1>
+        </div>
+
+        <div class="stats-card">
+            <h3>Total Attendance</h3>
+            <h1>{{ total_attendance }}</h1>
         </div>
     </div>
 
@@ -82,6 +69,28 @@
         </div>
     </div>
 
+    <div class="quick-actions-card">
+        <div class="section-heading">
+            <h2>Quick Actions</h2>
+            <span>Teacher tools</span>
+        </div>
+
+        <div class="quick-actions-grid">
+            <a href="{% url 'add_attendance' %}" class="quick-action-btn">
+                <i class="fas fa-calendar-plus"></i>
+                <span>Add Attendance</span>
+            </a>
+            <a href="{% url 'attendance_list' %}" class="quick-action-btn">
+                <i class="fas fa-table-list"></i>
+                <span>Attendance Logs</span>
+            </a>
+            <a href="{% url 'students_list' %}" class="quick-action-btn">
+                <i class="fas fa-user-graduate"></i>
+                <span>Students List</span>
+            </a>
+        </div>
+    </div>
+
     <div class="table-card">
         <div class="section-heading">
             <h2>Recent Attendance Logs</h2>
@@ -92,7 +101,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Student Name</th>
+                        <th>Student</th>
                         <th>Date</th>
                         <th>Status</th>
                     </tr>
@@ -104,14 +113,18 @@
                             <td>{{ record.student_name }}</td>
                             <td>{{ record.attendance_date }}</td>
                             <td>
-                                <span class="status-pill status-{{ record.status|lower }}">
-                                    {{ record.status }}
-                                </span>
+                                {% if record.status == "Present" %}
+                                    <span class="status-badge success">Present</span>
+                                {% else %}
+                                    <span class="status-badge danger">Absent</span>
+                                {% endif %}
                             </td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="3" class="empty-state">No attendance records available.</td>
+                            <td colspan="3" class="empty-state">
+                                No attendance records available.
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -141,6 +154,7 @@ new Chart(attendanceChart, {
     options: {
         responsive: true,
         maintainAspectRatio: false,
+        cutout: '68%',
         plugins: {
             legend: {
                 position: 'bottom',
@@ -150,8 +164,7 @@ new Chart(attendanceChart, {
                     padding: 18
                 }
             }
-        },
-        cutout: '68%'
+        }
     }
 });
 

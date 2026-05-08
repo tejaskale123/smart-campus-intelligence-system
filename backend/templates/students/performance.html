@@ -1,0 +1,35 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <div>
+            <p class="dashboard-kicker">Academic Overview</p>
+            <h1 class="dashboard-title">Performance</h1>
+            <p class="dashboard-subtitle">Track your subject performance and attendance strength.</p>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stats-card">
+            <h3>Python</h3>
+            <h1>{{ python_marks }}%</h1>
+        </div>
+        <div class="stats-card">
+            <h3>Django</h3>
+            <h1>{{ django_marks }}%</h1>
+        </div>
+        <div class="stats-card">
+            <h3>MongoDB</h3>
+            <h1>{{ mongodb_marks }}%</h1>
+        </div>
+        <div class="stats-card">
+            <h3>Attendance</h3>
+            <h1>{{ attendance_percentage }}%</h1>
+        </div>
+    </div>
+</div>
+{% endblock %}

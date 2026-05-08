@@ -1,0 +1,118 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <div>
+            <p class="dashboard-kicker">Student Workspace</p>
+            <h1 class="dashboard-title">My Dashboard</h1>
+            <p class="dashboard-subtitle">View your attendance and academic progress.</p>
+        </div>
+    </div>
+
+    <div class="profile-card">
+        <div class="profile-avatar">
+            {{ student.name|default:request.user.username|slice:":1" }}
+        </div>
+        <div class="profile-info">
+            <h2>{{ student.name|default:request.user.username }}</h2>
+            <p>{{ student.email|default:request.user.email|default:"Email not set" }}</p>
+            <p>{{ student.course|default:"Course not set" }}</p>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stats-card">
+            <h3>Attendance %</h3>
+            <h1>{{ attendance_percentage }}%</h1>
+        </div>
+        <div class="stats-card stats-card-success">
+            <h3>Total Present</h3>
+            <h1>{{ total_present }}</h1>
+        </div>
+        <div class="stats-card stats-card-danger">
+            <h3>Total Absent</h3>
+            <h1>{{ total_absent }}</h1>
+        </div>
+        <div class="stats-card">
+            <h3>Total Classes</h3>
+            <h1>{{ total_classes }}</h1>
+        </div>
+    </div>
+
+    <div class="progress-card">
+        <div class="section-heading">
+            <h2>Attendance Progress</h2>
+            <span>{{ attendance_percentage }}%</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" data-percentage="{{ attendance_percentage }}"></div>
+        </div>
+    </div>
+
+    <div class="charts-grid" id="performance">
+        <div class="chart-card">
+            <div class="section-heading">
+                <h2>Attendance Distribution</h2>
+                <span>Present vs Absent</span>
+            </div>
+            <canvas id="attendanceChart"></canvas>
+        </div>
+        <div class="chart-card">
+            <div class="section-heading">
+                <h2>Weekly Performance</h2>
+                <span>Last 7 days</span>
+            </div>
+            <canvas id="weeklyChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const progressFill = document.querySelector('.progress-fill');
+const percentage = Number(progressFill.dataset.percentage || 0);
+progressFill.style.width = `${Math.max(0, Math.min(percentage, 100))}%`;
+progressFill.classList.add(percentage < 75 ? 'is-danger' : 'is-success');
+
+new Chart(document.getElementById('attendanceChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Present', 'Absent'],
+        datasets: [{
+            data: [{{ total_present }}, {{ total_absent }}],
+            backgroundColor: ['#22c55e', '#ef4444']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+
+new Chart(document.getElementById('weeklyChart'), {
+    type: 'bar',
+    data: {
+        labels: {{ weekly_labels|safe }},
+        datasets: [{
+            label: 'Present',
+            data: {{ weekly_values|safe }},
+            backgroundColor: '#06b6d4'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { precision: 0, stepSize: 1 }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

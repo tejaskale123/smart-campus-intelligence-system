@@ -1,0 +1,89 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+<div class="students-container">
+
+    <div class="students-header">
+        <div>
+            <p class="students-kicker">Faculty Records</p>
+            <h1 class="students-title">
+                Teacher Management
+            </h1>
+            <p class="students-subtitle">
+                Manage all teachers, departments and permissions.
+            </p>
+        </div>
+
+        <a href="{% url 'add_teacher' %}" class="add-student-btn">
+            <i class="fas fa-chalkboard-user"></i>
+            <span>Add Teacher</span>
+        </a>
+    </div>
+
+    <div class="students-table-card">
+        <div class="students-table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for teacher in teachers %}
+                        <tr>
+                            <td>
+                                <div class="teacher-name-cell">
+                                    <div class="student-avatar">
+                                        {{ teacher.user.username|default:"T"|slice:":1" }}
+                                    </div>
+                                    <span>{{ teacher.user.username }}</span>
+                                </div>
+                            </td>
+
+                            <td>{{ teacher.user.email|default:"-" }}</td>
+
+                            <td>{{ teacher.department|default:"-" }}</td>
+
+                            <td>
+                                <span class="status-badge success">
+                                    Teacher
+                                </span>
+                            </td>
+
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{% url 'update_teacher' teacher.id %}" class="edit-btn">
+                                        Edit
+                                    </a>
+                                    <a
+                                        href="{% url 'delete_teacher' teacher.id %}"
+                                        class="delete-btn"
+                                        onclick="return confirm('Delete this teacher?');"
+                                    >
+                                        Delete
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="empty-state">
+                                No teachers found.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

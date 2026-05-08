@@ -1,0 +1,197 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+<section class="dashboard-hero">
+    <div>
+        <p class="eyebrow">Admin Control Center</p>
+        <h1>Smart Campus Admin Dashboard</h1>
+        <p>Manage students, teachers, attendance, analytics, reports, and campus settings from one secure workspace.</p>
+    </div>
+    <div class="hero-actions">
+        <a class="btn neon-btn" href="{% url 'add_student' %}"><i class="fas fa-user-plus"></i> Add Student</a>
+        <a class="btn ghost-btn" href="{% url 'admin_teachers' %}"><i class="fas fa-chalkboard-user"></i> Teachers</a>
+    </div>
+</section>
+
+<section class="dashboard-grid">
+    <article class="dashboard-card stat-card">
+        <div class="stat-icon"><i class="fas fa-user-graduate"></i></div>
+        <span>Total Students</span>
+        <strong>{{ total_students }}</strong>
+    </article>
+    <article class="dashboard-card stat-card">
+        <div class="stat-icon"><i class="fas fa-chalkboard-user"></i></div>
+        <span>Total Teachers</span>
+        <strong>{{ total_teachers }}</strong>
+    </article>
+    <article class="dashboard-card stat-card">
+        <div class="stat-icon"><i class="fas fa-clipboard-list"></i></div>
+        <span>Attendance Logs</span>
+        <strong>{{ total_attendance }}</strong>
+    </article>
+    <article class="dashboard-card stat-card success-card">
+        <div class="stat-icon"><i class="fas fa-user-check"></i></div>
+        <span>Present</span>
+        <strong>{{ present_count }}</strong>
+    </article>
+    <article class="dashboard-card stat-card danger-card">
+        <div class="stat-icon"><i class="fas fa-user-times"></i></div>
+        <span>Absent</span>
+        <strong>{{ absent_count }}</strong>
+    </article>
+</section>
+
+<section class="analytics-section" id="analytics">
+    <article class="dashboard-card chart-card">
+        <div class="section-title">
+            <div>
+                <h2>Attendance Distribution</h2>
+                <span>Present vs absent</span>
+            </div>
+            <i class="fas fa-chart-pie" style="color: var(--neon-cyan);"></i>
+        </div>
+        <canvas id="adminAttendanceDonut"></canvas>
+    </article>
+
+    <article class="dashboard-card chart-card">
+        <div class="section-title">
+            <div>
+                <h2>Weekly Attendance</h2>
+                <span>Last seven days</span>
+            </div>
+            <i class="fas fa-chart-column" style="color: var(--neon-cyan);"></i>
+        </div>
+        <canvas id="adminWeeklyChart"></canvas>
+    </article>
+</section>
+
+<section class="analytics-section">
+    <article class="dashboard-card table-card">
+        <div class="section-title">
+            <div>
+                <h2>Recent Attendance</h2>
+                <span>Latest campus records</span>
+            </div>
+            <a href="{% url 'attendance_list' %}">View all</a>
+        </div>
+
+        <div class="table-container compact-table">
+            <table>
+                <tr>
+                    <th>Student</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+                {% for attendance in recent_attendance %}
+                <tr>
+                    <td>{{ attendance.student_name }}</td>
+                    <td>{{ attendance.attendance_date }}</td>
+                    <td>
+                        {% if attendance.status == 'Present' %}
+                            <span class="badge badge-present">Present</span>
+                        {% else %}
+                            <span class="badge badge-absent">Absent</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No attendance records yet.</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </article>
+
+    <article class="dashboard-card activity-card">
+        <div class="section-title">
+            <div>
+                <h2>Admin Quick Actions</h2>
+                <span>Secure management tools</span>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <a href="{% url 'students_list' %}"><i class="fas fa-users"></i> Students</a>
+            <a href="{% url 'add_student' %}"><i class="fas fa-user-plus"></i> Add Student</a>
+            <a href="{% url 'admin_teachers' %}"><i class="fas fa-chalkboard-user"></i> Teachers</a>
+            <a href="{% url 'attendance_list' %}"><i class="fas fa-calendar-check"></i> Attendance</a>
+            <a href="{% url 'analytics' %}"><i class="fas fa-chart-line"></i> Analytics</a>
+            <a href="{% url 'reports' %}"><i class="fas fa-file-lines"></i> Reports</a>
+            <a href="{% url 'settings' %}"><i class="fas fa-gear"></i> Settings</a>
+        </div>
+    </article>
+</section>
+
+{{ present_count|json_script:"admin-present-count" }}
+{{ absent_count|json_script:"admin-absent-count" }}
+{{ weekly_labels|json_script:"admin-weekly-labels" }}
+{{ weekly_values|json_script:"admin-weekly-values" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const adminPresentCount = JSON.parse(document.getElementById('admin-present-count').textContent);
+    const adminAbsentCount = JSON.parse(document.getElementById('admin-absent-count').textContent);
+    const adminWeeklyLabels = JSON.parse(document.getElementById('admin-weekly-labels').textContent);
+    const adminWeeklyValues = JSON.parse(document.getElementById('admin-weekly-values').textContent);
+
+    const adminChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                labels: { color: '#e5f7ff' }
+            }
+        }
+    };
+
+    new Chart(document.getElementById('adminAttendanceDonut'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Present', 'Absent'],
+            datasets: [{
+                data: [adminPresentCount, adminAbsentCount],
+                backgroundColor: ['rgba(0, 255, 136, 0.86)', 'rgba(255, 0, 85, 0.86)'],
+                borderColor: ['#00ff88', '#ff0055'],
+                borderWidth: 2,
+                hoverOffset: 8
+            }]
+        },
+        options: {
+            ...adminChartOptions,
+            cutout: '68%'
+        }
+    });
+
+    new Chart(document.getElementById('adminWeeklyChart'), {
+        type: 'bar',
+        data: {
+            labels: adminWeeklyLabels,
+            datasets: [{
+                label: 'Present',
+                data: adminWeeklyValues,
+                backgroundColor: 'rgba(0, 243, 255, 0.42)',
+                borderColor: '#00f3ff',
+                borderWidth: 2,
+                borderRadius: 10
+            }]
+        },
+        options: {
+            ...adminChartOptions,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(255,255,255,0.08)' },
+                    ticks: { color: '#94a3b8', precision: 0 }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#94a3b8' }
+                }
+            }
+        }
+    });
+</script>
+
+{% endblock %}
