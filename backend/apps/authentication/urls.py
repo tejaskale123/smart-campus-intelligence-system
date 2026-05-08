@@ -1,25 +1,21 @@
 from django.urls import path
 
 from .views import (
-
     login_page,
     dashboard,
-
     add_student,
     students_list,
-
     update_student,
     delete_student,
-
     add_attendance,
     attendance_list,
-
     student_detail,
-
+    student_profile,
+    student_dashboard,
     register_page,
-
-    logout_page
-
+    logout_view,
+    teacher_dashboard,
+    student_dashboard
 )
 
 
@@ -134,12 +130,34 @@ path(
 
 
 # ==========================
+# STUDENT PROFILE
+# ==========================
+
+path(
+    'student-profile/',
+    student_profile,
+    name='student_profile'
+),
+
+
+# ==========================
+# STUDENT DASHBOARD
+# ==========================
+
+path(
+    'student-dashboard/',
+    student_dashboard,
+    name='student_dashboard'
+),
+
+
+# ==========================
 # LOGOUT
 # ==========================
 
 path(
     'logout/',
-    logout_page,
+    logout_view,
     name='logout'
 ),
 
@@ -153,5 +171,26 @@ path(
     name='register'
 ),
 
+# =========================
+# TEACHER DASHBOARD
+#=========================
+path(
+
+    'teacher-dashboard/',
+
+    teacher_dashboard,
+
+    name='teacher_dashboard'
+
+),
+
+#========================
+# STUDENT DASHBOARD
+#=======================
+path(
+    'student-dashboard/',
+    student_dashboard,
+    name='student_dashboard'
+),
 ]
 

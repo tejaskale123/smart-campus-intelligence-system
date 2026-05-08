@@ -2,70 +2,78 @@
 
 {% block content %}
 
-<h1><i class="fas fa-chart-pie"></i> Admin Dashboard</h1>
-
-<!-- =========================
-STATS SECTION
-========================= -->
-<div class="stats-grid">
-    <!-- TOTAL STUDENTS -->
-    <div class="stats-card">
-        <h2><i class="fas fa-users" style="margin-right: 10px; color: var(--neon-cyan);"></i> Total Students</h2>
-        <p>{{ total_students }}</p>
-    </div>
-
-    <!-- TOTAL ATTENDANCE -->
-    <div class="stats-card">
-        <h2><i class="fas fa-clipboard-list" style="margin-right: 10px; color: var(--neon-cyan);"></i> Total Attendance</h2>
-        <p>{{ total_attendance }}</p>
-    </div>
-
-    <!-- PRESENT STUDENTS -->
-    <div class="stats-card">
-        <h2><i class="fas fa-user-check" style="margin-right: 10px; color: var(--success);"></i> Present Students</h2>
-        <p style="color: var(--success);">{{ present_count }}</p>
-    </div>
-
-    <!-- ABSENT STUDENTS -->
-    <div class="stats-card">
-        <h2><i class="fas fa-user-times" style="margin-right: 10px; color: var(--danger);"></i> Absent Students</h2>
-        <p style="color: var(--danger);">{{ absent_count }}</p>
-    </div>
-</div>
-
-<!-- =========================
-CHARTS GRID
-========================= -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; margin-bottom: 30px;">
-    
-    <!-- DOUGHNUT CHART -->
-    <div class="card" style="margin-bottom: 0;">
-        <h2 style="color: var(--neon-cyan); text-align: center; margin-bottom: 25px; font-size: 20px; text-transform: uppercase; letter-spacing: 1px;">
-            <i class="fas fa-chart-doughnut"></i> Attendance Analytics
-        </h2>
-        <div style="width: 100%; max-width: 400px; margin: auto; height: 300px;">
-            <canvas id="attendanceChart"></canvas>
+<div class="admin-dashboard">
+    <div class="admin-dashboard-header">
+        <div>
+            <span>Smart Campus ERP</span>
+            <h1><i class="fas fa-chart-pie"></i> Admin Dashboard</h1>
+            <p>Monitor campus attendance, student activity, and monthly trends from one control center.</p>
         </div>
     </div>
 
-    <!-- BAR GRAPH -->
-    <div class="card" style="margin-bottom: 0;">
-        <h2 style="color: var(--neon-cyan); text-align: center; margin-bottom: 25px; font-size: 20px; text-transform: uppercase; letter-spacing: 1px;">
-            <i class="fas fa-chart-bar"></i> Attendance Bar Analytics
-        </h2>
-        <div style="width: 100%; margin: auto; height: 300px;">
-            <canvas id="barChart"></canvas>
+    <!-- =========================
+    STATS SECTION
+    ========================= -->
+    <div class="stats-grid admin-stats-grid">
+        <!-- TOTAL STUDENTS -->
+        <div class="stats-card">
+            <h2><i class="fas fa-users" style="margin-right: 10px; color: var(--neon-cyan);"></i> Total Students</h2>
+            <p>{{ total_students }}</p>
+        </div>
+
+        <!-- TOTAL ATTENDANCE -->
+        <div class="stats-card">
+            <h2><i class="fas fa-clipboard-list" style="margin-right: 10px; color: var(--neon-cyan);"></i> Total Attendance</h2>
+            <p>{{ total_attendance }}</p>
+        </div>
+
+        <!-- PRESENT STUDENTS -->
+        <div class="stats-card">
+            <h2><i class="fas fa-user-check" style="margin-right: 10px; color: var(--success);"></i> Present Students</h2>
+            <p style="color: var(--success);">{{ present_count }}</p>
+        </div>
+
+        <!-- ABSENT STUDENTS -->
+        <div class="stats-card">
+            <h2><i class="fas fa-user-times" style="margin-right: 10px; color: var(--danger);"></i> Absent Students</h2>
+            <p style="color: var(--danger);">{{ absent_count }}</p>
         </div>
     </div>
-</div>
 
-<!-- MONTHLY ANALYTICS -->
-<div class="card">
-    <h2 style="color: var(--neon-cyan); text-align: center; margin-bottom: 25px; font-size: 20px; text-transform: uppercase; letter-spacing: 1px;">
-        <i class="fas fa-chart-line"></i> Monthly Attendance Trends
-    </h2>
-    <div style="width: 100%; margin: auto; height: 350px;">
-        <canvas id="monthlyChart"></canvas>
+    <!-- =========================
+    CHARTS GRID
+    ========================= -->
+    <div class="admin-charts-grid">
+        
+        <!-- DOUGHNUT CHART -->
+        <div class="card admin-chart-card">
+            <h2>
+                <i class="fas fa-chart-doughnut"></i> Attendance Analytics
+            </h2>
+            <div class="admin-chart-box admin-chart-box-narrow">
+                <canvas id="attendanceChart"></canvas>
+            </div>
+        </div>
+
+        <!-- BAR GRAPH -->
+        <div class="card admin-chart-card">
+            <h2>
+                <i class="fas fa-chart-bar"></i> Attendance Bar Analytics
+            </h2>
+            <div class="admin-chart-box">
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- MONTHLY ANALYTICS -->
+    <div class="card admin-chart-card admin-chart-card-wide">
+        <h2>
+            <i class="fas fa-chart-line"></i> Monthly Attendance Trends
+        </h2>
+        <div class="admin-chart-box admin-chart-box-tall">
+            <canvas id="monthlyChart"></canvas>
+        </div>
     </div>
 </div>
 

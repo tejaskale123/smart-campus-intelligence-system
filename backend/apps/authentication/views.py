@@ -1,10 +1,15 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
-
+from django.http import HttpResponse
+from django.contrib.auth import authenticate
+from django.contrib.auth import login
+from django.contrib.auth import logout
 from django.conf import settings
 from bson import ObjectId
-from .decorators import admin_only
+from .decorators import admin_only, teacher_or_admin, student_only
+from .decorators import student_required
+from .models import UserProfile
 
 from database.mongo import db
 from django.contrib.auth.models import User
@@ -25,6 +30,12 @@ from .services import (
     get_student
 
 )
+from django.contrib.auth.decorators import login_required
+from .decorators import (
+
+    teacher_or_admin
+
+)
 
 # ==============================
 # HOME PAGE
@@ -39,24 +50,72 @@ def home(request):
 
 
 # ==============================
-# LOGIN
+# LOGIN PAGE
 # ==============================
 
 def login_page(request):
 
-    if request.method == "POST":
+    # ==========================
+    # ALREADY LOGGED IN
+    # ==========================
+
+    if request.user.is_authenticated:
+
+        profile = request.user.userprofile
+
+        # ADMIN
+
+        if profile.role == 'admin':
+
+            return redirect(
+
+                'dashboard'
+
+            )
+
+        # TEACHER
+
+        elif profile.role == 'teacher':
+
+            print("TEACHER LOGIN SUCCESS")
+
+            return redirect(
+
+                'teacher_dashboard'
+
+            )
+
+        # STUDENT
+
+        elif profile.role == 'student':
+
+            return redirect(
+
+                'student_dashboard'
+
+            )
+
+    # ==========================
+    # LOGIN FORM
+    # ==========================
+
+    if request.method == 'POST':
 
         username = request.POST.get(
 
-            "username"
+            'username'
 
         )
 
         password = request.POST.get(
 
-            "password"
+            'password'
 
         )
+
+        # ==========================
+        # AUTHENTICATE USER
+        # ==========================
 
         user = authenticate(
 
@@ -68,20 +127,55 @@ def login_page(request):
 
         )
 
+        # ==========================
+        # LOGIN SUCCESS
+        # ==========================
+
         if user is not None:
 
             login(
 
                 request,
+
                 user
 
             )
 
-            return redirect(
+            profile = user.userprofile
 
-                'dashboard'
+            # ADMIN
 
-            )
+            if profile.role == 'admin':
+
+                return redirect(
+
+                    'dashboard'
+
+                )
+
+            # TEACHER
+
+            elif profile.role == 'teacher':
+
+                return redirect(
+
+                    'teacher_dashboard'
+
+                )
+
+            # STUDENT
+
+            elif profile.role == 'student':
+
+                return redirect(
+
+                    'student_dashboard'
+
+                )
+
+        # ==========================
+        # INVALID LOGIN
+        # ==========================
 
         else:
 
@@ -93,9 +187,7 @@ def login_page(request):
 
                 {
 
-                    'error':
-
-                    'Invalid Username or Password'
+                    'error': 'Invalid Username or Password'
 
                 }
 
@@ -314,7 +406,7 @@ def add_student(request):
 # STUDENTS LIST + SEARCH
 # ==============================
 @login_required
-@admin_only
+@teacher_or_admin
 def students_list(request):
 
     search_query = request.GET.get('search')
@@ -432,6 +524,8 @@ def students_list(request):
 # ==============================
 # UPDATE STUDENT
 # ==============================
+@login_required
+@admin_only
 
 def update_student(request, student_id):
 
@@ -485,6 +579,8 @@ def update_student(request, student_id):
 # ==============================
 # DELETE STUDENT
 # ==============================
+@login_required
+@admin_only
 
 def delete_student(request, student_id):
 
@@ -499,58 +595,165 @@ def delete_student(request, student_id):
 # ==============================
 # ADD ATTENDANCE
 # ==============================
+
+from bson import ObjectId
+from datetime import datetime, timedelta
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+
+
 @login_required
-@admin_only
+@teacher_or_admin
 def add_attendance(request):
+
+    # ==========================
+    # GET ALL STUDENTS
+    # ==========================
+
+    students_cursor = get_all_students()
+
+    students = []
+
+    for student in students_cursor:
+
+        student['id'] = str(student['_id'])
+
+        students.append(student)
+
+    # ==========================
+    # SAVE ATTENDANCE
+    # ==========================
 
     if request.method == "POST":
 
+        student_id = request.POST.get("student_id")
+
+        attendance_date = request.POST.get("attendance_date")
+
+        status = request.POST.get("status")
+
+        # ==========================
+        # VALIDATE STUDENT
+        # ==========================
+
+        if not student_id:
+
+            return redirect('add_attendance')
+
+        # ==========================
+        # FIND STUDENT
+        # ==========================
+
+        student_doc = db["students"].find_one({
+
+            "_id": ObjectId(student_id)
+
+        })
+
+        # ==========================
+        # STUDENT NOT FOUND
+        # ==========================
+
+        if not student_doc:
+
+            return redirect('add_attendance')
+
+        # ==========================
+        # PREVENT DUPLICATE ATTENDANCE
+        # ==========================
+
+        existing_attendance = db["attendance_logs"].find_one({
+
+            "student_id": student_id,
+
+            "attendance_date": attendance_date
+
+        })
+
+        if existing_attendance:
+
+            return redirect('attendance_list')
+
+        # ==========================
+        # ATTENDANCE DATA
+        # ==========================
+
         attendance_data = {
 
-            "student_name": request.POST.get("student_name"),
+            "student_id": student_id,
 
-            "attendance_date": request.POST.get("attendance_date"),
+            "student_name": student_doc["name"],
 
-            "status": request.POST.get("status")
+            "attendance_date": attendance_date,
+
+            "status": status,
+
+            "created_at": datetime.now()
 
         }
 
-        db["attendance_logs"].insert_one(attendance_data)
+        # ==========================
+        # SAVE TO MONGODB
+        # ==========================
 
-        return redirect('attendance_list')
+        db["attendance_logs"].insert_one(
+
+            attendance_data
+
+        )
+
+        # ==========================
+        # REDIRECT
+        # ==========================
+
+        return redirect(
+
+            'attendance_list'
+
+        )
+
+    # ==========================
+    # RENDER PAGE
+    # ==========================
 
     return render(
 
         request,
-        'attendance/add_attendance.html'
+
+        'attendance/add_attendance.html',
+
+        {
+
+            'students': students
+
+        }
 
     )
-
 # ==============================
 # ATTENDANCE LIST + SEARCH
 # ==============================
 @login_required
+@teacher_or_admin
 def attendance_list(request):
 
+    role = request.user.userprofile.role
     search_query = request.GET.get('search')
 
-    if search_query:
-
+    if role == UserProfile.ROLE_STUDENT:
         attendance_cursor = db["attendance_logs"].find({
-
-            "student_name": {
-
-                "$regex": search_query,
-
-                "$options": "i"
-
-            }
-
+            "student_name": request.user.username
         })
-
     else:
-
-        attendance_cursor = db["attendance_logs"].find()
+        if search_query:
+            attendance_cursor = db["attendance_logs"].find({
+                "student_name": {
+                    "$regex": search_query,
+                    "$options": "i"
+                }
+            })
+        else:
+            attendance_cursor = db["attendance_logs"].find()
 
     attendance_records = []
 
@@ -603,6 +806,10 @@ def student_detail(request, student_id):
     student['id'] = str(student['_id'])
 
     student_name = student['name']
+    role = request.user.userprofile.role
+
+    if role == UserProfile.ROLE_STUDENT and student_name != request.user.username:
+        return HttpResponse("Access Denied")
 
     attendance_cursor = db["attendance_logs"].find({
 
@@ -665,7 +872,93 @@ def student_detail(request, student_id):
 
     )
 
-    # ==============================
+# ==============================
+# STUDENT PROFILE
+# ==============================
+
+@login_required
+@student_only
+def student_profile(request):
+
+    username = request.user.username
+
+    student = db["students"].find_one({
+
+        "name": username
+
+    })
+
+    attendance_logs = list(
+
+        db["attendance_logs"].find({
+
+            "student_name": username
+
+        })
+
+    )
+
+    total = len(attendance_logs)
+
+    present = len([
+
+        attendance for attendance in attendance_logs
+
+        if attendance.get("status") == "Present"
+
+    ])
+
+    percentage = 0
+
+    if total > 0:
+
+        percentage = int(
+
+            (present / total) * 100
+
+        )
+
+    context = {
+
+        "student": student,
+
+        "attendance_logs": attendance_logs,
+
+        "attendance_percentage": percentage
+
+    }
+
+    return render(
+
+        request,
+
+        'student/student_profile.html',
+
+        context
+
+    )
+
+# ==============================
+# STUDENT DASHBOARD
+# ==============================
+
+@login_required
+@student_required
+def student_dashboard(request):
+
+    context = {}
+
+    return render(
+
+        request,
+
+        'student/student_dashboard.html',
+
+        context
+
+    )
+
+# ==============================
 # REGISTER
 # ==============================
 
@@ -685,13 +978,29 @@ def register_page(request):
 
         )
 
-        User.objects.create_user(
+        role = request.POST.get(
+
+            "role",
+
+            UserProfile.ROLE_STUDENT
+
+        )
+
+        user = User.objects.create_user(
 
             username=username,
 
             password=password
 
         )
+
+        if role in [
+            UserProfile.ROLE_ADMIN,
+            UserProfile.ROLE_TEACHER,
+            UserProfile.ROLE_STUDENT
+        ]:
+            user.userprofile.role = role
+            user.userprofile.save()
 
         return redirect('login')
 
@@ -702,13 +1011,143 @@ def register_page(request):
         'authentication/register.html'
 
     )
-
-    # ==============================
+# ==============================
 # LOGOUT
 # ==============================
 
-def logout_page(request):
+@login_required
+
+def logout_view(request):
 
     logout(request)
 
-    return redirect('login')
+    return redirect(
+
+        'login'
+
+    )
+
+# ==============================
+# TEACHER DASHBOARD
+# ==============================
+
+@login_required
+@teacher_or_admin
+
+def teacher_dashboard(request):
+
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    # ==========================
+    # TOTAL STUDENTS
+    # ==========================
+
+    total_students = db["students"].count_documents({})
+
+    # ==========================
+    # TOTAL ATTENDANCE
+    # ==========================
+
+    total_attendance = db["attendance_logs"].count_documents({})
+
+    # ==========================
+    # PRESENT STUDENTS
+    # ==========================
+
+    present_students = db["attendance_logs"].count_documents({
+
+        "status": "Present"
+
+    })
+
+    present_today = db["attendance_logs"].count_documents({
+
+        "attendance_date": today,
+
+        "status": "Present"
+
+    })
+
+    # ==========================
+    # ABSENT STUDENTS
+    # ==========================
+
+    absent_students = db["attendance_logs"].count_documents({
+
+        "status": "Absent"
+
+    })
+
+    absent_today = db["attendance_logs"].count_documents({
+
+        "attendance_date": today,
+
+        "status": "Absent"
+
+    })
+
+    recent_attendance = []
+
+    for attendance in db["attendance_logs"].find().sort(
+
+        "created_at",
+
+        -1
+
+    ).limit(6):
+
+        attendance['id'] = str(attendance['_id'])
+
+        recent_attendance.append(attendance)
+
+    weekly_labels = []
+
+    weekly_values = []
+
+    for day_offset in range(4, -1, -1):
+
+        day = datetime.now() - timedelta(days=day_offset)
+
+        attendance_date = day.strftime("%Y-%m-%d")
+
+        weekly_labels.append(day.strftime("%a"))
+
+        weekly_values.append(
+
+            db["attendance_logs"].count_documents({
+
+                "attendance_date": attendance_date
+
+            })
+
+        )
+
+    return render(
+
+        request,
+
+        'dashboard/teacher_dashboard.html',
+
+        {
+
+            'total_students': total_students,
+
+            'total_attendance': total_attendance,
+
+            'present_students': present_students,
+
+            'absent_students': absent_students,
+
+            'present_today': present_today,
+
+            'absent_today': absent_today,
+
+            'recent_attendance': recent_attendance,
+
+            'weekly_labels': weekly_labels,
+
+            'weekly_values': weekly_values
+
+        }
+
+    )

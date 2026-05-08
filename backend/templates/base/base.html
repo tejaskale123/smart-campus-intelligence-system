@@ -38,11 +38,26 @@
 
         <ul>
             {% if request.user.is_authenticated %}
+
+            {% if request.user.userprofile.role == 'admin' %}
             <li><a href="/dashboard/"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
             <li><a href="/add-student/"><i class="fas fa-user-plus"></i> Add Student</a></li>
             <li><a href="/students/"><i class="fas fa-users"></i> Students List</a></li>
             <li><a href="/add-attendance/"><i class="fas fa-calendar-check"></i> Add Attendance</a></li>
             <li><a href="/attendance-list/"><i class="fas fa-list-alt"></i> Attendance List</a></li>
+            {% endif %}
+
+            {% if request.user.userprofile.role == 'teacher' %}
+            <li><a href="/teacher-dashboard/"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+            <li><a href="/add-attendance/"><i class="fas fa-calendar-check"></i> Add Attendance</a></li>
+            <li><a href="/attendance-list/"><i class="fas fa-list-alt"></i> Attendance List</a></li>
+            <li><a href="/students/"><i class="fas fa-users"></i> Students List</a></li>
+            {% endif %}
+
+            {% if request.user.userprofile.role == 'student' %}
+            <li><a href="/student-profile/"><i class="fas fa-user-graduate"></i> My Profile</a></li>
+            {% endif %}
+
             <li>
                 <a href="/logout/">
                     <i class="fas fa-sign-out-alt"></i> Logout

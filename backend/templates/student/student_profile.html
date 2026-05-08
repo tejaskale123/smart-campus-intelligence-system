@@ -1,0 +1,89 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+<div style="margin-bottom: 30px;">
+    <h1 style="font-size: 26px; margin-bottom: 5px; color: var(--text-primary); border-bottom: none;">
+        <i class="fas fa-user-graduate" style="color: var(--neon-blue); margin-right: 10px;"></i> My Profile
+    </h1>
+    <p style="color: var(--text-secondary); font-size: 14px;">Your student profile and attendance records.</p>
+</div>
+
+<div class="card profile-card" style="margin-bottom: 30px; display: flex; gap: 40px; align-items: center;">
+    {% if student.profile_image %}
+    <img src="/media/{{ student.profile_image }}" style="width: 180px; height: 180px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255,255,255,0.1); box-shadow: 0 4px 15px rgba(0,0,0,0.2);" alt="{{ student.name }}">
+    {% else %}
+    <div style="width: 180px; height: 180px; border-radius: 50%; background: rgba(15, 23, 42, 0.6); border: 1px dashed rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center;">
+        <i class="fas fa-user" style="font-size: 70px; color: var(--text-secondary);"></i>
+    </div>
+    {% endif %}
+
+    <div class="profile-info" style="flex: 1;">
+        <h2 style="font-size: 28px; margin-bottom: 15px; color: var(--text-primary);">
+            {{ student.name }}
+        </h2>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
+            <p style="color: var(--text-secondary); font-size: 15px; margin: 0;">
+                <i class="fas fa-book" style="margin-right: 10px; color: var(--neon-blue);"></i>
+                <span style="color: var(--text-primary);">Course:</span>
+                {{ student.course }}
+            </p>
+            <p style="color: var(--text-secondary); font-size: 15px; margin: 0;">
+                <i class="fas fa-calendar-alt" style="margin-right: 10px; color: var(--neon-blue);"></i>
+                <span style="color: var(--text-primary);">Age:</span>
+                {{ student.age }}
+            </p>
+            <p style="color: var(--text-secondary); font-size: 15px; margin: 0;">
+                <i class="fas fa-envelope" style="margin-right: 10px; color: var(--neon-blue);"></i>
+                <span style="color: var(--text-primary);">Email:</span>
+                {{ student.email }}
+            </p>
+        </div>
+
+        <div style="background: rgba(15, 23, 42, 0.4); padding: 20px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <p style="font-weight: 500; font-size: 14px; color: var(--text-secondary); margin: 0;">Overall Attendance</p>
+                <span style="font-weight: 600; font-size: 16px; color: var(--text-primary);">{{ attendance_percentage }}%</span>
+            </div>
+            <div style="height: 8px; width: 100%; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                <div id="attendance-bar" data-percentage="{{ attendance_percentage }}" style="height: 100%;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="table-container">
+    <div style="padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+        <h3 style="color: var(--text-primary); font-size: 18px; margin: 0;">
+            <i class="fas fa-history" style="margin-right: 8px; color: var(--neon-blue);"></i> Attendance Log
+        </h3>
+    </div>
+    <table>
+        <tr>
+            <th>Date</th>
+            <th>Status</th>
+        </tr>
+        {% for attendance in attendance_logs %}
+        <tr>
+            <td>{{ attendance.attendance_date }}</td>
+            <td>{{ attendance.status }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="2" style="color: var(--text-secondary);">No attendance records found.</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<script>
+    (function() {
+        const bar = document.getElementById('attendance-bar');
+        const pct = parseInt(bar.getAttribute('data-percentage'));
+        bar.style.width = pct + '%';
+        bar.style.backgroundColor = pct < 75 ? 'var(--danger)' : 'var(--success)';
+    })();
+</script>
+
+{% endblock %}
