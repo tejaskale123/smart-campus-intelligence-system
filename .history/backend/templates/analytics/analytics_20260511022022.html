@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Poppins',sans-serif;
+        }
+
+        body{
+            background:#020617;
+            color:white;
+            display:flex;
+        }
+
+        .sidebar{
+            width:280px;
+            height:100vh;
+            background:#081028;
+            padding:30px 20px;
+            position:fixed;
+            left:0;
+            top:0;
+            border-right:1px solid rgba(255,255,255,0.08);
+        }
+
+        .logo{
+            font-size:40px;
+            font-weight:700;
+            color:#22d3ee;
+            margin-bottom:50px;
+        }
+
+        .menu a{
+            display:block;
+            padding:18px;
+            margin-bottom:15px;
+            border-radius:14px;
+            text-decoration:none;
+            color:#cbd5e1;
+            font-size:18px;
+            transition:0.3s;
+        }
+
+        .menu a:hover,
+        .menu a.active{
+            background:linear-gradient(90deg,#06b6d4,#2563eb);
+            color:white;
+        }
+
+        .main{
+            margin-left:280px;
+            width:calc(100% - 280px);
+            padding:40px;
+        }
+
+        .top-title p{
+            color:#22d3ee;
+            letter-spacing:2px;
+            font-weight:600;
+            margin-bottom:10px;
+        }
+
+        .top-title h1{
+            font-size:72px;
+            font-weight:700;
+        }
+
+        .underline{
+            width:80px;
+            height:5px;
+            background:#22d3ee;
+            border-radius:20px;
+            margin-top:15px;
+        }
+
+        .cards{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+            gap:25px;
+            margin-top:50px;
+        }
+
+        .card{
+            background:#1e293b;
+            padding:35px;
+            border-radius:25px;
+            transition:0.4s;
+            border:1px solid rgba(255,255,255,0.05);
+        }
+
+        .card:hover{
+            transform:translateY(-8px);
+            box-shadow:0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .card h2{
+            font-size:60px;
+            margin-bottom:10px;
+        }
+
+        .card p{
+            color:#94a3b8;
+            font-size:20px;
+        }
+
+        .charts{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:30px;
+            margin-top:50px;
+        }
+
+        .chart-box{
+            background:#111827;
+            padding:30px;
+            border-radius:25px;
+        }
+
+        .chart-box h3{
+            margin-bottom:20px;
+            color:#22d3ee;
+        }
+
+        .ai-box{
+            margin-top:50px;
+            background:linear-gradient(135deg,#0f172a,#1e293b);
+            padding:35px;
+            border-radius:25px;
+            border:1px solid rgba(255,255,255,0.05);
+        }
+
+        .ai-box h2{
+            color:#22d3ee;
+            margin-bottom:20px;
+        }
+
+        .ai-box ul{
+            padding-left:20px;
+        }
+
+        .ai-box li{
+            margin-bottom:12px;
+            color:#cbd5e1;
+            font-size:18px;
+        }
+
+        .table-box{
+            margin-top:50px;
+            background:#111827;
+            border-radius:25px;
+            padding:30px;
+            overflow-x:auto;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        th{
+            background:black;
+            color:#22d3ee;
+            padding:20px;
+            text-align:left;
+        }
+
+        td{
+            padding:18px;
+            border-bottom:1px solid rgba(255,255,255,0.05);
+        }
+
+        tr:hover{
+            background:rgba(255,255,255,0.03);
+        }
+
+        .alert-box{
+            margin-top:50px;
+            background:#7f1d1d;
+            padding:30px;
+            border-radius:20px;
+        }
+
+        .alert-box h2{
+            margin-bottom:20px;
+        }
+
+        .activity-box{
+            margin-top:50px;
+            background:#111827;
+            padding:30px;
+            border-radius:25px;
+        }
+
+        .activity-item{
+            padding:15px 0;
+            border-bottom:1px solid rgba(255,255,255,0.05);
+            color:#cbd5e1;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<div class="sidebar">
+
+    <div class="logo">
+        Smart Campus
+    </div>
+
+    <div class="menu">
+
+        <a href="/admin-dashboard/">Dashboard</a>
+        <a href="/students/">Students</a>
+        <a href="/teachers/">Teachers</a>
+        <a href="/attendance-list/">Attendance</a>
+        <a href="/analytics/" class="active">Analytics</a>
+        <a href="/reports/">Reports</a>
+        <a href="/logout/">Logout</a>
+
+    </div>
+
+</div>
+
+<div class="main">
+
+    <div class="top-title">
+
+        <p>SMART CAMPUS ANALYTICS</p>
+
+        <h1>Analytics Dashboard</h1>
+
+        <div class="underline"></div>
+
+    </div>
+
+    <div class="cards">
+
+        <div class="card">
+            <h2>{{ total_students }}</h2>
+            <p>Total Students</p>
+        </div>
+
+        <div class="card">
+            <h2>{{ present_students }}</h2>
+            <p>Present Students</p>
+        </div>
+
+        <div class="card">
+            <h2>{{ absent_students }}</h2>
+            <p>Absent Students</p>
+        </div>
+
+        <div class="card">
+            <h2>{{ attendance_percentage }}%</h2>
+            <p>Attendance Percentage</p>
+        </div>
+
+    </div>
+
+    <div class="charts">
+
+        <div class="chart-box">
+
+            <h3>Attendance Overview</h3>
+
+            <canvas id="attendanceChart"></canvas>
+
+        </div>
+
+        <div class="chart-box">
+
+            <h3>Course Distribution</h3>
+
+            <canvas id="courseChart"></canvas>
+
+        </div>
+
+    </div>
+
+    <div class="ai-box">
+
+        <h2>🤖 AI Insights</h2>
+
+        <ul>
+            <li>Attendance increased by 12% this week</li>
+            <li>MCA students have lower attendance</li>
+            <li>3 students require attendance warning</li>
+            <li>Best performing course is BCA</li>
+        </ul>
+
+    </div>
+
+    <div class="table-box">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Name</th>
+                    <th>Course</th>
+                    <th>Email</th>
+                </tr>
+
+            </thead>
+                <tbody>
+
+                {% for student in students %}
+
+                <tr>
+
+                    <td>
+
+                        <div style="display:flex;align-items:center;gap:12px;">
+
+                            <div style="
+                                width:45px;
+                                height:45px;
+                                border-radius:50%;
+                                background:#06b6d4;
+                                display:flex;
+                                align-items:center;
+                                justify-content:center;
+                                font-weight:700;
+                                color:white;
+                            ">
+
+                                {{ student.name|slice:":1" }}
+
+                            </div>
+
+                            {{ student.name }}
+
+                        </div>
+
+                    </td>
+
+                    <td>{{ student.course }}</td>
+
+                    <td>{{ student.email }}</td>
+
+                </tr>
+
+                {% endfor %}
+
+                </tbody>
+        </table>
+
+    </div>
+
+    <div class="alert-box">
+
+        <h2>⚠ Low Attendance Alerts</h2>
+
+        <p>Students below 75% attendance require attention.</p>
+
+    </div>
+
+    <div class="activity-box">
+
+        <h2>📌 Recent Activity</h2>
+
+        <div class="activity-item">✔ Rohit marked present today</div>
+
+        <div class="activity-item">✔ Teacher uploaded attendance</div>
+
+        <div class="activity-item">✔ New student added to BCA</div>
+
+    </div>
+
+</div>
+
+<script>
+
+    const attendanceChart = new Chart(
+        document.getElementById('attendanceChart'),
+        {
+            type:'doughnut',
+            data:{
+                labels:['Present','Absent'],
+                datasets:[{
+                    data:[
+                        {{ present_students }},
+                        {{ absent_students }}
+                    ],
+                    backgroundColor:[
+                        '#22d3ee',
+                        '#ef4444'
+                    ]
+                }]
+            }
+        }
+    );
+
+    const courseChart = new Chart(
+        document.getElementById('courseChart'),
+        {
+            type:'bar',
+            data:{
+                labels:['BCA','MCA','B.Tech','B.Com'],
+                datasets:[{
+                    label:'Students',
+                    data:[12,8,10,6],
+                    backgroundColor:'#3b82f6'
+                }]
+            }
+        }
+    );
+
+</script>
+
+</body>
+</html>

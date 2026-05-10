@@ -1,0 +1,545 @@
+<!-- backend/templates/analytics/analytics.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Analytics Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial, Helvetica, sans-serif;
+        }
+
+        body{
+            background:#020b2d;
+            color:white;
+            display:flex;
+        }
+
+        .sidebar{
+            width:280px;
+            height:100vh;
+            background:#06123d;
+            padding:30px 20px;
+            position:fixed;
+            left:0;
+            top:0;
+        }
+
+        .logo{
+            font-size:55px;
+            font-weight:bold;
+            color:#22d3ee;
+            line-height:1.1;
+            margin-bottom:70px;
+        }
+
+        .menu a{
+            display:block;
+            color:white;
+            text-decoration:none;
+            padding:18px 20px;
+            margin-bottom:15px;
+            border-radius:18px;
+            font-size:20px;
+            transition:0.3s;
+        }
+
+        .menu a:hover{
+            background:#1d4ed8;
+        }
+
+        .active{
+            background:linear-gradient(to right,#06b6d4,#2563eb);
+        }
+
+        .main{
+            margin-left:300px;
+            padding:40px;
+            width:100%;
+        }
+
+        .top-text{
+            color:#22d3ee;
+            letter-spacing:3px;
+            font-size:20px;
+            margin-bottom:20px;
+            font-weight:bold;
+        }
+
+        .heading{
+            font-size:90px;
+            font-weight:bold;
+            margin-bottom:20px;
+        }
+
+        .line{
+            width:120px;
+            height:6px;
+            background:#22d3ee;
+            border-radius:20px;
+            margin-bottom:50px;
+        }
+
+        .cards{
+            display:grid;
+            grid-template-columns:repeat(4,1fr);
+            gap:30px;
+            margin-bottom:50px;
+        }
+
+        .card{
+            background:#1c2945;
+            padding:40px;
+            border-radius:30px;
+            position:relative;
+            overflow:hidden;
+        }
+
+        .card::after{
+            content:"";
+            width:140px;
+            height:140px;
+            background:rgba(34,211,238,0.08);
+            position:absolute;
+            border-radius:50%;
+            top:-30px;
+            right:-30px;
+        }
+
+        .card h1{
+            font-size:90px;
+            margin-bottom:20px;
+        }
+
+        .card p{
+            color:#bfc7d5;
+            font-size:20px;
+        }
+
+        .charts{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:30px;
+            margin-bottom:50px;
+        }
+
+        .chart-box{
+            background:#101c3a;
+            padding:35px;
+            border-radius:30px;
+        }
+
+        .chart-box h2{
+            color:#22d3ee;
+            margin-bottom:30px;
+            font-size:28px;
+        }
+
+        .insight-box{
+            background:linear-gradient(to right,#101c3a,#1c2945);
+            padding:35px;
+            border-radius:30px;
+            margin-bottom:40px;
+        }
+
+        .insight-box h2{
+            color:#22d3ee;
+            font-size:30px;
+            margin-bottom:20px;
+        }
+
+        .insight-box ul{
+            padding-left:25px;
+        }
+
+        .insight-box li{
+            margin-bottom:15px;
+            font-size:20px;
+        }
+
+        .table-box{
+            background:#101c3a;
+            border-radius:30px;
+            padding:35px;
+            margin-bottom:40px;
+        }
+
+        .table-box h2{
+            color:#22d3ee;
+            font-size:28px;
+            margin-bottom:30px;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        th{
+            background:black;
+            color:#22d3ee;
+            padding:20px;
+            text-align:left;
+            font-size:20px;
+        }
+
+        td{
+            padding:25px 20px;
+            border-bottom:1px solid rgba(255,255,255,0.08);
+            font-size:20px;
+        }
+
+        .alert-box{
+            background:#991b1b;
+            padding:35px;
+            border-radius:30px;
+            margin-bottom:40px;
+        }
+
+        .alert-box h2{
+            font-size:35px;
+            margin-bottom:15px;
+        }
+
+        .activity-box{
+            background:#101c3a;
+            padding:35px;
+            border-radius:30px;
+        }
+
+        .activity-box h2{
+            font-size:32px;
+            margin-bottom:25px;
+        }
+
+        .activity{
+            padding:18px 0;
+            border-bottom:1px solid rgba(255,255,255,0.08);
+            font-size:20px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="sidebar">
+
+        <div class="logo">
+
+            Smart<br>
+            Campus
+
+        </div>
+
+        <div class="menu">
+
+            <a href="#">Dashboard</a>
+
+            <a href="#">Students</a>
+
+            <a href="#">Teachers</a>
+
+            <a href="#">Attendance</a>
+
+            <a href="#" class="active">Analytics</a>
+
+            <a href="#">Reports</a>
+
+        </div>
+
+    </div>
+
+    <div class="main">
+
+        <div class="top-text">
+            SMART CAMPUS ANALYTICS
+        </div>
+
+        <div class="heading">
+            Analytics Dashboard
+        </div>
+
+        <div class="line"></div>
+
+        <!-- CARDS -->
+
+        <div class="cards">
+
+            <div class="card">
+                <h1>{{ total_students }}</h1>
+                <p>Total Students</p>
+            </div>
+
+            <div class="card">
+                <h1>{{ present_students }}</h1>
+                <p>Present Students</p>
+            </div>
+
+            <div class="card">
+                <h1>{{ absent_students }}</h1>
+                <p>Absent Students</p>
+            </div>
+
+            <div class="card">
+                <h1>{{ attendance_percentage }}%</h1>
+                <p>Attendance Percentage</p>
+            </div>
+
+        </div>
+
+        <!-- CHARTS -->
+
+        <div class="charts">
+
+            <div class="chart-box">
+
+                <h2>Attendance Overview</h2>
+
+                <canvas id="attendanceChart"></canvas>
+
+            </div>
+
+            <div class="chart-box">
+
+                <h2>Course Distribution</h2>
+
+                <canvas id="courseChart"></canvas>
+
+            </div>
+
+        </div>
+
+        <!-- AI INSIGHTS -->
+
+        <div class="insight-box">
+
+            <h2>🤖 AI Insights</h2>
+
+            <ul>
+
+                {% for insight in ai_insights %}
+
+                <li>{{ insight }}</li>
+
+                {% endfor %}
+
+            </ul>
+
+        </div>
+
+        <!-- STUDENTS TABLE -->
+
+        <div class="table-box">
+
+            <h2>Students Overview</h2>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Name</th>
+
+                        <th>Course</th>
+
+                        <th>Email</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for student in students %}
+
+                    <tr>
+
+                        <td>{{ student.name }}</td>
+
+                        <td>{{ student.course }}</td>
+
+                        <td>{{ student.email }}</td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <!-- ALERTS -->
+
+        <div class="alert-box">
+
+            <h2>⚠ Low Attendance Alerts</h2>
+
+            <p>
+
+                {{ low_attendance_students|length }}
+
+                students require attention.
+
+            </p>
+
+        </div>
+
+        <!-- ACTIVITY -->
+
+        <div class="activity-box">
+
+            <h2>📌 Recent Activity</h2>
+
+            {% for activity in recent_activities %}
+
+            <div class="activity">
+
+                ✔ {{ activity }}
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    <!-- CHART JS -->
+
+    <script>
+
+        // ATTENDANCE CHART
+
+        const attendanceCtx = document
+        .getElementById('attendanceChart');
+
+        new Chart(attendanceCtx, {
+
+            type: 'doughnut',
+
+            data: {
+
+                labels: ['Present', 'Absent'],
+
+                datasets: [{
+
+                    data: [
+
+                        {{ present_students }},
+
+                        {{ absent_students }}
+
+                    ],
+
+                    backgroundColor: [
+
+                        '#22d3ee',
+
+                        '#ef4444'
+
+                    ],
+
+                    borderWidth: 0
+
+                }]
+
+            }
+
+        });
+
+        // COURSE CHART
+
+        const courseCtx = document
+        .getElementById('courseChart');
+
+        new Chart(courseCtx, {
+
+            type: 'bar',
+
+            data: {
+
+                labels: {{ course_labels|safe }},
+
+                datasets: [{
+
+                    label: 'Students',
+
+                    data: {{ course_values|safe }},
+
+                    backgroundColor: '#3b82f6',
+
+                    borderRadius: 10
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                plugins: {
+
+                    legend: {
+
+                        labels: {
+
+                            color: 'white'
+
+                        }
+
+                    }
+
+                },
+
+                scales: {
+
+                    y: {
+
+                        ticks: {
+
+                            color: 'white'
+
+                        }
+
+                    },
+
+                    x: {
+
+                        ticks: {
+
+                            color: 'white'
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        });
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,151 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Campus</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial, Helvetica, sans-serif;
+        }
+
+        body{
+            background:#020617;
+            color:white;
+        }
+
+        .main-layout{
+            display:flex;
+            min-height:100vh;
+        }
+
+        .sidebar{
+
+            width:280px;
+            background:#081028;
+            padding:40px 25px;
+            position:fixed;
+            left:0;
+            top:0;
+            height:100vh;
+
+        }
+
+        .logo{
+
+            font-size:65px;
+            font-weight:800;
+            color:#22d3ee;
+            line-height:1.1;
+            margin-bottom:80px;
+
+        }
+
+        .menu{
+
+            display:flex;
+            flex-direction:column;
+            gap:18px;
+
+        }
+
+        .menu a{
+
+            color:white;
+            text-decoration:none;
+            padding:18px 20px;
+            border-radius:18px;
+            font-size:20px;
+            transition:0.3s;
+
+        }
+
+        .menu a:hover{
+
+            background:#1e293b;
+
+        }
+
+        .menu .active{
+
+            background:linear-gradient(
+                90deg,
+                #06b6d4,
+                #2563eb
+            );
+
+        }
+
+        .content{
+
+            margin-left:280px;
+            width:calc(100% - 280px);
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="main-layout">
+
+        <!-- SIDEBAR -->
+
+        <div class="sidebar">
+
+            <div class="logo">
+                Smart<br>Campus
+            </div>
+
+            <div class="menu">
+
+                <a href="#">Dashboard</a>
+
+                <a href="#">Students</a>
+
+                <a href="#">Teachers</a>
+
+                <a href="#">Attendance</a>
+
+                <a href="/analytics/" class="active">
+                    Analytics
+                </a>
+
+                <a href="#">Reports</a>
+
+                <a href="#">Logout</a>
+
+            </div>
+
+        </div>
+
+        <!-- PAGE CONTENT -->
+
+        <div class="content">
+
+            {% block content %}
+
+            {% endblock %}
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

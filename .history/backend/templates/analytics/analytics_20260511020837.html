@@ -1,0 +1,372 @@
+
+{% load static %}
+
+{% block content %}
+
+<div class="analytics-page">
+
+    <!-- HERO SECTION -->
+
+    <div class="analytics-hero">
+
+        <div class="hero-left">
+
+            <p class="analytics-label">
+                SMART CAMPUS ANALYTICS
+            </p>
+
+            <h1 class="analytics-title">
+                Analytics Dashboard
+            </h1>
+
+            <p class="analytics-subtitle">
+                Real-time student attendance insights, 
+                performance monitoring and AI-powered campus analytics.
+            </p>
+
+        </div>
+
+        <div class="hero-right">
+
+            <div class="hero-badge">
+                LIVE DATA
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- STATS SECTION -->
+
+    <div class="stats-grid">
+
+        <div class="stats-card">
+
+            <div class="stats-icon cyan">
+                <i class="fa-solid fa-users"></i>
+            </div>
+
+            <div class="stats-content">
+                <h2>{{ total_students }}</h2>
+                <p>Total Students</p>
+            </div>
+
+        </div>
+
+        <div class="stats-card">
+
+            <div class="stats-icon green">
+                <i class="fa-solid fa-user-check"></i>
+            </div>
+
+            <div class="stats-content">
+                <h2>{{ present_count }}</h2>
+                <p>Present Students</p>
+            </div>
+
+        </div>
+
+        <div class="stats-card">
+
+            <div class="stats-icon red">
+                <i class="fa-solid fa-user-xmark"></i>
+            </div>
+
+            <div class="stats-content">
+                <h2>{{ absent_count }}</h2>
+                <p>Absent Students</p>
+            </div>
+
+        </div>
+
+        <div class="stats-card">
+
+            <div class="stats-icon blue">
+                <i class="fa-solid fa-chart-line"></i>
+            </div>
+
+            <div class="stats-content">
+                <h2>{{ attendance_percentage }}%</h2>
+                <p>Attendance Rate</p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- CHARTS -->
+
+    <div class="charts-grid">
+
+        <!-- PIE CHART -->
+
+        <div class="chart-card">
+
+            <div class="chart-header">
+                <h3>Attendance Distribution</h3>
+                <span>Live Overview</span>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="pieChart"></canvas>
+            </div>
+
+        </div>
+
+        <!-- BAR CHART -->
+
+        <div class="chart-card">
+
+            <div class="chart-header">
+                <h3>Weekly Attendance</h3>
+                <span>Last 7 Days</span>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="barChart"></canvas>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- TOP STUDENTS TABLE -->
+
+    <div class="table-card">
+
+        <div class="table-header">
+
+            <div>
+                <p class="table-label">
+                    STUDENT PERFORMANCE
+                </p>
+
+                <h2>
+                    Top Attendance Students
+                </h2>
+            </div>
+
+        </div>
+
+        <div class="table-wrapper">
+
+            <table class="analytics-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Student</th>
+                        <th>Course</th>
+                        <th>Email</th>
+                        <th>Attendance</th>
+                        <th>Status</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for student in students %}
+
+                    <tr>
+
+                        <td>
+
+                            <div class="student-info">
+
+                                <div class="student-avatar">
+                                    {{ student.name|first|upper }}
+                                </div>
+
+                                <div>
+                                    <h4>{{ student.name }}</h4>
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <td>{{ student.course }}</td>
+
+                        <td>{{ student.email }}</td>
+
+                        <td>
+
+                            <div class="attendance-progress">
+
+                                <div class="progress-bar">
+
+                                    <div class="progress-fill"
+                                         style="width: {{ student.attendance }}%;">
+                                    </div>
+
+                                </div>
+
+                                <span>
+                                    {{ student.attendance }}%
+                                </span>
+
+                            </div>
+
+                        </td>
+
+                        <td>
+
+                            {% if student.attendance >= 75 %}
+
+                                <span class="status good">
+                                    Good
+                                </span>
+
+                            {% else %}
+
+                                <span class="status low">
+                                    Low
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- CHART JS -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+const pieCtx = document.getElementById('pieChart');
+
+new Chart(pieCtx, {
+
+    type: 'doughnut',
+
+    data: {
+
+        labels: ['Present', 'Absent'],
+
+        datasets: [{
+
+            data: [
+                {{ present_count }},
+                {{ absent_count }}
+            ],
+
+            backgroundColor: [
+                '#00e5ff',
+                '#ff3b5c'
+            ],
+
+            borderWidth: 0
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        plugins: {
+
+            legend: {
+
+                labels: {
+                    color: '#ffffff'
+                }
+
+            }
+
+        }
+
+    }
+
+});
+
+const barCtx = document.getElementById('barChart');
+
+new Chart(barCtx, {
+
+    type: 'bar',
+
+    data: {
+
+        labels: [
+            'Mon',
+            'Tue',
+            'Wed',
+            'Thu',
+            'Fri',
+            'Sat'
+        ],
+
+        datasets: [{
+
+            label: 'Attendance',
+
+            data: [12, 19, 10, 15, 8, 13],
+
+            backgroundColor: '#00e5ff',
+
+            borderRadius: 12
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        plugins: {
+
+            legend: {
+
+                labels: {
+                    color: '#ffffff'
+                }
+
+            }
+
+        },
+
+        scales: {
+
+            y: {
+
+                ticks: {
+                    color: '#ffffff'
+                }
+
+            },
+
+            x: {
+
+                ticks: {
+                    color: '#ffffff'
+                }
+
+            }
+
+        }
+
+    }
+
+});
+
+</script>
+
+{% endblock %}

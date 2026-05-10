@@ -1,0 +1,133 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+<div class="dashboard-container">
+
+    <div class="dashboard-header">
+        <div>
+            <p class="dashboard-kicker">Admin Insights</p>
+            <h1 class="dashboard-title">
+                Analytics Dashboard
+            </h1>
+            <p class="dashboard-subtitle">
+                Attendance insights, student trends and analytics overview.
+            </p>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stats-card">
+            <h3>Total Students</h3>
+            <h1>{{ total_students }}</h1>
+        </div>
+
+        <div class="stats-card stats-card-success">
+            <h3>Present</h3>
+            <h1>{{ present_count }}</h1>
+        </div>
+
+        <div class="stats-card stats-card-danger">
+            <h3>Absent</h3>
+            <h1>{{ absent_count }}</h1>
+        </div>
+
+        <div class="stats-card">
+            <h3>Attendance %</h3>
+            <h1>{{ attendance_percentage }}%</h1>
+        </div>
+    </div>
+
+    <div class="charts-grid">
+        <div class="chart-card">
+            <div class="section-heading">
+                <h2>Present vs Absent</h2>
+                <span>Distribution</span>
+            </div>
+            <canvas id="pieChart"></canvas>
+        </div>
+
+        <div class="chart-card">
+            <div class="section-heading">
+                <h2>Weekly Attendance</h2>
+                <span>Last 7 days</span>
+            </div>
+            <canvas id="barChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+new Chart(document.getElementById('pieChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Present', 'Absent'],
+        datasets: [{
+            data: [{{ present_count }}, {{ absent_count }}],
+            backgroundColor: ['#22c55e', '#ef4444'],
+            borderColor: ['rgba(34, 197, 94, 0.35)', 'rgba(239, 68, 68, 0.35)'],
+            borderWidth: 1,
+            hoverOffset: 6
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '68%',
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    color: '#e5eefb',
+                    boxWidth: 12,
+                    padding: 18
+                }
+            }
+        }
+    }
+});
+
+new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+        labels: {{ weekly_labels|safe }},
+        datasets: [{
+            label: 'Present Students',
+            data: {{ weekly_values|safe }},
+            backgroundColor: 'rgba(0, 217, 255, 0.72)',
+            borderColor: '#00d9ff',
+            borderWidth: 1,
+            borderRadius: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                labels: { color: '#e5eefb' }
+            }
+        },
+        scales: {
+            x: {
+                ticks: { color: '#9ca3af' },
+                grid: { color: 'rgba(148, 163, 184, 0.08)' }
+            },
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    color: '#9ca3af',
+                    precision: 0
+                },
+                grid: { color: 'rgba(148, 163, 184, 0.1)' }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

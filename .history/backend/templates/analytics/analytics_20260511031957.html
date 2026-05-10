@@ -1,0 +1,861 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="analytics-container">
+
+    <!-- HEADER -->
+
+    <div class="analytics-header">
+
+        <p class="analytics-subtitle">
+            SMART CAMPUS ANALYTICS
+        </p>
+
+        <h1 class="analytics-title">
+            Analytics Dashboard
+        </h1>
+
+        <div class="analytics-line"></div>
+
+    </div>
+
+    <!-- STATS CARDS -->
+
+    <div class="stats-grid">
+
+        <div class="stats-card">
+
+            <div class="card-glow"></div>
+
+            <h2>{{ total_students }}</h2>
+
+            <p>Total Students</p>
+
+        </div>
+
+        <div class="stats-card">
+
+            <div class="card-glow"></div>
+
+            <h2>{{ present_students }}</h2>
+
+            <p>Present Students</p>
+
+        </div>
+
+        <div class="stats-card">
+
+            <div class="card-glow"></div>
+
+            <h2>{{ absent_students }}</h2>
+
+            <p>Absent Students</p>
+
+        </div>
+
+        <div class="stats-card">
+
+            <div class="card-glow"></div>
+
+            <h2>{{ attendance_percentage }}%</h2>
+
+            <p>Attendance Percentage</p>
+
+        </div>
+
+    </div>
+
+    <!-- CHARTS -->
+
+    <div class="charts-grid">
+
+        <div class="chart-card">
+
+            <h3>Attendance Overview</h3>
+
+            <div class="chart-container">
+                <canvas id="attendanceChart"></canvas>
+            </div>
+
+        </div>
+
+        <div class="chart-card">
+
+            <h3>Course Distribution</h3>
+
+            <div class="chart-container">
+                <canvas id="courseChart"></canvas>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- AI INSIGHTS -->
+
+    <div class="ai-card">
+
+        <h2>🤖 AI Insights</h2>
+
+        <ul>
+
+            {% if ai_insights %}
+
+                {% for insight in ai_insights %}
+
+                    <li>{{ insight }}</li>
+
+                {% endfor %}
+
+            {% else %}
+
+                <li>Attendance data updated successfully</li>
+
+                <li>Students attendance monitoring active</li>
+
+                <li>Analytics generated from MongoDB records</li>
+
+            {% endif %}
+
+        </ul>
+
+    </div>
+
+    <!-- STUDENT TABLE -->
+
+    <div class="table-card">
+
+        <div class="table-top">
+
+            <h2>Students Overview</h2>
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search Student..."
+            >
+
+        </div>
+
+        <div class="table-wrapper">
+
+            <table id="studentTable">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Name</th>
+                        <th>Course</th>
+                        <th>Email</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for student in students %}
+
+                    <tr>
+
+                        <td>
+
+                            <div class="student-cell">
+
+                                <div class="avatar">
+
+                                    {{ student.name|slice:":1" }}
+
+                                </div>
+
+                                <span>
+                                    {{ student.name }}
+                                </span>
+
+                            </div>
+
+                        </td>
+
+                        <td>
+                            {{ student.course }}
+                        </td>
+
+                        <td>
+                            {{ student.email }}
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td colspan="3" class="empty-data">
+                            No student data found
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <!-- ALERT -->
+
+    <div class="alert-card">
+
+        <h2>⚠ Low Attendance Alerts</h2>
+
+        {% if low_attendance_students %}
+
+            {% for student in low_attendance_students %}
+
+                <p>
+
+                    {{ student.name }}
+                    -
+                    {{ student.attendance_percentage }}%
+
+                </p>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p>
+                No low attendance alerts.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+    <!-- RECENT ACTIVITY -->
+
+    <div class="activity-card">
+
+        <h2>📌 Recent Activity</h2>
+
+        {% if recent_activities %}
+
+            {% for activity in recent_activities %}
+
+                <div class="activity-item">
+
+                    ✔ {{ activity }}
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="activity-item">
+                Attendance records updated
+            </div>
+
+            <div class="activity-item">
+                Analytics dashboard loaded
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<!-- CHART JS -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+    // =========================
+    // SEARCH FILTER
+    // =========================
+
+    const searchInput = document.getElementById("searchInput");
+
+    searchInput.addEventListener("keyup", function () {
+
+        const value = this.value.toLowerCase();
+
+        const rows = document.querySelectorAll("#studentTable tbody tr");
+
+        rows.forEach(row => {
+
+            const text = row.innerText.toLowerCase();
+
+            row.style.display = text.includes(value)
+                ? ""
+                : "none";
+
+        });
+
+    });
+
+    // =========================
+    // ATTENDANCE CHART
+    // =========================
+
+    const attendanceCanvas =
+        document.getElementById("attendanceChart");
+
+    if(attendanceCanvas){
+
+        new Chart(attendanceCanvas, {
+
+            type: "doughnut",
+
+            data: {
+
+                labels: [
+                    "Present",
+                    "Absent"
+                ],
+
+                datasets: [{
+
+                    data: [
+                        {{ present_students|default:0 }},
+                        {{ absent_students|default:0 }}
+                    ],
+
+                    backgroundColor: [
+                        "#22d3ee",
+                        "#ef4444"
+                    ],
+
+                    borderColor: "#0f172a",
+
+                    borderWidth: 3,
+
+                    hoverOffset: 15
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+
+                        labels: {
+
+                            color: "white",
+
+                            font: {
+                                size: 14
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        });
+
+    }
+
+    // =========================
+    // COURSE CHART
+    // =========================
+
+    const courseCanvas =
+        document.getElementById("courseChart");
+
+    if(courseCanvas){
+
+        new Chart(courseCanvas, {
+
+            type: "bar",
+
+            data: {
+
+                labels: {{ course_labels|safe }},
+
+                datasets: [{
+
+                    label: "Students",
+
+                    data: {{ course_values|safe }},
+
+                    backgroundColor: "#3b82f6",
+
+                    borderRadius: 12
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+
+                        labels: {
+                            color: "white"
+                        }
+
+                    }
+
+                },
+
+                scales: {
+
+                    x: {
+
+                        ticks: {
+                            color: "white"
+                        },
+
+                        grid: {
+                            color: "rgba(255,255,255,0.05)"
+                        }
+
+                    },
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+                            color: "white"
+                        },
+
+                        grid: {
+                            color: "rgba(255,255,255,0.05)"
+                        }
+
+                    }
+
+                }
+
+            }
+
+        });
+
+    }
+
+</script>
+
+<style>
+
+.analytics-container{
+
+    width:100%;
+    padding:40px;
+    background:#020617;
+    min-height:100vh;
+    color:white;
+
+}
+
+.analytics-subtitle{
+
+    color:#22d3ee;
+    letter-spacing:3px;
+    font-size:15px;
+    font-weight:600;
+
+}
+
+.analytics-title{
+
+    font-size:90px;
+    font-weight:800;
+    line-height:1;
+    margin-top:10px;
+
+}
+
+.analytics-line{
+
+    width:90px;
+    height:5px;
+    border-radius:20px;
+    background:#22d3ee;
+    margin-top:20px;
+
+}
+
+/* =======================
+   STATS
+======================= */
+
+.stats-grid{
+
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:25px;
+    margin-top:50px;
+
+}
+
+.stats-card{
+
+    background:linear-gradient(
+        145deg,
+        #172033,
+        #1e293b
+    );
+
+    padding:40px;
+    border-radius:30px;
+    position:relative;
+    overflow:hidden;
+    transition:0.4s;
+    border:1px solid rgba(255,255,255,0.05);
+
+}
+
+.stats-card:hover{
+
+    transform:translateY(-8px);
+
+}
+
+.card-glow{
+
+    position:absolute;
+    width:140px;
+    height:140px;
+    background:rgba(34,211,238,0.08);
+    border-radius:50%;
+    top:-40px;
+    right:-40px;
+
+}
+
+.stats-card h2{
+
+    font-size:75px;
+    font-weight:800;
+    position:relative;
+    z-index:2;
+
+}
+
+.stats-card p{
+
+    color:#94a3b8;
+    font-size:22px;
+    margin-top:10px;
+    position:relative;
+    z-index:2;
+
+}
+
+/* =======================
+   CHARTS
+======================= */
+
+.charts-grid{
+
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:30px;
+    margin-top:50px;
+
+}
+
+.chart-card{
+
+    background:#111827;
+    border-radius:30px;
+    padding:35px;
+    border:1px solid rgba(255,255,255,0.05);
+
+}
+
+.chart-card h3{
+
+    color:#22d3ee;
+    font-size:28px;
+    margin-bottom:20px;
+
+}
+
+.chart-container{
+
+    position:relative;
+    width:100%;
+    height:400px;
+
+}
+
+/* =======================
+   AI CARD
+======================= */
+
+.ai-card{
+
+    margin-top:50px;
+    background:linear-gradient(
+        90deg,
+        #111827,
+        #1e293b
+    );
+
+    padding:35px;
+    border-radius:30px;
+    border:1px solid rgba(255,255,255,0.05);
+
+}
+
+.ai-card h2{
+
+    font-size:40px;
+    color:#22d3ee;
+    margin-bottom:20px;
+
+}
+
+.ai-card li{
+
+    margin-bottom:15px;
+    font-size:18px;
+    color:#e2e8f0;
+
+}
+
+/* =======================
+   TABLE
+======================= */
+
+.table-card{
+
+    margin-top:50px;
+    background:#111827;
+    border-radius:30px;
+    padding:35px;
+    border:1px solid rgba(255,255,255,0.05);
+
+}
+
+.table-top{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+    gap:20px;
+
+}
+
+.table-top h2{
+
+    color:#22d3ee;
+    font-size:42px;
+
+}
+
+#searchInput{
+
+    background:#1e293b;
+    border:none;
+    outline:none;
+    color:white;
+    padding:15px 20px;
+    border-radius:15px;
+    width:280px;
+    font-size:16px;
+
+}
+
+.table-wrapper{
+
+    overflow-x:auto;
+
+}
+
+table{
+
+    width:100%;
+    border-collapse:collapse;
+
+}
+
+th{
+
+    background:black;
+    color:#22d3ee;
+    text-align:left;
+    padding:20px;
+    font-size:20px;
+
+}
+
+td{
+
+    padding:22px;
+    border-bottom:1px solid rgba(255,255,255,0.05);
+
+}
+
+tr{
+
+    transition:0.3s;
+
+}
+
+tr:hover{
+
+    background:rgba(255,255,255,0.03);
+
+}
+
+.student-cell{
+
+    display:flex;
+    align-items:center;
+    gap:15px;
+
+}
+
+.avatar{
+
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    background:#06b6d4;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+
+}
+
+.empty-data{
+
+    text-align:center;
+    color:#94a3b8;
+
+}
+
+/* =======================
+   ALERT
+======================= */
+
+.alert-card{
+
+    margin-top:50px;
+    background:linear-gradient(
+        135deg,
+        #991b1b,
+        #7f1d1d
+    );
+
+    padding:35px;
+    border-radius:30px;
+
+}
+
+.alert-card h2{
+
+    font-size:38px;
+    margin-bottom:20px;
+
+}
+
+.alert-card p{
+
+    margin-bottom:10px;
+    font-size:18px;
+
+}
+
+/* =======================
+   ACTIVITY
+======================= */
+
+.activity-card{
+
+    margin-top:50px;
+    background:#111827;
+    border-radius:30px;
+    padding:35px;
+    border:1px solid rgba(255,255,255,0.05);
+
+}
+
+.activity-card h2{
+
+    color:#22d3ee;
+    font-size:38px;
+    margin-bottom:20px;
+
+}
+
+.activity-item{
+
+    padding:18px 0;
+    border-bottom:1px solid rgba(255,255,255,0.05);
+    font-size:18px;
+    color:#e2e8f0;
+
+}
+
+/* =======================
+   RESPONSIVE
+======================= */
+
+@media(max-width:1200px){
+
+    .charts-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .analytics-title{
+
+        font-size:55px;
+
+    }
+
+    .table-top{
+
+        flex-direction:column;
+        align-items:flex-start;
+
+    }
+
+    #searchInput{
+
+        width:100%;
+
+    }
+
+}
+
+</style>
+
+{% endblock %}

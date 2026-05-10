@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Analytics Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial,sans-serif;
+        }
+
+        body{
+            background:#020826;
+            color:white;
+            display:flex;
+        }
+
+        .sidebar{
+            width:280px;
+            min-height:100vh;
+            background:#07122f;
+            padding:40px 20px;
+            position:fixed;
+            left:0;
+            top:0;
+        }
+
+        .logo{
+            font-size:60px;
+            font-weight:bold;
+            line-height:1.1;
+            color:#27d8ff;
+            margin-bottom:80px;
+        }
+
+        .menu{
+            list-style:none;
+        }
+
+        .menu li{
+            margin-bottom:20px;
+        }
+
+        .menu a{
+            text-decoration:none;
+            color:white;
+            font-size:22px;
+            display:block;
+            padding:18px 20px;
+            border-radius:18px;
+            transition:0.3s;
+        }
+
+        .menu a:hover,
+        .active{
+            background:linear-gradient(90deg,#12d8fa,#1f6fff);
+        }
+
+        .main{
+            margin-left:300px;
+            width:100%;
+            padding:40px;
+        }
+
+        .top-title{
+            color:#1ddcff;
+            font-size:20px;
+            letter-spacing:3px;
+            margin-bottom:20px;
+        }
+
+        .main h1{
+            font-size:90px;
+            margin-bottom:20px;
+            font-weight:900;
+        }
+
+        .line{
+            width:120px;
+            height:7px;
+            background:#20d7ff;
+            border-radius:20px;
+            margin-bottom:50px;
+        }
+
+        .cards{
+            display:grid;
+            grid-template-columns:repeat(4,1fr);
+            gap:30px;
+            margin-bottom:50px;
+        }
+
+        .card{
+            background:linear-gradient(145deg,#1d2942,#131f38);
+            padding:40px;
+            border-radius:30px;
+            min-height:220px;
+            position:relative;
+            overflow:hidden;
+        }
+
+        .card::after{
+            content:'';
+            position:absolute;
+            width:120px;
+            height:120px;
+            background:rgba(0,255,255,0.08);
+            border-radius:50%;
+            top:-30px;
+            right:-30px;
+        }
+
+        .card h2{
+            font-size:80px;
+            margin-bottom:20px;
+        }
+
+        .card p{
+            font-size:22px;
+            color:#b6bfd1;
+        }
+
+        .charts{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:30px;
+            margin-bottom:50px;
+        }
+
+        .chart-box{
+            background:#111d37;
+            border-radius:30px;
+            padding:35px;
+        }
+
+        .chart-box h2{
+            color:#1ddcff;
+            font-size:28px;
+            margin-bottom:30px;
+        }
+
+        .insights{
+            background:linear-gradient(90deg,#111d37,#202d46);
+            padding:40px;
+            border-radius:30px;
+            margin-bottom:40px;
+        }
+
+        .insights h2{
+            color:#1ddcff;
+            font-size:28px;
+            margin-bottom:25px;
+        }
+
+        .insights ul{
+            padding-left:20px;
+        }
+
+        .insights li{
+            margin-bottom:20px;
+            font-size:22px;
+        }
+
+        .table-box{
+            background:#111d37;
+            padding:35px;
+            border-radius:30px;
+            margin-bottom:40px;
+        }
+
+        .table-header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:30px;
+        }
+
+        .table-header h2{
+            color:#1ddcff;
+            font-size:30px;
+        }
+
+        .search{
+            padding:16px 20px;
+            width:280px;
+            border:none;
+            border-radius:18px;
+            background:#202c46;
+            color:white;
+            font-size:18px;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        th{
+            background:black;
+            color:#1ddcff;
+            text-align:left;
+            padding:25px;
+            font-size:22px;
+        }
+
+        td{
+            padding:25px;
+            border-bottom:1px solid rgba(255,255,255,0.06);
+            font-size:22px;
+        }
+
+        tr:hover{
+            background:#1b2740;
+        }
+
+        .avatar{
+            width:55px;
+            height:55px;
+            border-radius:50%;
+            background:#1ddcff;
+            display:inline-flex;
+            justify-content:center;
+            align-items:center;
+            color:white;
+            font-weight:bold;
+            margin-right:15px;
+        }
+
+        .danger{
+            background:#991b1b;
+            padding:35px;
+            border-radius:30px;
+            margin-bottom:40px;
+        }
+
+        .danger h2{
+            font-size:32px;
+            margin-bottom:15px;
+        }
+
+        .activity{
+            background:#111d37;
+            padding:35px;
+            border-radius:30px;
+        }
+
+        .activity h2{
+            margin-bottom:20px;
+            font-size:30px;
+        }
+
+        .activity p{
+            margin-bottom:20px;
+            font-size:22px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="sidebar">
+
+        <div class="logo">
+            Smart<br>Campus
+        </div>
+
+        <ul class="menu">
+
+            <li><a href="#">Dashboard</a></li>
+
+            <li><a href="#">Students</a></li>
+
+            <li><a href="#">Teachers</a></li>
+
+            <li><a href="#">Attendance</a></li>
+
+            <li><a class="active" href="#">Analytics</a></li>
+
+            <li><a href="#">Reports</a></li>
+
+        </ul>
+
+    </div>
+
+    <div class="main">
+
+        <div class="top-title">
+            SMART CAMPUS ANALYTICS
+        </div>
+
+        <h1>Analytics Dashboard</h1>
+
+        <div class="line"></div>
+
+        <div class="cards">
+
+            <div class="card">
+                <h2>{{ total_students }}</h2>
+                <p>Total Students</p>
+            </div>
+
+            <div class="card">
+                <h2>{{ present_students }}</h2>
+                <p>Present Students</p>
+            </div>
+
+            <div class="card">
+                <h2>{{ absent_students }}</h2>
+                <p>Absent Students</p>
+            </div>
+
+            <div class="card">
+                <h2>{{ attendance_percentage }}%</h2>
+                <p>Attendance Percentage</p>
+            </div>
+
+        </div>
+
+        <div class="charts">
+
+            <div class="chart-box">
+
+                <h2>Attendance Overview</h2>
+
+                <canvas id="attendanceChart"></canvas>
+
+            </div>
+
+            <div class="chart-box">
+
+                <h2>Course Distribution</h2>
+
+                <canvas id="courseChart"></canvas>
+
+            </div>
+
+        </div>
+
+        <div class="insights">
+
+            <h2>🤖 AI Insights</h2>
+
+            <ul>
+
+                {% for insight in ai_insights %}
+
+                    <li>{{ insight }}</li>
+
+                {% endfor %}
+
+            </ul>
+
+        </div>
+
+        <div class="table-box">
+
+            <div class="table-header">
+
+                <h2>Students Overview</h2>
+
+                <input
+                    type="text"
+                    class="search"
+                    placeholder="Search Student..."
+                >
+
+            </div>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Name</th>
+
+                        <th>Course</th>
+
+                        <th>Email</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for student in students %}
+
+                    <tr>
+
+                        <td>
+
+                            <span class="avatar">
+
+                                {{ student.name|first }}
+
+                            </span>
+
+                            {{ student.name }}
+
+                        </td>
+
+                        <td>{{ student.course }}</td>
+
+                        <td>{{ student.email }}</td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="danger">
+
+            <h2>⚠ Low Attendance Alerts</h2>
+
+            <p>
+                Students below 75% attendance require attention.
+            </p>
+
+        </div>
+
+        <div class="activity">
+
+            <h2>📌 Recent Activity</h2>
+
+            {% for activity in recent_activities %}
+
+                <p>✔ {{ activity }}</p>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    <script>
+
+        // =========================
+        // ATTENDANCE CHART
+        // =========================
+
+        const attendanceCtx = document
+            .getElementById('attendanceChart');
+
+        new Chart(attendanceCtx, {
+
+            type: 'doughnut',
+
+            data: {
+
+                labels: ['Present', 'Absent'],
+
+                datasets: [{
+
+                    data: [
+
+                        {{ present_students }},
+
+                        {{ absent_students }}
+
+                    ],
+
+                    backgroundColor: [
+
+                        '#28d7ff',
+
+                        '#ff4d4d'
+
+                    ],
+
+                    borderWidth: 3,
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                plugins: {
+
+                    legend: {
+
+                        labels: {
+
+                            color: 'white',
+
+                            font: {
+
+                                size: 18
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        });
+
+        // =========================
+        // COURSE CHART
+        // =========================
+
+        const courseCtx = document
+            .getElementById('courseChart');
+
+        new Chart(courseCtx, {
+
+            type: 'bar',
+
+            data: {
+
+                labels: {{ course_labels|safe }},
+
+                datasets: [{
+
+                    label: 'Students',
+
+                    data: {{ course_values|safe }},
+
+                    backgroundColor: '#3b82f6',
+
+                    borderRadius: 10
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                scales: {
+
+                    x: {
+
+                        ticks: {
+
+                            color: 'white'
+
+                        }
+
+                    },
+
+                    y: {
+
+                        ticks: {
+
+                            color: 'white'
+
+                        }
+
+                    }
+
+                },
+
+                plugins: {
+
+                    legend: {
+
+                        labels: {
+
+                            color: 'white'
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        });
+
+    </script>
+
+</body>
+
+</html>
