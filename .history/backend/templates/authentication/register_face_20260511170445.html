@@ -1,0 +1,619 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>AI Face Registration</title>
+
+    <script
+        src="{% static 'js/register_face.js' %}"
+        defer
+    ></script>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Poppins',sans-serif;
+        }
+
+        body{
+
+            background:
+            linear-gradient(
+                135deg,
+                #020617,
+                #071132,
+                #020617
+            );
+
+            min-height:100vh;
+            color:white;
+            overflow-x:hidden;
+        }
+
+        .main-container{
+
+            width:95%;
+            max-width:1500px;
+            margin:auto;
+            padding:30px;
+        }
+
+        .top-header{
+
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:30px;
+        }
+
+        .title{
+
+            font-size:52px;
+            font-weight:700;
+            color:#22d3ee;
+        }
+
+        .status{
+
+            background:#052e16;
+            color:#22c55e;
+            padding:14px 24px;
+            border-radius:14px;
+            font-size:18px;
+            border:1px solid #22c55e;
+        }
+
+        .grid{
+
+            display:grid;
+            grid-template-columns:2fr 1fr;
+            gap:30px;
+        }
+
+        .card{
+
+            background:rgba(9,18,48,0.85);
+
+            border:1px solid rgba(34,211,238,0.2);
+
+            backdrop-filter:blur(18px);
+
+            border-radius:28px;
+
+            padding:28px;
+
+            box-shadow:
+            0 0 40px rgba(0,255,255,0.08);
+        }
+
+        .section-title{
+
+            font-size:34px;
+            color:#22d3ee;
+            margin-bottom:25px;
+            font-weight:600;
+        }
+
+        .camera-box{
+
+            position:relative;
+            overflow:hidden;
+            border-radius:22px;
+            border:3px solid #22d3ee;
+        }
+
+        video{
+
+            width:100%;
+            height:620px;
+            object-fit:cover;
+            display:block;
+        }
+
+        .scan-line{
+
+            position:absolute;
+            width:100%;
+            height:6px;
+
+            background:#22d3ee;
+
+            box-shadow:0 0 20px #22d3ee;
+
+            animation:scan 3s linear infinite;
+        }
+
+        @keyframes scan{
+
+            0%{
+                top:0%;
+            }
+
+            100%{
+                top:100%;
+            }
+        }
+
+        .face-frame{
+
+            position:absolute;
+
+            top:50%;
+            left:50%;
+
+            transform:translate(-50%,-50%);
+
+            width:260px;
+            height:320px;
+
+            border:4px solid #22d3ee;
+
+            border-radius:20px;
+
+            box-shadow:
+            0 0 25px #22d3ee;
+        }
+
+        .controls{
+
+            margin-top:25px;
+        }
+
+        input{
+
+            width:100%;
+            padding:18px;
+            margin-bottom:18px;
+
+            background:#132252;
+
+            border:none;
+
+            border-radius:14px;
+
+            color:white;
+
+            font-size:18px;
+        }
+
+        .btn{
+
+            width:100%;
+            padding:18px;
+
+            border:none;
+
+            border-radius:16px;
+
+            font-size:22px;
+
+            font-weight:600;
+
+            cursor:pointer;
+
+            transition:0.3s;
+        }
+
+        .capture-btn{
+
+            background:#06b6d4;
+            color:black;
+            margin-bottom:18px;
+        }
+
+        .capture-btn:hover{
+
+            transform:scale(1.02);
+        }
+
+        .register-btn{
+
+            background:#22c55e;
+            color:white;
+        }
+
+        .progress-box{
+
+            margin-top:22px;
+
+            background:#0f172a;
+
+            padding:20px;
+
+            border-radius:16px;
+        }
+
+        .progress-text{
+
+            text-align:center;
+
+            color:#22c55e;
+
+            font-size:24px;
+
+            margin-bottom:15px;
+        }
+
+        .progress-bar{
+
+            width:100%;
+            height:14px;
+
+            background:#1e293b;
+
+            border-radius:20px;
+
+            overflow:hidden;
+        }
+
+        .progress-fill{
+
+            width:0%;
+            height:100%;
+
+            background:#22d3ee;
+
+            transition:0.4s;
+        }
+
+        .student-card{
+
+            text-align:center;
+        }
+
+        .avatar{
+
+            width:130px;
+            height:130px;
+
+            border-radius:50%;
+
+            margin:auto;
+
+            background:
+            linear-gradient(
+                135deg,
+                #22d3ee,
+                #2563eb
+            );
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+
+            font-size:55px;
+            font-weight:700;
+
+            margin-bottom:20px;
+        }
+
+        .student-name{
+
+            font-size:34px;
+            font-weight:600;
+        }
+
+        .student-dept{
+
+            margin-top:10px;
+            color:#94a3b8;
+            font-size:20px;
+        }
+
+        .success-box{
+
+            margin-top:25px;
+
+            background:#052e16;
+
+            border:1px solid #22c55e;
+
+            color:#22c55e;
+
+            padding:18px;
+
+            border-radius:16px;
+
+            font-size:20px;
+        }
+
+        .stats-grid{
+
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:18px;
+            margin-top:30px;
+        }
+
+        .stat{
+
+            background:#0f172a;
+
+            padding:25px;
+
+            border-radius:18px;
+
+            text-align:center;
+        }
+
+        .stat h2{
+
+            font-size:42px;
+            color:#22d3ee;
+        }
+
+        .stat p{
+
+            margin-top:10px;
+            color:#cbd5e1;
+        }
+
+        @media(max-width:1100px){
+
+            .grid{
+
+                grid-template-columns:1fr;
+            }
+
+            video{
+
+                height:420px;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="main-container">
+
+    <div class="top-header">
+
+        <div class="title">
+
+            AI Face Registration
+
+        </div>
+
+        <div class="status">
+
+            AI System Active ✅
+
+        </div>
+
+    </div>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <div class="section-title">
+
+                Live AI Camera
+
+            </div>
+
+            <div class="camera-box">
+
+                <video
+                    id="video"
+                    autoplay
+                ></video>
+
+                <div class="scan-line"></div>
+
+                <div class="face-frame"></div>
+
+            </div>
+
+            <div class="controls">
+
+                <form method="POST">
+
+                    {% csrf_token %}
+
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="Student Full Name"
+                        required
+                    >
+
+                    <input
+                        type="text"
+                        name="roll_no"
+                        placeholder="Roll Number"
+                        required
+                    >
+
+                    <input
+                        type="text"
+                        name="department"
+                        placeholder="Department"
+                        required
+                    >
+
+                    <canvas
+                        id="canvas"
+                        width="640"
+                        height="480"
+                        style="display:none;"
+                    ></canvas>
+
+                    <button
+                        type="button"
+                        id="captureBtn"
+                        class="btn capture-btn"
+                    >
+
+                        📸 Capture Face
+
+                    </button>
+
+                    <div class="progress-box">
+
+                        <div
+                            class="progress-text"
+                            id="imageCount"
+                        >
+
+                            0 / 5 Images Captured
+
+                        </div>
+
+                        <div class="progress-bar">
+
+                            <div
+                                class="progress-fill"
+                                id="progressFill"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="btn register-btn"
+                    >
+
+                        🚀 Register Student
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="card">
+
+            <div class="section-title">
+
+                AI Student Detection
+
+            </div>
+
+            <div class="student-card">
+
+                <div class="avatar">
+
+                    T
+
+                </div>
+
+                <div class="student-name">
+
+                    Tejas Kale
+
+                </div>
+
+                <div class="student-dept">
+
+                    BCA • AI Department
+
+                </div>
+
+                <div class="success-box">
+
+                    Face Registration Ready ✅
+
+                </div>
+
+            </div>
+
+            <div class="stats-grid">
+
+                <div class="stat">
+
+                    <h2>98%</h2>
+
+                    <p>AI Accuracy</p>
+
+                </div>
+
+                <div class="stat">
+
+                    <h2>5</h2>
+
+                    <p>Images</p>
+
+                </div>
+
+                <div class="stat">
+
+                    <h2>Live</h2>
+
+                    <p>Realtime</p>
+
+                </div>
+
+                <div class="stat">
+
+                    <h2>AI</h2>
+
+                    <p>Status</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    let captured = 0;
+
+    document
+    .getElementById("captureBtn")
+    .addEventListener("click",function(){
+
+        if(captured >= 5){
+
+            alert("5 Images Already Captured");
+            return;
+        }
+
+        captured++;
+
+        document.getElementById(
+            "imageCount"
+        ).innerText =
+        captured + " / 5 Images Captured";
+
+        document.getElementById(
+            "progressFill"
+        ).style.width =
+        (captured * 20) + "%";
+
+    });
+
+</script>
+
+</body>
+</html>

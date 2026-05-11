@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Face</title>
+
+    <style>
+
+        body{
+            background:#06142E;
+            font-family:Arial;
+            color:white;
+            padding:40px;
+        }
+
+        .container{
+            width:500px;
+            margin:auto;
+            background:#0B1E4F;
+            padding:30px;
+            border-radius:20px;
+        }
+
+        h1{
+            text-align:center;
+            margin-bottom:30px;
+        }
+
+        input{
+            width:100%;
+            padding:15px;
+            margin-top:15px;
+            border:none;
+            border-radius:10px;
+            font-size:16px;
+        }
+
+        button{
+            width:100%;
+            padding:15px;
+            margin-top:20px;
+            border:none;
+            border-radius:10px;
+            background:#12D6FF;
+            font-size:18px;
+            font-weight:bold;
+            cursor:pointer;
+        }
+
+        button:hover{
+            background:#00B5D8;
+        }
+
+    </style>
+
+</head>
+<body>
+
+    <div class="container">
+
+        <h1>Register Student</h1>
+
+        <form method="POST" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <input
+                type="text"
+                name="name"
+                placeholder="Enter Name"
+                required
+            >
+
+            <input
+                type="text"
+                name="roll_no"
+                placeholder="Enter Roll Number"
+                required
+            >
+
+            <input
+                type="text"
+                name="department"
+                placeholder="Enter Department"
+                required
+            >
+
+            <input
+                type="file"
+                name="face_image"
+                accept="image/*"
+                required
+            >
+
+            <button type="submit">
+                Register Student
+            </button>
+
+        </form>
+
+    </div>
+
+</body>
+</html>

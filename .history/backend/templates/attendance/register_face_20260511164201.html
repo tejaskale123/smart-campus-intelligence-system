@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Face</title>
+
+    <style>
+
+        body{
+            background:#020b24;
+            color:white;
+            font-family:Arial;
+            padding:40px;
+        }
+
+        .container{
+            max-width:700px;
+            margin:auto;
+            background:#09142f;
+            padding:40px;
+            border-radius:20px;
+        }
+
+        h1{
+            color:#00d9ff;
+            margin-bottom:30px;
+        }
+
+        input{
+            width:100%;
+            padding:15px;
+            margin-top:15px;
+            border:none;
+            border-radius:10px;
+            background:#122042;
+            color:white;
+            font-size:16px;
+        }
+
+        button{
+            width:100%;
+            padding:15px;
+            margin-top:20px;
+            border:none;
+            border-radius:10px;
+            background:#00d9ff;
+            color:black;
+            font-size:18px;
+            font-weight:bold;
+            cursor:pointer;
+        }
+
+        button:hover{
+            background:#00b5d6;
+        }
+
+        .info{
+            margin-top:20px;
+            color:#00ff88;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>AI Face Registration</h1>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <input type="text" name="name" placeholder="Student Name" required>
+
+        <input type="text" name="roll_no" placeholder="Roll Number" required>
+
+        <input type="text" name="department" placeholder="Department" required>
+
+        <button type="submit">
+
+            Register Face
+
+        </button>
+
+    </form>
+
+    <div class="info">
+
+        System will capture 5 face images automatically.
+
+    </div>
+
+</div>
+
+</body>
+</html>

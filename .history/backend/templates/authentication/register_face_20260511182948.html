@@ -1,0 +1,970 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Smart AI Face Registration
+    </title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+
+    background:
+    linear-gradient(
+        135deg,
+        #020617,
+        #071133,
+        #020617
+    );
+
+    min-height:100vh;
+
+    color:white;
+
+    overflow-x:hidden;
+}
+
+.container{
+
+    width:95%;
+
+    max-width:1600px;
+
+    margin:auto;
+
+    padding:35px;
+}
+
+.header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:35px;
+}
+
+.logo{
+
+    font-size:46px;
+
+    font-weight:700;
+
+    color:#22d3ee;
+}
+
+.ai-status{
+
+    padding:14px 24px;
+
+    background:#052e16;
+
+    border:1px solid #22c55e;
+
+    border-radius:14px;
+
+    color:#22c55e;
+
+    font-size:18px;
+}
+
+.grid{
+
+    display:grid;
+
+    grid-template-columns:2fr 1fr;
+
+    gap:30px;
+}
+
+.card{
+
+    background:rgba(8,15,40,0.95);
+
+    border:1px solid rgba(34,211,238,0.15);
+
+    border-radius:30px;
+
+    padding:30px;
+
+    backdrop-filter:blur(20px);
+
+    box-shadow:
+    0 0 40px rgba(0,255,255,0.08);
+}
+
+.section-title{
+
+    font-size:34px;
+
+    color:#22d3ee;
+
+    margin-bottom:25px;
+}
+
+.camera-wrapper{
+
+    position:relative;
+
+    border-radius:24px;
+
+    overflow:hidden;
+
+    border:3px solid #22d3ee;
+}
+
+video{
+
+    width:100%;
+
+    height:550px;
+
+    object-fit:cover;
+
+    display:block;
+}
+
+.scan-line{
+
+    position:absolute;
+
+    width:100%;
+
+    height:4px;
+
+    background:#22d3ee;
+
+    box-shadow:0 0 20px #22d3ee;
+
+    animation:scan 3s linear infinite;
+}
+
+@keyframes scan{
+
+    0%{
+        top:0%;
+    }
+
+    100%{
+        top:100%;
+    }
+}
+
+.face-box{
+
+    position:absolute;
+
+    top:50%;
+    left:50%;
+
+    transform:translate(-50%,-50%);
+
+    width:220px;
+    height:280px;
+
+    border:4px solid #22d3ee;
+
+    border-radius:18px;
+
+    box-shadow:
+    0 0 30px #22d3ee;
+}
+
+.form-area{
+
+    margin-top:30px;
+}
+
+.input-group{
+
+    margin-bottom:20px;
+}
+
+label{
+
+    display:block;
+
+    margin-bottom:10px;
+
+    color:#cbd5e1;
+
+    font-size:16px;
+}
+
+input{
+
+    width:100%;
+
+    padding:18px;
+
+    background:#132252;
+
+    border:none;
+
+    border-radius:16px;
+
+    color:white;
+
+    font-size:18px;
+
+    outline:none;
+}
+
+input:focus{
+
+    border:2px solid #22d3ee;
+}
+
+.btn{
+
+    width:100%;
+
+    padding:18px;
+
+    border:none;
+
+    border-radius:16px;
+
+    font-size:20px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:0.3s;
+}
+
+.capture-btn{
+
+    background:#06b6d4;
+
+    color:black;
+
+    margin-bottom:20px;
+}
+
+.capture-btn:hover{
+
+    transform:scale(1.02);
+
+    box-shadow:
+    0 0 25px #06b6d4;
+}
+
+.register-btn{
+
+    background:#22c55e;
+
+    color:white;
+}
+
+.register-btn:hover{
+
+    transform:scale(1.02);
+
+    box-shadow:
+    0 0 25px #22c55e;
+}
+
+.progress-card{
+
+    background:#0f172a;
+
+    padding:22px;
+
+    border-radius:18px;
+
+    margin-bottom:22px;
+}
+
+.progress-text{
+
+    text-align:center;
+
+    font-size:24px;
+
+    color:#22c55e;
+
+    margin-bottom:15px;
+}
+
+.progress-bar{
+
+    width:100%;
+
+    height:12px;
+
+    background:#1e293b;
+
+    border-radius:20px;
+
+    overflow:hidden;
+}
+
+.progress-fill{
+
+    width:0%;
+
+    height:100%;
+
+    background:#22d3ee;
+
+    transition:0.4s;
+}
+
+.preview-container{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    margin-top:18px;
+}
+
+.student-card{
+
+    text-align:center;
+}
+
+.avatar{
+
+    width:120px;
+    height:120px;
+
+    border-radius:50%;
+
+    margin:auto;
+
+    background:
+    linear-gradient(
+        135deg,
+        #22d3ee,
+        #2563eb
+    );
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:50px;
+
+    font-weight:700;
+
+    margin-bottom:20px;
+}
+
+.student-name{
+
+    font-size:30px;
+
+    font-weight:600;
+}
+
+.student-course{
+
+    color:#94a3b8;
+
+    margin-top:10px;
+
+    font-size:18px;
+}
+
+.success{
+
+    margin-top:25px;
+
+    background:#052e16;
+
+    border:1px solid #22c55e;
+
+    padding:16px;
+
+    border-radius:14px;
+
+    color:#22c55e;
+}
+
+.stats{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:18px;
+
+    margin-top:30px;
+}
+
+.stat{
+
+    background:#0f172a;
+
+    padding:25px;
+
+    border-radius:18px;
+
+    text-align:center;
+}
+
+.stat h2{
+
+    font-size:38px;
+
+    color:#22d3ee;
+}
+
+.stat p{
+
+    margin-top:8px;
+
+    color:#cbd5e1;
+}
+
+#statusBox{
+
+    margin-top:20px;
+
+    text-align:center;
+
+    font-size:18px;
+
+    color:#22c55e;
+}
+
+@media(max-width:1100px){
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    video{
+        height:420px;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <div class="logo">
+
+            Smart AI Face Registration
+
+        </div>
+
+        <div class="ai-status">
+
+            AI System Active ✅
+
+        </div>
+
+    </div>
+
+    <div class="grid">
+
+        <!-- LEFT SIDE -->
+
+        <div class="card">
+
+            <div class="section-title">
+
+                Live AI Camera
+
+            </div>
+
+            <div class="camera-wrapper">
+
+                <video
+                    id="video"
+                    autoplay
+                    muted
+                    playsinline
+                ></video>
+
+                <div class="scan-line"></div>
+
+                <div class="face-box"></div>
+
+            </div>
+
+            <div class="form-area">
+
+                <div class="input-group">
+
+                    <label>
+                        Student Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="student_name"
+                        placeholder="Enter Student Name"
+                    >
+
+                </div>
+
+                <div class="input-group">
+
+                    <label>
+                        Roll Number
+                    </label>
+
+                    <input
+                        type="text"
+                        id="roll_number"
+                        placeholder="Enter Roll Number"
+                    >
+
+                </div>
+
+                <div class="input-group">
+
+                    <label>
+                        Course / Department
+                    </label>
+
+                    <input
+                        type="text"
+                        id="course"
+                        placeholder="Enter Course"
+                    >
+
+                </div>
+
+                <button
+                    type="button"
+                    class="btn capture-btn"
+                    onclick="captureFace()"
+                >
+
+                    📸 Capture Face
+
+                </button>
+
+                <div class="progress-card">
+
+                    <div
+                        class="progress-text"
+                        id="imageCount"
+                    >
+
+                        0 / 5 Images Captured
+
+                    </div>
+
+                    <div class="progress-bar">
+
+                        <div
+                            class="progress-fill"
+                            id="progressFill"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+                <div
+                    class="preview-container"
+                    id="previewContainer"
+                ></div>
+
+                <div id="statusBox"></div>
+
+                <button
+                    type="button"
+                    class="btn register-btn"
+                    onclick="registerStudent()"
+                >
+
+                    🚀 Register Student
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT SIDE -->
+
+        <div class="card">
+
+            <div class="section-title">
+
+                AI Detection
+
+            </div>
+
+            <div class="student-card">
+
+                <div class="avatar">
+
+                    AI
+
+                </div>
+
+                <div class="student-name">
+
+                    Smart Recognition
+
+                </div>
+
+                <div class="student-course">
+
+                    Realtime Face Analysis
+
+                </div>
+
+                <div class="success">
+
+                    Face Detection System Ready ✅
+
+                </div>
+
+            </div>
+
+            <div class="stats">
+
+                <div class="stat">
+
+                    <h2>98%</h2>
+
+                    <p>Accuracy</p>
+
+                </div>
+
+                <div class="stat">
+
+                    <h2>AI</h2>
+
+                    <p>Realtime</p>
+
+                </div>
+
+                <div class="stat">
+
+                    <h2>5</h2>
+
+                    <p>Images</p>
+
+                </div>
+
+                <div class="stat">
+
+                    <h2>LIVE</h2>
+
+                    <p>Tracking</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+let capturedImages = [];
+
+const video =
+    document.getElementById("video");
+
+
+// START CAMERA
+navigator.mediaDevices.getUserMedia({
+    video:true
+})
+.then(function(stream){
+
+    video.srcObject = stream;
+
+})
+.catch(function(error){
+
+    console.log(error);
+
+    alert("Camera Access Denied");
+
+});
+
+
+
+// CAPTURE FACE
+function captureFace(){
+
+    if(capturedImages.length >= 5){
+
+        alert("Maximum 5 Images Allowed");
+
+        return;
+    }
+
+    const canvas =
+        document.createElement("canvas");
+
+    canvas.width = video.videoWidth;
+
+    canvas.height = video.videoHeight;
+
+    const ctx =
+        canvas.getContext("2d");
+
+    ctx.drawImage(
+        video,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    const imageData =
+        canvas.toDataURL("image/jpeg");
+
+    capturedImages.push(imageData);
+
+
+    // UPDATE COUNT
+    document.getElementById(
+        "imageCount"
+    ).innerText =
+        capturedImages.length +
+        " / 5 Images Captured";
+
+
+    // UPDATE PROGRESS
+    document.getElementById(
+        "progressFill"
+    ).style.width =
+        (capturedImages.length * 20) + "%";
+
+
+    // IMAGE PREVIEW
+    const preview =
+        document.getElementById(
+            "previewContainer"
+        );
+
+    const img =
+        document.createElement("img");
+
+    img.src = imageData;
+
+    img.style.width = "90px";
+
+    img.style.height = "90px";
+
+    img.style.objectFit = "cover";
+
+    img.style.borderRadius = "12px";
+
+    img.style.margin = "5px";
+
+    img.style.border =
+        "2px solid #22d3ee";
+
+    preview.appendChild(img);
+
+
+    // SUCCESS
+    if(capturedImages.length === 5){
+
+        document.getElementById(
+            "statusBox"
+        ).innerHTML =
+            "✅ 5 Images Captured Successfully";
+
+    }
+
+}
+
+
+
+
+// REGISTER STUDENT
+async function registerStudent(){
+
+    const studentName =
+        document.getElementById(
+            "student_name"
+        ).value;
+
+    const rollNumber =
+        document.getElementById(
+            "roll_number"
+        ).value;
+
+    const course =
+        document.getElementById(
+            "course"
+        ).value;
+
+
+
+    if(
+        studentName === "" ||
+        rollNumber === "" ||
+        course === ""
+    ){
+
+        alert("Fill All Fields");
+
+        return;
+    }
+
+
+    if(capturedImages.length < 5){
+
+        alert("Capture 5 Images First");
+
+        return;
+    }
+
+
+    const formData =
+        new FormData();
+
+    formData.append(
+        "student_name",
+        studentName
+    );
+
+    formData.append(
+        "roll_number",
+        rollNumber
+    );
+
+    formData.append(
+        "course",
+        course
+    );
+
+
+    capturedImages.forEach(function(img){
+
+        formData.append(
+            "images[]",
+            img
+        );
+
+    });
+
+
+
+    try{
+
+        const response =
+            await fetch(
+                "/register-face/",
+                {
+                    method:"POST",
+
+                    body:formData,
+
+                    headers:{
+                        "X-CSRFToken":
+                        "{{ csrf_token }}"
+                    }
+                }
+            );
+
+        const data =
+            await response.json();
+
+
+        if(data.status === "success"){
+
+        "statusBox"
+    ).innerHTML =
+        "✅ Student Registered Successfully";
+
+    // SUCCESS SOUND EFFECT
+    const successAudio =
+        new Audio(
+            "https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"
+        );
+
+    successAudio.play();
+
+    // RESET UI
+    capturedImages = [];
+
+    document.getElementById(
+        "imageCount"
+    ).innerText =
+        "0 / 5 Images Captured";
+
+    document.getElementById(
+        "progressFill"
+    ).style.width = "0%";
+
+    document.getElementById(
+        "previewContainer"
+    ).innerHTML = "";
+
+    // AUTO REDIRECT
+    setTimeout(function(){
+
+        window.location.href =
+        "/face-attendance/";
+
+    }, 2000);
+
+}
+
+        else{
+
+            alert(data.message);
+
+        }
+
+    }
+
+    catch(error){
+
+        console.log(error);
+
+        alert("Registration Failed");
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>    document.getElementById(

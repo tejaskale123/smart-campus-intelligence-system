@@ -1,0 +1,148 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>AI Face Registration</title>
+
+    <script src="{% static 'js/register_face.js' %}" defer></script>
+
+    <style>
+
+        body{
+
+            background:#020b2d;
+            font-family:Arial;
+            color:white;
+            margin:0;
+            padding:0;
+        }
+
+        .container{
+
+            width:900px;
+            margin:auto;
+            margin-top:40px;
+            background:#09153d;
+            padding:30px;
+            border-radius:20px;
+        }
+
+        h1{
+
+            color:#22d3ee;
+            font-size:45px;
+        }
+
+        input{
+
+            width:100%;
+            padding:15px;
+            margin-top:15px;
+            background:#132252;
+            border:none;
+            border-radius:10px;
+            color:white;
+            font-size:18px;
+        }
+
+        video{
+
+            width:100%;
+            margin-top:20px;
+            border-radius:20px;
+            border:3px solid #22d3ee;
+        }
+
+        button{
+
+            width:100%;
+            padding:18px;
+            margin-top:20px;
+            border:none;
+            border-radius:12px;
+            background:#22d3ee;
+            color:black;
+            font-size:22px;
+            font-weight:bold;
+            cursor:pointer;
+        }
+
+        #imageCount{
+
+            margin-top:20px;
+            color:#22c55e;
+            font-size:25px;
+            text-align:center;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>AI Face Registration</h1>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <input
+            type="text"
+            name="name"
+            placeholder="Student Name"
+            required
+        >
+
+        <input
+            type="text"
+            name="roll_no"
+            placeholder="Roll Number"
+            required
+        >
+
+        <input
+            type="text"
+            name="department"
+            placeholder="Department"
+            required
+        >
+
+        <video id="video" autoplay></video>
+
+        <canvas
+            id="canvas"
+            width="640"
+            height="480"
+            style="display:none;"
+        ></canvas>
+
+        <button
+            type="button"
+            id="captureBtn"
+        >
+            Capture Face
+        </button>
+
+        <div id="imageCount">
+
+            0 / 5 Images Captured
+
+        </div>
+
+        <button type="submit">
+
+            Register Student
+
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+</html>

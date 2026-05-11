@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Smart AI Face Attendance
+    </title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Poppins',sans-serif;
+        }
+
+        body{
+
+            background:
+            linear-gradient(
+                135deg,
+                #020617,
+                #071129,
+                #0f172a
+            );
+
+            color:white;
+
+            min-height:100vh;
+
+            overflow-x:hidden;
+        }
+
+        .main-container{
+
+            width:95%;
+
+            margin:auto;
+
+            padding-top:40px;
+
+            padding-bottom:50px;
+        }
+
+        .top-bar{
+
+            display:flex;
+
+            justify-content:space-between;
+
+            align-items:center;
+
+            margin-bottom:40px;
+        }
+
+        .logo{
+
+            font-size:55px;
+
+            font-weight:700;
+
+            background:linear-gradient(
+                to right,
+                #22d3ee,
+                #3b82f6
+            );
+
+            -webkit-background-clip:text;
+
+            -webkit-text-fill-color:transparent;
+        }
+
+        .status-badge{
+
+            background:#052e16;
+
+            color:#22c55e;
+
+            padding:12px 20px;
+
+            border-radius:12px;
+
+            font-size:16px;
+
+            border:1px solid #14532d;
+        }
+
+        .dashboard-grid{
+
+            display:grid;
+
+            grid-template-columns:2fr 1fr;
+
+            gap:30px;
+        }
+
+        .camera-section{
+
+            background:rgba(15,23,42,0.7);
+
+            border:1px solid rgba(255,255,255,0.08);
+
+            border-radius:30px;
+
+            padding:30px;
+
+            backdrop-filter:blur(20px);
+
+            box-shadow:
+            0 0 40px rgba(0,255,255,0.05);
+        }
+
+        .camera-header{
+
+            display:flex;
+
+            justify-content:space-between;
+
+            align-items:center;
+
+            margin-bottom:25px;
+        }
+
+        .camera-title{
+
+            font-size:34px;
+
+            font-weight:600;
+
+            color:#22d3ee;
+        }
+
+        .ai-dot{
+
+            width:14px;
+
+            height:14px;
+
+            border-radius:50%;
+
+            background:#22c55e;
+
+            animation:pulse 1s infinite;
+        }
+
+        @keyframes pulse{
+
+            0%{
+                transform:scale(1);
+                opacity:1;
+            }
+
+            50%{
+                transform:scale(1.3);
+                opacity:0.5;
+            }
+
+            100%{
+                transform:scale(1);
+                opacity:1;
+            }
+        }
+
+        .camera-box{
+
+            width:100%;
+
+            height:600px;
+
+            border-radius:25px;
+
+            overflow:hidden;
+
+            position:relative;
+
+            border:3px solid #22d3ee;
+
+            background:#000;
+        }
+
+        .camera-box img{
+
+            width:100%;
+
+            height:100%;
+
+            object-fit:cover;
+        }
+
+        .camera-overlay{
+
+            position:absolute;
+
+            top:0;
+
+            left:0;
+
+            width:100%;
+
+            height:100%;
+
+            background:
+            linear-gradient(
+                to bottom,
+                rgba(0,0,0,0.1),
+                rgba(0,0,0,0.4)
+            );
+        }
+
+        .scan-line{
+
+            position:absolute;
+
+            width:100%;
+
+            height:4px;
+
+            background:#22d3ee;
+
+            top:0;
+
+            animation:scan 4s linear infinite;
+        }
+
+        @keyframes scan{
+
+            0%{
+                top:0;
+            }
+
+            100%{
+                top:100%;
+            }
+        }
+
+        .controls{
+
+            margin-top:30px;
+
+            display:flex;
+
+            gap:20px;
+        }
+
+        .btn{
+
+            padding:16px 30px;
+
+            border:none;
+
+            border-radius:14px;
+
+            font-size:18px;
+
+            cursor:pointer;
+
+            transition:0.3s;
+        }
+
+        .start-btn{
+
+            background:
+            linear-gradient(
+                to right,
+                #06b6d4,
+                #3b82f6
+            );
+
+            color:white;
+        }
+
+        .start-btn:hover{
+
+            transform:translateY(-3px);
+
+            box-shadow:
+            0 10px 25px rgba(59,130,246,0.4);
+        }
+
+        .stop-btn{
+
+            background:#7f1d1d;
+
+            color:white;
+        }
+
+        .stop-btn:hover{
+
+            background:#991b1b;
+        }
+
+        .side-panel{
+
+            display:flex;
+
+            flex-direction:column;
+
+            gap:25px;
+        }
+
+        .card{
+
+            background:rgba(15,23,42,0.7);
+
+            border-radius:25px;
+
+            padding:25px;
+
+            border:1px solid rgba(255,255,255,0.08);
+
+            backdrop-filter:blur(20px);
+        }
+
+        .card h2{
+
+            margin-bottom:20px;
+
+            color:#22d3ee;
+        }
+
+        .student-card{
+
+            display:flex;
+
+            align-items:center;
+
+            gap:20px;
+        }
+
+        .avatar{
+
+            width:80px;
+
+            height:80px;
+
+            border-radius:50%;
+
+            background:
+            linear-gradient(
+                to right,
+                #06b6d4,
+                #3b82f6
+            );
+
+            display:flex;
+
+            justify-content:center;
+
+            align-items:center;
+
+            font-size:30px;
+
+            font-weight:700;
+        }
+
+        .student-info h3{
+
+            font-size:24px;
+        }
+
+        .student-info p{
+
+            color:#94a3b8;
+
+            margin-top:5px;
+        }
+
+        .stats{
+
+            display:grid;
+
+            grid-template-columns:1fr 1fr;
+
+            gap:15px;
+        }
+
+        .stat-box{
+
+            background:#0f172a;
+
+            padding:20px;
+
+            border-radius:20px;
+
+            text-align:center;
+        }
+
+        .stat-box h1{
+
+            color:#22d3ee;
+
+            font-size:38px;
+        }
+
+        .attendance-status{
+
+            margin-top:20px;
+
+            padding:15px;
+
+            background:#052e16;
+
+            border-radius:14px;
+
+            color:#22c55e;
+
+            text-align:center;
+
+            font-size:18px;
+        }
+
+        @media(max-width:1100px){
+
+            .dashboard-grid{
+
+                grid-template-columns:1fr;
+            }
+
+            .camera-box{
+
+                height:400px;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="main-container">
+
+    <div class="top-bar">
+
+        <div class="logo">
+            Smart AI Face Attendance
+        </div>
+
+        <div class="status-badge">
+            AI System Active ✅
+        </div>
+
+    </div>
+
+    <div class="dashboard-grid">
+
+        <div class="camera-section">
+
+            <div class="camera-header">
+
+                <div class="camera-title">
+                    Live Face Recognition
+                </div>
+
+                <div class="ai-dot"></div>
+
+            </div>
+
+            <div class="camera-box">
+
+                <img
+                    src="https://placehold.co/1200x700/020617/22d3ee?text=AI+Face+Recognition+Camera"
+                >
+
+                <div class="camera-overlay"></div>
+
+                <div class="scan-line"></div>
+
+            </div>
+
+            <div class="controls">
+
+                <a href="/start-face-attendance/">
+
+                    <button class="btn start-btn">
+
+                        START AI ATTENDANCE
+
+                    </button>
+
+                </a>
+
+                <button class="btn stop-btn">
+
+                    STOP CAMERA
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="side-panel">
+
+            <div class="card">
+
+                <h2>Detected Student</h2>
+
+                <div class="student-card">
+
+                    <div class="avatar">
+                        T
+                    </div>
+
+                    <div class="student-info">
+
+                        <h3>Tejas Kale</h3>
+
+                        <p>BCA • AI Department</p>
+
+                    </div>
+
+                </div>
+
+                <div class="attendance-status">
+
+                    Attendance Marked Successfully ✅
+
+                </div>
+
+            </div>
+
+            <div class="card">
+
+                <h2>Realtime Stats</h2>
+
+                <div class="stats">
+
+                    <div class="stat-box">
+
+                        <h1>98%</h1>
+
+                        <p>Confidence</p>
+
+                    </div>
+
+                    <div class="stat-box">
+
+                        <h1>1</h1>
+
+                        <p>Detected</p>
+
+                    </div>
+
+                    <div class="stat-box">
+
+                        <h1>24</h1>
+
+                        <p>Today</p>
+
+                    </div>
+
+                    <div class="stat-box">
+
+                        <h1>AI</h1>
+
+                        <p>Status</p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
