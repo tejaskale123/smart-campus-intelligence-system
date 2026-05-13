@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart AI Face Attendance</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+
+        body {
+
+            background:
+            radial-gradient(circle at top,
+            #07152f,
+            #020617);
+
+            overflow-x: hidden;
+
+        }
+
+        .glass {
+
+            background:
+            rgba(255,255,255,0.04);
+
+            backdrop-filter:
+            blur(10px);
+
+            border:
+            1px solid rgba(255,255,255,0.08);
+
+            box-shadow:
+            0 0 30px rgba(0,255,255,0.08);
+
+        }
+
+        .neon {
+
+            box-shadow:
+            0 0 20px rgba(0,255,255,0.4);
+
+        }
+
+        .camera-box {
+
+            border:
+            3px solid #22d3ee;
+
+            box-shadow:
+            0 0 30px #06b6d4;
+
+        }
+
+        .pulse {
+
+            animation: pulse 2s infinite;
+
+        }
+
+        @keyframes pulse {
+
+            0% {
+
+                transform: scale(1);
+
+            }
+
+            50% {
+
+                transform: scale(1.05);
+
+            }
+
+            100% {
+
+                transform: scale(1);
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body class="text-white min-h-screen p-8">
+
+    <div class="max-w-7xl mx-auto">
+
+        <!-- HEADER -->
+
+        <div class="flex justify-between items-center mb-10">
+
+            <h1 class="text-6xl font-bold text-cyan-400">
+
+                Smart AI Face Attendance
+
+            </h1>
+
+            <div class="bg-green-900/60 px-8 py-4 rounded-2xl border border-green-500 text-green-300 text-2xl">
+
+                AI System Active ✅
+
+            </div>
+
+        </div>
+
+        <!-- MAIN -->
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- CAMERA SECTION -->
+
+            <div class="lg:col-span-2 glass rounded-3xl p-8">
+
+                <div class="flex justify-between items-center mb-6">
+
+                    <h2 class="text-4xl font-bold text-cyan-400">
+
+                        Live Face Recognition
+
+                    </h2>
+
+                    <div class="w-6 h-6 bg-green-500 rounded-full pulse"></div>
+
+                </div>
+
+                <!-- CAMERA -->
+
+                <div class="relative">
+
+                    <video
+                        id="video"
+                        autoplay
+                        playsinline
+                        class="w-full rounded-3xl camera-box"
+                    ></video>
+
+                    <!-- FACE SCANNER -->
+
+                    <div class="absolute inset-0 flex items-center justify-center">
+
+                        <div class="w-64 h-64 border-4 border-cyan-400 rounded-3xl neon"></div>
+
+                    </div>
+
+                </div>
+
+                <!-- BUTTONS -->
+
+                <div class="flex gap-6 mt-8">
+
+                    <button
+                        onclick="startCamera()"
+                        class="bg-cyan-500 hover:bg-cyan-400 px-10 py-4 rounded-2xl text-2xl font-bold transition"
+                    >
+
+                        START AI ATTENDANCE
+
+                    </button>
+
+                    <button
+                        onclick="stopCamera()"
+                        class="bg-red-700 hover:bg-red-600 px-10 py-4 rounded-2xl text-2xl font-bold transition"
+                    >
+
+                        STOP CAMERA
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- RIGHT PANEL -->
+
+            <div class="space-y-8">
+
+                <!-- DETECTED STUDENT -->
+
+                <div class="glass rounded-3xl p-8">
+
+                    <h2 class="text-4xl font-bold text-cyan-400 mb-8">
+
+                        Detected Student
+
+                    </h2>
+
+                    <div class="flex items-center gap-6 mb-8">
+
+                        <div class="w-24 h-24 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 flex items-center justify-center text-5xl font-bold">
+
+                            <span id="studentInitial">
+
+                                ?
+
+                            </span>
+
+                        </div>
+
+                        <div>
+
+                            <h3
+                                id="studentName"
+                                class="text-4xl font-bold"
+                            >
+
+                                Waiting...
+
+                            </h3>
+
+                            <p
+                                id="studentCourse"
+                                class="text-gray-400 text-2xl mt-2"
+                            >
+
+                                AI Recognition Active
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        id="attendanceStatus"
+                        class="bg-green-900/60 border border-green-500 text-green-300 text-2xl px-6 py-4 rounded-2xl text-center"
+                    >
+
+                        Camera Ready ✅
+
+                    </div>
+
+                </div>
+
+                <!-- STATS -->
+
+                <div class="glass rounded-3xl p-8">
+
+                    <h2 class="text-4xl font-bold text-cyan-400 mb-8">
+
+                        Realtime Stats
+
+                    </h2>
+
+                    <div class="grid grid-cols-2 gap-6">
+
+                        <div class="glass rounded-2xl p-6 text-center">
+
+                            <h3 class="text-6xl font-bold text-cyan-400">
+
+                                98%
+
+                            </h3>
+
+                            <p class="text-2xl mt-3 text-gray-300">
+
+                                Confidence
+
+                            </p>
+
+                        </div>
+
+                        <div class="glass rounded-2xl p-6 text-center">
+
+                            <h3
+                                id="detectedCount"
+                                class="text-6xl font-bold text-cyan-400"
+                            >
+
+                                0
+
+                            </h3>
+
+                            <p class="text-2xl mt-3 text-gray-300">
+
+                                Detected
+
+                            </p>
+
+                        </div>
+
+                        <div class="glass rounded-2xl p-6 text-center">
+
+                            <h3 class="text-6xl font-bold text-cyan-400">
+
+                                24
+
+                            </h3>
+
+                            <p class="text-2xl mt-3 text-gray-300">
+
+                                Today
+
+                            </p>
+
+                        </div>
+
+                        <div class="glass rounded-2xl p-6 text-center">
+
+                            <h3 class="text-6xl font-bold text-cyan-400">
+
+                                AI
+
+                            </h3>
+
+                            <p class="text-2xl mt-3 text-gray-300">
+
+                                Status
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT -->
+
+    <script>
+
+        const video = document.getElementById("video");
+
+        let stream = null;
+
+        async function startCamera() {
+
+            try {
+
+                stream = await navigator.mediaDevices.getUserMedia({
+
+                    video: true
+
+                });
+
+                video.srcObject = stream;
+
+                document.getElementById(
+                    "attendanceStatus"
+                ).innerText = "Camera Started ✅";
+
+            }
+
+            catch(error) {
+
+                console.log(error);
+
+            }
+
+        }
+
+        function stopCamera() {
+
+            if(stream) {
+
+                stream.getTracks().forEach(track => {
+
+                    track.stop();
+
+                });
+
+                video.srcObject = null;
+
+                document.getElementById(
+                    "attendanceStatus"
+                ).innerText = "Camera Stopped";
+
+            }
+
+        }
+
+        // ==========================================
+        // LOAD ATTENDANCE
+        // ==========================================
+
+        async function loadAttendance() {
+
+            try {
+
+                const response = await fetch(
+
+                    "/get-last-attendance/"
+
+                );
+
+                const data = await response.json();
+
+                if(data.status === "success") {
+
+                    document.getElementById(
+                        "studentName"
+                    ).innerText = data.student_name;
+
+                    document.getElementById(
+                        "studentCourse"
+                    ).innerText = data.course;
+
+                    document.getElementById(
+                        "studentInitial"
+                    ).innerText = data.student_name.charAt(0);
+
+                    document.getElementById(
+                        "attendanceStatus"
+                    ).innerText =
+                    "Attendance Marked Successfully ✅";
+
+                    document.getElementById(
+                        "detectedCount"
+                    ).innerText = "1";
+
+                }
+
+            }
+
+            catch(error) {
+
+                console.log(error);
+
+            }
+
+        }
+
+        // AUTO LOAD
+
+        setInterval(
+
+            loadAttendance,
+
+            2000
+
+        );
+
+        // AUTO START CAMERA
+
+        startCamera();
+
+    </script>
+
+</body>
+
+</html>
