@@ -166,6 +166,7 @@ backend/
 │   │   ├── add_attendance.html
 │   │   └── attendance_list.html
 │   ├── authentication/
+│   │   ├── attendance_history.html
 │   │   ├── face_attendance.html
 │   │   ├── login.html
 │   │   ├── register.html
@@ -652,6 +653,7 @@ FILE: apps\authentication\face_utils.py
 import cv2
 import face_recognition
 import numpy as np
+import time
 
 from database.mongo import db
 from datetime import datetime
@@ -661,103 +663,95 @@ from datetime import datetime
 # DATABASE
 # ==========================================
 
-attendance_collection = db["attendance"]
+attendance_collection = db["attendance_logs"]
 
 students_collection = db["students"]
 
 
 # ==========================================
-# STORAGE
+# LOAD STUDENTS
 # ==========================================
 
 known_faces = []
-
 known_names = []
 
-
-print("Loading face encodings from MongoDB...")
-
-
-# ==========================================
-# LOAD ALL STUDENTS FROM DATABASE
-# ==========================================
+print("Loading students from MongoDB...")
 
 students = students_collection.find()
 
-
 for student in students:
 
-    student_name = student.get(
-
-        "student_name"
-
-    )
+    student_name = student.get("student_name", "").strip()
 
     face_encodings = student.get(
-
         "face_encodings",
-
         []
-
     )
 
     for encoding in face_encodings:
 
         known_faces.append(
-
             np.array(encoding)
-
         )
 
         known_names.append(
-
             student_name
-
         )
 
-        print(
+        print(f"Loaded: {student_name}")
 
-            f"Loaded: {student_name}"
-
-        )
-
-
-print(
-
-    "Known Names:",
-
-    known_names
-
-)
+print("Known Names:", known_names)
 
 
 # ==========================================
-# FACE RECOGNITION
+# FACE ATTENDANCE
 # ==========================================
 
 def recognize_faces():
 
-    video_capture = cv2.VideoCapture(0)
+    # ==========================================
+    # OPEN CAMERA
+    # ==========================================
+
+    video_capture = cv2.VideoCapture(
+        0,
+        cv2.CAP_DSHOW
+    )
+
+    if not video_capture.isOpened():
+
+        print("Cannot Open Camera")
+
+        return
+
+    print("Camera Started")
 
     # ==========================================
-    # HD CAMERA
+    # CAMERA QUALITY
     # ==========================================
 
     video_capture.set(
-
         cv2.CAP_PROP_FRAME_WIDTH,
-
         1280
-
     )
 
     video_capture.set(
-
         cv2.CAP_PROP_FRAME_HEIGHT,
-
         720
-
     )
+
+    # ==========================================
+    # PREVENT MULTIPLE ENTRIES
+    # ==========================================
+
+    last_detected_name = None
+    last_detection_time = 0
+
+    # ==========================================
+    # AUTO CLOSE TIMER
+    # ==========================================
+
+    start_time = time.time()
 
     while True:
 
@@ -769,121 +763,133 @@ def recognize_faces():
 
             break
 
-
         # ==========================================
-        # SMALL FRAME FOR FAST SPEED
+        # SMALL FRAME FOR FAST PROCESSING
         # ==========================================
 
         small_frame = cv2.resize(
-
             frame,
-
             (0, 0),
-
             fx=0.25,
-
             fy=0.25
-
         )
-
 
         rgb_small_frame = cv2.cvtColor(
-
             small_frame,
-
             cv2.COLOR_BGR2RGB
-
         )
 
-
         # ==========================================
-        # DETECT FACES
+        # DETECT FACE
         # ==========================================
 
         face_locations = face_recognition.face_locations(
-
             rgb_small_frame,
-
             model="hog"
-
         )
-
 
         face_encodings = face_recognition.face_encodings(
-
             rgb_small_frame,
-
             face_locations
-
         )
 
-
         # ==========================================
-        # MATCH FACES
+        # PROCESS FACE
         # ==========================================
 
-        for (top, right, bottom, left), face_encoding in zip(
-
+        for (
+            top,
+            right,
+            bottom,
+            left
+        ), face_encoding in zip(
             face_locations,
-
             face_encodings
-
         ):
 
             matches = face_recognition.compare_faces(
-
                 known_faces,
-
                 face_encoding,
-
                 tolerance=0.5
-
             )
 
             name = "Unknown"
 
             face_distances = face_recognition.face_distance(
-
                 known_faces,
-
                 face_encoding
-
             )
-
 
             if len(face_distances) > 0:
 
                 best_match_index = np.argmin(
-
                     face_distances
-
                 )
 
                 if matches[best_match_index]:
 
-                    name = known_names[best_match_index]
+                    name = known_names[
+                        best_match_index
+                    ]
+
+                    current_time_seconds = time.time()
 
                     # ==========================================
-                    # CHECK TODAY ATTENDANCE
+                    # PREVENT REPEATED DETECTION
                     # ==========================================
 
-                    already_marked = attendance_collection.find_one({
+                    if (
+                        last_detected_name == name
+                        and
+                        current_time_seconds - last_detection_time < 10
+                    ):
+
+                        continue
+
+                    last_detected_name = name
+                    last_detection_time = current_time_seconds
+
+                    today_date = datetime.now().strftime(
+                        "%Y-%m-%d"
+                    )
+
+                    current_clock_time = datetime.now().strftime(
+                        "%H:%M:%S"
+                    )
+
+                    # ==========================================
+                    # CHECK IN
+                    # ==========================================
+
+                    check_in_record = attendance_collection.find_one({
 
                         "student_name": name,
 
-                        "date": datetime.now().strftime(
+                        "attendance_date": today_date,
 
-                            "%Y-%m-%d"
-
-                        )
+                        "type": "IN"
 
                     })
 
                     # ==========================================
-                    # MARK ATTENDANCE
+                    # CHECK OUT
                     # ==========================================
 
-                    if not already_marked:
+                    check_out_record = attendance_collection.find_one({
+
+                        "student_name": name,
+
+                        "attendance_date": today_date,
+
+                        "type": "OUT"
+
+                    })
+
+                    # ==========================================
+                    # FIRST ENTRY = IN
+                    # ==========================================
+
+                    if not check_in_record:
 
                         attendance_collection.insert_one({
 
@@ -891,39 +897,54 @@ def recognize_faces():
 
                             "status": "Present",
 
-                            "date": datetime.now().strftime(
+                            "attendance_date": today_date,
 
-                                "%Y-%m-%d"
+                            "time": current_clock_time,
 
-                            ),
-
-                            "time": datetime.now().strftime(
-
-                                "%H:%M:%S"
-
-                            ),
+                            "type": "IN",
 
                             "method": "Face Recognition"
 
                         })
 
+                        print(f"{name} CHECK-IN marked")
+
+                    # ==========================================
+                    # SECOND ENTRY = OUT
+                    # ==========================================
+
+                    elif not check_out_record:
+
+                        attendance_collection.insert_one({
+
+                            "student_name": name,
+
+                            "status": "Present",
+
+                            "attendance_date": today_date,
+
+                            "time": current_clock_time,
+
+                            "type": "OUT",
+
+                            "method": "Face Recognition"
+
+                        })
+
+                        print(f"{name} CHECK-OUT marked")
+
+                    # ==========================================
+                    # ALREADY COMPLETED
+                    # ==========================================
+
+                    else:
+
                         print(
-
-                            f"{name} attendance marked"
-
+                            f"{name} attendance already completed today"
                         )
 
-                        # ==========================================
-                        # AUTO STOP CAMERA
-                        # ==========================================
-
-                        video_capture.release()
-
-                        return
-
-
             # ==========================================
-            # RESIZE FACE BOX
+            # FACE BOX
             # ==========================================
 
             top *= 4
@@ -931,69 +952,60 @@ def recognize_faces():
             bottom *= 4
             left *= 4
 
-
-            # ==========================================
-            # FACE RECTANGLE
-            # ==========================================
-
             cv2.rectangle(
-
                 frame,
-
                 (left, top),
-
                 (right, bottom),
-
                 (0, 255, 0),
-
                 3
-
             )
-
-
-            # ==========================================
-            # NAME LABEL
-            # ==========================================
-
-            cv2.rectangle(
-
-                frame,
-
-                (left, bottom - 35),
-
-                (right, bottom),
-
-                (0, 255, 0),
-
-                cv2.FILLED
-
-            )
-
 
             cv2.putText(
-
                 frame,
-
                 name,
-
-                (left + 6, bottom - 8),
-
+                (left, top - 10),
                 cv2.FONT_HERSHEY_SIMPLEX,
-
-                0.8,
-
-                (0, 0, 0),
-
+                1,
+                (0, 255, 0),
                 2
-
             )
 
+        # ==========================================
+        # SHOW CAMERA
+        # ==========================================
+
+        cv2.imshow(
+            "Smart Attendance System",
+            frame
+        )
+
+        # ==========================================
+        # AUTO CLOSE AFTER 15 SECONDS
+        # ==========================================
+
+        if time.time() - start_time > 15:
+
+            print("Camera Auto Closed")
+
+            break
+
+        # ==========================================
+        # PRESS Q TO EXIT
+        # ==========================================
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+
+            print("Camera Closed By User")
+
+            break
 
     # ==========================================
     # RELEASE CAMERA
     # ==========================================
 
     video_capture.release()
+
+    cv2.destroyAllWindows()
 
 ================================================================================
 FILE: apps\authentication\migrations\0001_userprofile.py
@@ -1263,7 +1275,8 @@ from .views import (
     analytics_view,
     register_face,
     face_attendance_page,
-    start_face_attendance
+    start_face_attendance,
+    attendance_history,
 )
 
 
@@ -1361,6 +1374,16 @@ path(
     register_face,
     name='register_face'
 ),
+
+path(
+
+    "attendance-history/",
+
+    attendance_history,
+
+    name="attendance_history"
+
+),
 ]
 
 
@@ -1426,7 +1449,7 @@ db = client["smart_campus_db"]
 
 students_collection = db["students"]
 
-attendance_collection = db["attendance"]
+attendance_collection = db["attendance_logs"]
 
 STUDENTS_COLLECTION = db["students"]
 ATTENDANCE_COLLECTION = db["attendance_logs"]
@@ -2906,16 +2929,39 @@ def analytics_view(request):
 
 
 
+from django.http import JsonResponse
+import threading
+
+
 def start_face_attendance(request):
 
-    threading.Thread(
-        target=recognize_faces
-    ).start()
+    try:
 
-    return render(
-        request,
-        "authentication/face_attendance.html"
-    )
+        camera_thread = threading.Thread(
+            target=recognize_faces
+        )
+
+        camera_thread.daemon = True
+
+        camera_thread.start()
+
+        return JsonResponse({
+
+            "status": "success",
+
+            "message": "Camera Started"
+
+        })
+
+    except Exception as e:
+
+        return JsonResponse({
+
+            "status": "error",
+
+            "message": str(e)
+
+        })
 
 BASE_DIR = os.path.dirname(
     os.path.dirname(
@@ -2961,22 +3007,6 @@ os.makedirs(
 )
 
 
-
-
-# ==========================================
-# START FACE ATTENDANCE
-# ==========================================
-
-def start_face_attendance(request):
-
-    threading.Thread(
-        target=recognize_faces
-    ).start()
-
-    return render(
-        request,
-        "authentication/face_attendance.html"
-    )
 
 
 # ==========================================
@@ -3164,6 +3194,8 @@ def register_face(request):
 
         db.students.insert_one({
 
+            
+
             "student_name": student_name,
 
             "roll_number": roll_number,
@@ -3173,7 +3205,10 @@ def register_face(request):
             "face_encodings": encodings_list
 
         })
+        from importlib import reload
+        import apps.authentication.face_utils as face_utils
 
+        reload(face_utils)
 
         print(
 
@@ -3218,23 +3253,29 @@ def face_attendance_page(request):
 
 
 
-# ==========================================
-# START FACE ATTENDANCE
-# ==========================================
 
-def start_face_attendance(request):
+def attendance_history(request):
 
-    threading.Thread(
+    attendance_collection = db["attendance_logs"]
 
-        target=recognize_faces
+    attendance_data = attendance_collection.find().sort(
 
-    ).start()
+        "attendance_date",
+        -1
+
+    )
 
     return render(
 
         request,
 
-        "authentication/face_attendance.html"
+        "authentication/attendance_history.html",
+
+        {
+
+            "attendance_data": attendance_data
+
+        }
 
     )
 

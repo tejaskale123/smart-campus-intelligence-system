@@ -32,7 +32,6 @@ from .views import (
     register_face,
     face_attendance_page,
     start_face_attendance,
-    attendance_history,
 )
 
 
@@ -129,15 +128,5 @@ path(
     'register-face/',
     register_face,
     name='register_face'
-),
-
-path(
-
-    "attendance-history/",
-
-    attendance_history,
-
-    name="attendance_history"
-
 ),
 ]

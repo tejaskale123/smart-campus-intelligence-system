@@ -29,7 +29,7 @@ students = students_collection.find()
 
 for student in students:
 
-    student_name = student.get("student_name", "").strip()
+    student_name = student.get("student_name")
 
     face_encodings = student.get(
         "face_encodings",
@@ -61,10 +61,7 @@ def recognize_faces():
     # OPEN CAMERA
     # ==========================================
 
-    video_capture = cv2.VideoCapture(
-        0,
-        cv2.CAP_DSHOW
-    )
+ video_capture = cv2.VideoCapture(0)
 
     if not video_capture.isOpened():
 
@@ -74,32 +71,9 @@ def recognize_faces():
 
     print("Camera Started")
 
-    # ==========================================
-    # CAMERA QUALITY
-    # ==========================================
-
-    video_capture.set(
-        cv2.CAP_PROP_FRAME_WIDTH,
-        1280
-    )
-
-    video_capture.set(
-        cv2.CAP_PROP_FRAME_HEIGHT,
-        720
-    )
-
-    # ==========================================
-    # PREVENT MULTIPLE ENTRIES
-    # ==========================================
-
     last_detected_name = None
+
     last_detection_time = 0
-
-    # ==========================================
-    # AUTO CLOSE TIMER
-    # ==========================================
-
-    start_time = time.time()
 
     while True:
 
@@ -112,7 +86,7 @@ def recognize_faces():
             break
 
         # ==========================================
-        # SMALL FRAME FOR FAST PROCESSING
+        # SMALL FRAME
         # ==========================================
 
         small_frame = cv2.resize(
@@ -145,15 +119,7 @@ def recognize_faces():
         # PROCESS FACE
         # ==========================================
 
-        for (
-            top,
-            right,
-            bottom,
-            left
-        ), face_encoding in zip(
-            face_locations,
-            face_encodings
-        ):
+        for face_encoding in face_encodings:
 
             matches = face_recognition.compare_faces(
                 known_faces,
@@ -183,7 +149,7 @@ def recognize_faces():
                     current_time_seconds = time.time()
 
                     # ==========================================
-                    # PREVENT REPEATED DETECTION
+                    # PREVENT MULTIPLE DETECTION
                     # ==========================================
 
                     if (
@@ -195,13 +161,14 @@ def recognize_faces():
                         continue
 
                     last_detected_name = name
+
                     last_detection_time = current_time_seconds
 
                     today_date = datetime.now().strftime(
                         "%Y-%m-%d"
                     )
 
-                    current_clock_time = datetime.now().strftime(
+                    current_time = datetime.now().strftime(
                         "%H:%M:%S"
                     )
 
@@ -234,7 +201,7 @@ def recognize_faces():
                     })
 
                     # ==========================================
-                    # FIRST ENTRY = IN
+                    # FIRST = IN
                     # ==========================================
 
                     if not check_in_record:
@@ -247,7 +214,7 @@ def recognize_faces():
 
                             "attendance_date": today_date,
 
-                            "time": current_clock_time,
+                            "time": current_time,
 
                             "type": "IN",
 
@@ -258,7 +225,7 @@ def recognize_faces():
                         print(f"{name} CHECK-IN marked")
 
                     # ==========================================
-                    # SECOND ENTRY = OUT
+                    # SECOND = OUT
                     # ==========================================
 
                     elif not check_out_record:
@@ -271,7 +238,7 @@ def recognize_faces():
 
                             "attendance_date": today_date,
 
-                            "time": current_clock_time,
+                            "time": current_time,
 
                             "type": "OUT",
 
@@ -291,64 +258,16 @@ def recognize_faces():
                             f"{name} attendance already completed today"
                         )
 
-            # ==========================================
-            # FACE BOX
-            # ==========================================
-
-            top *= 4
-            right *= 4
-            bottom *= 4
-            left *= 4
-
-            cv2.rectangle(
-                frame,
-                (left, top),
-                (right, bottom),
-                (0, 255, 0),
-                3
-            )
-
-            cv2.putText(
-                frame,
-                name,
-                (left, top - 10),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                1,
-                (0, 255, 0),
-                2
-            )
-
         # ==========================================
-        # SHOW CAMERA
-        # ==========================================
-
-        cv2.imshow(
-            "Smart Attendance System",
-            frame
-        )
-
-        # ==========================================
-        # AUTO CLOSE AFTER 15 SECONDS
-        # ==========================================
-
-        if time.time() - start_time > 15:
-
-            print("Camera Auto Closed")
-
-            break
-
-        # ==========================================
-        # PRESS Q TO EXIT
+        # AUTO CLOSE CAMERA
         # ==========================================
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
 
-            print("Camera Closed By User")
-
             break
 
     # ==========================================
-    # RELEASE CAMERA
+    # CLOSE CAMERA
     # ==========================================
 
     video_capture.release()

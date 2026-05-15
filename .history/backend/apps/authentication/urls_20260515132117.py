@@ -130,14 +130,4 @@ path(
     register_face,
     name='register_face'
 ),
-
-path(
-
-    "attendance-history/",
-
-    attendance_history,
-
-    name="attendance_history"
-
-),
 ]

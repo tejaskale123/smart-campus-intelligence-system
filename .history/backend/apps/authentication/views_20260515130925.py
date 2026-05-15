@@ -1860,28 +1860,3 @@ def face_attendance_page(request):
 
 
 
-
-def attendance_history(request):
-
-    attendance_collection = db["attendance_logs"]
-
-    attendance_data = attendance_collection.find().sort(
-
-        "attendance_date",
-        -1
-
-    )
-
-    return render(
-
-        request,
-
-        "authentication/attendance_history.html",
-
-        {
-
-            "attendance_data": attendance_data
-
-        }
-
-    )

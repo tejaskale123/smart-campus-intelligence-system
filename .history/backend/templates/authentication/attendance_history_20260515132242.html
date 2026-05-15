@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>
+
+        Attendance History
+
+    </title>
+
+    <style>
+
+        body{
+
+            font-family: Arial;
+
+            background: #f4f7fc;
+
+            padding: 30px;
+
+        }
+
+        h1{
+
+            text-align: center;
+
+            color: #333;
+
+        }
+
+        table{
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            background: white;
+
+            margin-top: 20px;
+
+        }
+
+        th{
+
+            background: #4CAF50;
+
+            color: white;
+
+            padding: 15px;
+
+        }
+
+        td{
+
+            padding: 12px;
+
+            border-bottom: 1px solid #ddd;
+
+            text-align: center;
+
+        }
+
+        tr:hover{
+
+            background: #f1f1f1;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <h1>
+
+        Smart Attendance History
+
+    </h1>
+
+    <table>
+
+        <tr>
+
+            <th>Student Name</th>
+
+            <th>Type</th>
+
+            <th>Time</th>
+
+            <th>Date</th>
+
+            <th>Method</th>
+
+        </tr>
+
+        {% for attendance in attendance_data %}
+
+        <tr>
+
+            <td>
+
+                {{ attendance.student_name }}
+
+            </td>
+
+            <td>
+
+                {{ attendance.type }}
+
+            </td>
+
+            <td>
+
+                {{ attendance.time }}
+
+            </td>
+
+            <td>
+
+                {{ attendance.attendance_date }}
+
+            </td>
+
+            <td>
+
+                {{ attendance.method }}
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+</body>
+
+</html>

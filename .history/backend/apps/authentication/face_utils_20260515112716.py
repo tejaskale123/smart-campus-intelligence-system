@@ -1,7 +1,6 @@
 import cv2
 import face_recognition
 import numpy as np
-import time
 
 from database.mongo import db
 from datetime import datetime
@@ -17,19 +16,26 @@ students_collection = db["students"]
 
 
 # ==========================================
-# LOAD STUDENTS
+# STORAGE
 # ==========================================
 
 known_faces = []
+
 known_names = []
 
-print("Loading students from MongoDB...")
+
+print("Loading face encodings from MongoDB...")
+
+
+# ==========================================
+# LOAD ALL STUDENTS
+# ==========================================
 
 students = students_collection.find()
 
 for student in students:
 
-    student_name = student.get("student_name", "").strip()
+    student_name = student.get("student_name")
 
     face_encodings = student.get(
         "face_encodings",
@@ -48,18 +54,15 @@ for student in students:
 
         print(f"Loaded: {student_name}")
 
+
 print("Known Names:", known_names)
 
 
 # ==========================================
-# FACE ATTENDANCE
+# FACE RECOGNITION
 # ==========================================
 
 def recognize_faces():
-
-    # ==========================================
-    # OPEN CAMERA
-    # ==========================================
 
     video_capture = cv2.VideoCapture(
         0,
@@ -72,10 +75,8 @@ def recognize_faces():
 
         return
 
-    print("Camera Started")
-
     # ==========================================
-    # CAMERA QUALITY
+    # HD CAMERA
     # ==========================================
 
     video_capture.set(
@@ -88,19 +89,6 @@ def recognize_faces():
         720
     )
 
-    # ==========================================
-    # PREVENT MULTIPLE ENTRIES
-    # ==========================================
-
-    last_detected_name = None
-    last_detection_time = 0
-
-    # ==========================================
-    # AUTO CLOSE TIMER
-    # ==========================================
-
-    start_time = time.time()
-
     while True:
 
         ret, frame = video_capture.read()
@@ -112,7 +100,7 @@ def recognize_faces():
             break
 
         # ==========================================
-        # SMALL FRAME FOR FAST PROCESSING
+        # SMALL FRAME
         # ==========================================
 
         small_frame = cv2.resize(
@@ -128,7 +116,7 @@ def recognize_faces():
         )
 
         # ==========================================
-        # DETECT FACE
+        # DETECT FACES
         # ==========================================
 
         face_locations = face_recognition.face_locations(
@@ -142,7 +130,7 @@ def recognize_faces():
         )
 
         # ==========================================
-        # PROCESS FACE
+        # MATCH FACES
         # ==========================================
 
         for (
@@ -180,28 +168,11 @@ def recognize_faces():
                         best_match_index
                     ]
 
-                    current_time_seconds = time.time()
-
-                    # ==========================================
-                    # PREVENT REPEATED DETECTION
-                    # ==========================================
-
-                    if (
-                        last_detected_name == name
-                        and
-                        current_time_seconds - last_detection_time < 10
-                    ):
-
-                        continue
-
-                    last_detected_name = name
-                    last_detection_time = current_time_seconds
-
                     today_date = datetime.now().strftime(
                         "%Y-%m-%d"
                     )
 
-                    current_clock_time = datetime.now().strftime(
+                    current_time = datetime.now().strftime(
                         "%H:%M:%S"
                     )
 
@@ -247,7 +218,7 @@ def recognize_faces():
 
                             "attendance_date": today_date,
 
-                            "time": current_clock_time,
+                            "time": current_time,
 
                             "type": "IN",
 
@@ -256,6 +227,8 @@ def recognize_faces():
                         })
 
                         print(f"{name} CHECK-IN marked")
+
+                       
 
                     # ==========================================
                     # SECOND ENTRY = OUT
@@ -271,7 +244,7 @@ def recognize_faces():
 
                             "attendance_date": today_date,
 
-                            "time": current_clock_time,
+                            "time": current_time,
 
                             "type": "OUT",
 
@@ -281,8 +254,10 @@ def recognize_faces():
 
                         print(f"{name} CHECK-OUT marked")
 
+                     
+
                     # ==========================================
-                    # ALREADY COMPLETED
+                    # BOTH DONE
                     # ==========================================
 
                     else:
@@ -308,18 +283,26 @@ def recognize_faces():
                 3
             )
 
+            cv2.rectangle(
+                frame,
+                (left, bottom - 35),
+                (right, bottom),
+                (0, 255, 0),
+                cv2.FILLED
+            )
+
             cv2.putText(
                 frame,
                 name,
-                (left, top - 10),
+                (left + 6, bottom - 8),
                 cv2.FONT_HERSHEY_SIMPLEX,
-                1,
-                (0, 255, 0),
+                0.8,
+                (0, 0, 0),
                 2
             )
 
         # ==========================================
-        # SHOW CAMERA
+        # SHOW WINDOW
         # ==========================================
 
         cv2.imshow(
@@ -328,22 +311,10 @@ def recognize_faces():
         )
 
         # ==========================================
-        # AUTO CLOSE AFTER 15 SECONDS
-        # ==========================================
-
-        if time.time() - start_time > 15:
-
-            print("Camera Auto Closed")
-
-            break
-
-        # ==========================================
         # PRESS Q TO EXIT
         # ==========================================
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
-
-            print("Camera Closed By User")
 
             break
 
