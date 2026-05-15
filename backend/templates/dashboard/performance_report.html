@@ -1,194 +1,60 @@
 {% extends 'base/base.html' %}
-{% load static %}
 
 {% block content %}
+<style>
+    .report-page{color:#f8fafc}
+    .eyebrow{color:#22d3ee;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+    .header h1{font-size:clamp(34px,4vw,54px);line-height:1.05;margin:8px 0}
+    .header p{color:#9fb0c8;margin-bottom:24px}
+    .stats{display:grid;gap:16px;grid-template-columns:repeat(4,1fr);margin-bottom:22px}
+    .stat,.table-wrap{background:#0f172acc;border:1px solid #23314f;border-radius:20px}
+    .stat{padding:20px}
+    .stat strong{color:#22d3ee;display:block;font-size:34px}
+    .stat span{color:#cbd5e1}
+    .table-wrap{overflow:auto}
+    table{border-collapse:collapse;width:100%}
+    th{background:#07111f;color:#22d3ee;font-size:13px;letter-spacing:1px;padding:15px;text-align:left;text-transform:uppercase}
+    td{border-top:1px solid #1f2d49;color:#e2e8f0;padding:15px;white-space:nowrap}
+    .muted{color:#9fb0c8}
+    @media(max-width:1000px){.stats{grid-template-columns:1fr 1fr}}
+    @media(max-width:650px){.stats{grid-template-columns:1fr}}
+</style>
 
-<div class="reports-page">
-
-    <!-- HEADER -->
-
-    <div class="reports-header">
-
-        <div>
-
-            <p class="reports-subtitle">
-
-                PERFORMANCE ANALYTICS
-
-            </p>
-
-            <h1 class="reports-title">
-
-                Performance Report
-
-            </h1>
-
-            <p class="reports-description">
-
-                Student attendance and analytics overview.
-
-            </p>
-
-        </div>
-
+<div class="report-page">
+    <div class="header">
+        <div class="eyebrow">Performance Analytics</div>
+        <h1>Performance Report</h1>
+        <p>Student attendance and analytics overview generated from current records.</p>
     </div>
 
-    <!-- STATS -->
-
-    <div class="reports-grid">
-
-        <!-- TOTAL -->
-
-        <div class="report-card">
-
-            <div class="report-icon">
-
-                <i class="fa-solid fa-users"></i>
-
-            </div>
-
-            <h2>
-
-                {{ total_students }}
-
-            </h2>
-
-            <p>
-
-                Total Students
-
-            </p>
-
-        </div>
-
-        <!-- PRESENT -->
-
-        <div class="report-card">
-
-            <div class="report-icon">
-
-                <i class="fa-solid fa-user-check"></i>
-
-            </div>
-
-            <h2>
-
-                {{ present_count }}
-
-            </h2>
-
-            <p>
-
-                Present Students
-
-            </p>
-
-        </div>
-
-        <!-- ABSENT -->
-
-        <div class="report-card">
-
-            <div class="report-icon">
-
-                <i class="fa-solid fa-user-xmark"></i>
-
-            </div>
-
-            <h2>
-
-                {{ absent_count }}
-
-            </h2>
-
-            <p>
-
-                Absent Students
-
-            </p>
-
-        </div>
-
-        <!-- PERCENTAGE -->
-
-        <div class="report-card">
-
-            <div class="report-icon">
-
-                <i class="fa-solid fa-chart-pie"></i>
-
-            </div>
-
-            <h2>
-
-                {{ attendance_percentage }}%
-
-            </h2>
-
-            <p>
-
-                Attendance Percentage
-
-            </p>
-
-        </div>
-
+    <div class="stats">
+        <div class="stat"><strong>{{ total_students }}</strong><span>Total Students</span></div>
+        <div class="stat"><strong>{{ present_count }}</strong><span>Present Records</span></div>
+        <div class="stat"><strong>{{ absent_count }}</strong><span>Absent Records</span></div>
+        <div class="stat"><strong>{{ attendance_percentage }}%</strong><span>Attendance Rate</span></div>
     </div>
 
-    <!-- TABLE -->
-
-    <div class="attendance-table-wrapper">
-
-        <table class="attendance-table">
-
+    <div class="table-wrap">
+        <table>
             <thead>
-
                 <tr>
-
                     <th>Name</th>
-
                     <th>Course</th>
-
                     <th>Email</th>
-
                 </tr>
-
             </thead>
-
             <tbody>
-
                 {% for student in students %}
-
-                <tr>
-
-                    <td>
-
-                        {{ student.name }}
-
-                    </td>
-
-                    <td>
-
-                        {{ student.course }}
-
-                    </td>
-
-                    <td>
-
-                        {{ student.email }}
-
-                    </td>
-
-                </tr>
-
+                    <tr>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.course }}</td>
+                        <td class="muted">{{ student.email }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="3" class="muted">No students available.</td></tr>
                 {% endfor %}
-
             </tbody>
-
         </table>
-
     </div>
-
 </div>
-
 {% endblock %}

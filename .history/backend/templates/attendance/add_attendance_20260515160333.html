@@ -1,0 +1,515 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Campus Intelligence System</title>
+
+    <!-- GOOGLE FONT -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- FONT AWESOME -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family:'Inter',sans-serif;
+            background:#020b24;
+            color:white;
+            display:flex;
+            min-height:100vh;
+            overflow-x:hidden;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar{
+            width:280px;
+            min-width:280px;
+            height:100vh;
+            position:fixed;
+            top:0;
+            left:0;
+
+            background:linear-gradient(
+                180deg,
+                #07122f 0%,
+                #06163f 50%,
+                #081a4d 100%
+            );
+
+            border-right:1px solid rgba(0,255,255,0.15);
+
+            padding:30px 22px;
+
+            overflow-y:auto;
+
+            z-index:999;
+        }
+
+        .sidebar::-webkit-scrollbar{
+            width:5px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb{
+            background:#11d8ff;
+            border-radius:10px;
+        }
+
+        .sidebar h2{
+            font-size:42px;
+            font-weight:800;
+            line-height:1.1;
+
+            margin-bottom:50px;
+        }
+
+        .sidebar h2 span{
+            color:#19d9ff;
+        }
+
+        .sidebar-menu{
+            list-style:none;
+        }
+
+        .sidebar-menu li{
+            margin-bottom:12px;
+        }
+
+        .sidebar-menu li a{
+            display:flex;
+            align-items:center;
+            gap:15px;
+
+            text-decoration:none;
+
+            padding:18px 18px;
+
+            border-radius:18px;
+
+            color:#d8e4ff;
+
+            font-size:17px;
+            font-weight:600;
+
+            transition:0.3s ease;
+        }
+
+        .sidebar-menu li a i{
+            font-size:20px;
+            width:22px;
+        }
+
+        .sidebar-menu li a:hover{
+            background:rgba(0,255,255,0.08);
+            color:#19d9ff;
+            transform:translateX(5px);
+        }
+
+        .sidebar-menu li a.active{
+            background:linear-gradient(
+                90deg,
+                #13d8ff,
+                #24a4ff
+            );
+
+            color:white;
+
+            box-shadow:
+                0 0 20px rgba(0,255,255,0.25);
+
+            transform:scale(1.02);
+        }
+
+        /* ================= MAIN CONTENT ================= */
+
+        .main-content{
+            margin-left:280px;
+            width:calc(100% - 280px);
+            padding:40px;
+        }
+
+        /* ================= MOBILE ================= */
+
+        .mobile-header{
+            display:none;
+        }
+
+        .mobile-toggle{
+            background:none;
+            border:none;
+            color:white;
+            font-size:24px;
+            cursor:pointer;
+        }
+
+        .mobile-close{
+            display:none;
+        }
+
+        /* ================= MESSAGES ================= */
+
+        .message-stack{
+            margin-bottom:25px;
+        }
+
+        .system-message{
+            padding:16px 20px;
+            border-radius:12px;
+            margin-bottom:12px;
+            font-weight:600;
+        }
+
+        .system-message.success{
+            background:rgba(0,255,120,0.15);
+            border:1px solid rgba(0,255,120,0.3);
+            color:#57ff9b;
+        }
+
+        .system-message.error{
+            background:rgba(255,0,0,0.12);
+            border:1px solid rgba(255,0,0,0.25);
+            color:#ff8d8d;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media(max-width:992px){
+
+            .sidebar{
+                left:-100%;
+                transition:0.3s ease;
+            }
+
+            .sidebar.active{
+                left:0;
+            }
+
+            .main-content{
+                margin-left:0;
+                width:100%;
+                padding:20px;
+            }
+
+            .mobile-header{
+                position:fixed;
+                top:0;
+                left:0;
+                width:100%;
+                z-index:1000;
+
+                background:#07122f;
+
+                padding:18px 20px;
+
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+
+                border-bottom:1px solid rgba(255,255,255,0.1);
+            }
+
+            .mobile-header h2{
+                font-size:24px;
+                color:white;
+            }
+
+            .mobile-close{
+                display:block;
+
+                position:absolute;
+                top:20px;
+                right:20px;
+
+                background:none;
+                border:none;
+
+                color:white;
+                font-size:22px;
+
+                cursor:pointer;
+            }
+
+            body{
+                padding-top:80px;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- MOBILE HEADER -->
+
+    <div class="mobile-header">
+
+        <h2>Smart Campus</h2>
+
+        <button id="sidebarToggle" class="mobile-toggle">
+
+            <i class="fas fa-bars"></i>
+
+        </button>
+
+    </div>
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <button id="sidebarClose" class="mobile-close">
+
+            <i class="fas fa-times"></i>
+
+        </button>
+
+        <h2>
+            Smart
+            <span>Campus</span>
+        </h2>
+
+        <ul class="sidebar-menu">
+
+            {% if request.user.is_authenticated %}
+
+                {% with current=request.resolver_match.url_name %}
+
+                    <!-- DASHBOARD -->
+
+                    <li>
+
+                        <a class="{% if current == 'admin_dashboard' or current == 'dashboard' %}active{% endif %}"
+                           href="{% url 'admin_dashboard' %}">
+
+                            <i class="fas fa-chart-pie"></i>
+
+                            <span>Dashboard</span>
+
+                        </a>
+
+                    </li>
+
+                    <!-- STUDENTS -->
+
+                    <li>
+
+                        <a class="{% if current == 'students_list' %}active{% endif %}"
+                           href="{% url 'students_list' %}">
+
+                            <i class="fas fa-user-graduate"></i>
+
+                            <span>Students</span>
+
+                        </a>
+
+                    </li>
+
+                    <!-- TEACHERS -->
+
+                    <li>
+
+                        <a class="{% if current == 'admin_teachers' %}active{% endif %}"
+                           href="{% url 'admin_teachers' %}">
+
+                            <i class="fas fa-chalkboard-user"></i>
+
+                            <span>Teachers</span>
+
+                        </a>
+
+                    </li>
+
+                    <!-- ATTENDANCE -->
+
+                    <li>
+
+                        <a class="{% if current == 'attendance_list' or current == 'add_attendance' %}active{% endif %}"
+                           href="{% url 'attendance_list' %}">
+
+                            <i class="fas fa-calendar-check"></i>
+
+                            <span>Attendance</span>
+
+                        </a>
+
+                    </li>
+
+                    <!-- HISTORY -->
+
+                    <li>
+
+                        <a class="{% if current == 'attendance_history' %}active{% endif %}"
+                           href="{% url 'attendance_history' %}">
+
+                            <i class="fas fa-clock-rotate-left"></i>
+
+                            <span>Attendance History</span>
+
+                        </a>
+
+                    </li>
+
+                    <!-- ANALYTICS -->
+
+                    <li>
+
+                        <a class="{% if current == 'analytics' %}active{% endif %}"
+                           href="{% url 'analytics' %}">
+
+                            <i class="fas fa-chart-line"></i>
+
+                            <span>Analytics</span>
+
+                        </a>
+
+                    </li>
+
+                    <!-- REPORTS -->
+
+                    <li>
+
+                        <a class="{% if current == 'reports' %}active{% endif %}"
+                           href="{% url 'reports' %}">
+
+                            <i class="fas fa-file-lines"></i>
+
+                            <span>Reports</span>
+
+                        </a>
+
+                    </li>
+
+                    <!-- REGISTER FACE -->
+
+                    <li>
+
+                        <a class="{% if current == 'register_face' %}active{% endif %}"
+                           href="{% url 'register_face' %}">
+
+                            <i class="fas fa-camera"></i>
+
+                            <span>Register Face</span>
+
+                        </a>
+
+                    </li>
+
+                    <!-- FACE ATTENDANCE -->
+
+                    <li>
+
+                        <a class="{% if current == 'face_attendance' %}active{% endif %}"
+                           href="{% url 'face_attendance' %}">
+
+                            <i class="fas fa-user-check"></i>
+
+                            <span>Face Attendance</span>
+
+                        </a>
+
+                    </li>
+
+                    <!-- SETTINGS -->
+
+                    <li>
+
+                        <a class="{% if current == 'settings' %}active{% endif %}"
+                           href="{% url 'settings' %}">
+
+                            <i class="fas fa-gear"></i>
+
+                            <span>Settings</span>
+
+                        </a>
+
+                    </li>
+
+                    <!-- LOGOUT -->
+
+                    <li>
+
+                        <a href="{% url 'logout' %}">
+
+                            <i class="fas fa-right-from-bracket"></i>
+
+                            <span>Logout</span>
+
+                        </a>
+
+                    </li>
+
+                {% endwith %}
+
+            {% endif %}
+
+        </ul>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+        {% if messages %}
+
+            <div class="message-stack">
+
+                {% for message in messages %}
+
+                    <div class="system-message {{ message.tags }}">
+
+                        {{ message }}
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+
+    </main>
+
+    <!-- SIDEBAR JS -->
+
+    <script>
+
+        const sidebar = document.getElementById("sidebar");
+
+        const sidebarToggle = document.getElementById("sidebarToggle");
+
+        const sidebarClose = document.getElementById("sidebarClose");
+
+        sidebarToggle.addEventListener("click", () => {
+
+            sidebar.classList.add("active");
+
+        });
+
+        sidebarClose.addEventListener("click", () => {
+
+            sidebar.classList.remove("active");
+
+        });
+
+    </script>
+
+</body>
+
+</html>

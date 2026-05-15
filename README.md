@@ -1,453 +1,323 @@
 # Smart Campus Intelligence System
 
-A comprehensive Django-based campus management system with AI-powered face recognition, role-based dashboards, and intelligent attendance tracking. The system provides seamless management for admins, teachers, and students with advanced analytics, real-time monitoring, and responsive UI.
+A Django-based campus management system for role-based dashboards, student and teacher management, attendance tracking, analytics, reporting, and AI-assisted face attendance.
 
-## 🚀 Features
+The project combines Django auth and SQLite for application users with MongoDB for student records, attendance logs, face encodings, and reporting data.
 
-### Core Functionality
-- **Role-Based Authentication**: Secure login system for admins, teachers, and students with distinct dashboards
-- **Student Management**: Complete CRUD operations for student records stored in MongoDB
-- **Teacher Management**: Add, edit, delete, and manage teacher profiles
-- **Attendance System**: Traditional manual attendance marking with Present/Absent tracking
-- **Analytics Dashboard**: Comprehensive data visualization and insights
-- **Reports Generation**: Detailed reporting capabilities for campus metrics
-- **Settings Management**: Configurable system settings
+## Features
 
-### AI-Powered Features
-- **Face Registration**: Advanced AI camera system for student face enrollment using computer vision
-- **Face Recognition Attendance**: Automated attendance marking through facial recognition
-- **Real-Time AI Tracking**: Live face detection and analysis with 98% accuracy
-- **Auto Capture System**: Intelligent automatic face image capture (5 images per registration)
-- **Smart Recognition**: AI-powered facial analysis and matching
+- Role-based login for admin, teacher, and student users
+- Admin dashboard with students, teachers, analytics, reports, and settings
+- Teacher dashboard with student lists and attendance tools
+- Student dashboard with personal attendance, profile, and performance pages
+- Student management using MongoDB
+- Teacher management using Django users and profiles
+- Manual attendance marking with Present and Absent status
+- Attendance history and searchable attendance records
+- Face registration using webcam capture
+- Face attendance using `face_recognition`, dlib, OpenCV, and MongoDB-stored face encodings
+- Professional popup notifications using Django messages
+- CSV and PDF report export
+- Responsive sidebar-based UI
 
-### User Dashboards
-- **Admin Dashboard**: Full system overview with management tools
-- **Teacher Dashboard**: Attendance tools, student lists, and class management
-- **Student Dashboard**: Personal attendance records, performance metrics, and profile management
-
-### Additional Modules
-- **Canteen Management**: Food service tracking and management
-- **Library System**: Book borrowing and inventory management
-- **Device Management**: Campus device tracking and monitoring
-- **Notifications**: Real-time alerts and messaging system
-- **Security Monitoring**: Campus security features and alerts
-- **Real-Time Updates**: WebSocket-based live data updates
-
-## 🛠 Tech Stack
+## Tech Stack
 
 ### Backend
-- **Python 3.x**
-- **Django 5.2.14**: Web framework
-- **Django REST Framework**: API development
-- **Channels**: WebSocket support for real-time features
-- **SQLite**: Django models (users, attendance, sessions)
-- **MongoDB**: Student records and NoSQL data
-- **PyMongo**: MongoDB driver
 
-### AI & Computer Vision
-- **OpenCV**: Computer vision library
-- **face-recognition**: Facial recognition library
-- **dlib**: Machine learning toolkit
-- **NumPy**: Numerical computing
-- **Pillow**: Image processing
+- Python
+- Django 5.2.14
+- Django REST Framework
+- Django Channels
+- SQLite for Django auth, sessions, and relational app data
+- MongoDB for students, attendance logs, face encodings, reports, and NoSQL records
+- PyMongo
+
+### AI and Image Processing
+
+- face-recognition
+- dlib
+- OpenCV
+- NumPy
+- Pillow
 
 ### Frontend
-- **HTML5/CSS3**: Responsive design
-- **JavaScript**: Interactive features
-- **Font Awesome**: Icons and UI elements
-- **Chart.js**: Data visualization (integrated in analytics)
 
-### Data Processing
-- **Pandas**: Data analysis and manipulation
-- **JWT**: Secure authentication tokens
+- Django templates
+- HTML
+- CSS
+- JavaScript
+- Font Awesome
 
-## 📁 Project Structure
+## Project Structure
 
-```
+```text
 smart-campus-intelligence-system/
-├── backend/
-│   ├── apps/
-│   │   ├── authentication/     # User auth, face recognition
-│   │   ├── attendance/         # Attendance management
-│   │   ├── students/           # Student CRUD operations
-│   │   ├── teachers/           # Teacher management
-│   │   ├── analytics/          # Data analytics
-│   │   ├── canteen/            # Canteen services
-│   │   ├── devices/            # Device tracking
-│   │   ├── library/            # Library management
-│   │   ├── notifications/      # Alert system
-│   │   ├── realtime/           # WebSocket features
-│   │   └── security/           # Security monitoring
-│   ├── config/
-│   │   ├── settings.py         # Django settings
-│   │   ├── urls.py            # URL routing
-│   │   ├── asgi.py            # ASGI config
-│   │   └── wsgi.py            # WSGI config
-│   ├── database/
-│   │   └── mongo.py           # MongoDB connection
-│   ├── static/                 # CSS, JS, images
-│   ├── templates/              # HTML templates
-│   ├── media/                  # User uploads
-│   ├── db.sqlite3              # SQLite database
-│   ├── manage.py               # Django management
-│   └── requirements.txt        # Python dependencies
-├── docs/                       # Documentation
-├── frontend/                   # Frontend assets (if any)
-└── README.md                   # This file
+|-- backend/
+|   |-- apps/
+|   |   |-- authentication/        # Login, roles, dashboards, students, reports, face features
+|   |   |-- attendance/            # Attendance model, form, URLs, legacy app views
+|   |   |-- students/              # Student dashboard pages
+|   |   |-- teachers/              # Teacher app shell
+|   |   `-- analytics/             # Analytics app shell
+|   |-- config/                    # Django settings, root URLs, ASGI, WSGI
+|   |-- database/
+|   |   `-- mongo.py               # MongoDB connection
+|   |-- static/css/                # Application styles
+|   |-- templates/                 # Django templates
+|   |-- media/                     # Uploaded files and generated media
+|   |-- db.sqlite3                 # Local SQLite database
+|   |-- manage.py
+|   `-- requirements.txt
+|-- docs/
+|-- frontend/
+`-- README.md
 ```
 
-## ⚙️ Installation & Setup
+## Prerequisites
 
-### Prerequisites
-- Python 3.8+
-- MongoDB installed and running
-- Webcam (for face recognition features)
+- Python 3.10 or newer recommended
+- MongoDB running locally on `localhost:27017`
+- Webcam for face registration and face attendance
+- Windows users may need Visual C++ build tools for `dlib` if installing from source
 
-### 1. Clone Repository
-```bash
-git clone <repository-url>
-cd smart-campus-intelligence-system
-```
+## Setup
 
-### 2. Backend Setup
-```bash
-cd backend
-```
+From the repository root:
 
-### 3. Create Virtual Environment
 ```powershell
-# Windows
+cd backend
 python -m venv venv
 .\venv\Scripts\activate
-
-# Linux/Mac
-python -m venv venv
-source venv/bin/activate
-```
-
-### 4. Install Dependencies
-```bash
 pip install -r requirements.txt
-```
-
-### 5. Database Setup
-```bash
-# Run Django migrations
-python manage.py makemigrations
-python manage.py migrate
-```
-
-### 6. MongoDB Configuration
-Ensure MongoDB is running and update connection settings in `config/settings.py` if needed.
-
-### 7. Start Development Server
-```bash
-python manage.py runserver
-```
-
-Visit: `http://127.0.0.1:8000/`
-
-## 👥 Sample Users
-
-For testing purposes, create these users:
-
-| Role | Username | Password | Email |
-|------|----------|----------|-------|
-| Admin | admin | admin123 | admin@campus.com |
-| Teacher | teacher1 | teacher123 | teacher1@campus.com |
-| Student | student1 | student123 | student1@campus.com |
-| Student | student2 | student123 | student2@campus.com |
-| Student | student3 | student123 | student3@campus.com |
-
-### Create Sample Users (Django Shell)
-```bash
-python manage.py shell
-```
-
-```python
-from django.contrib.auth.models import User
-from authentication.models import UserProfile
-
-# Create users
-users_data = [
-    ('admin', 'admin123', 'admin@campus.com', 'admin'),
-    ('teacher1', 'teacher123', 'teacher1@campus.com', 'teacher'),
-    ('student1', 'student123', 'student1@campus.com', 'student'),
-    ('student2', 'student123', 'student2@campus.com', 'student'),
-    ('student3', 'student123', 'student3@campus.com', 'student'),
-]
-
-for username, password, email, role in users_data:
-    user, created = User.objects.get_or_create(
-        username=username,
-        defaults={'email': email}
-    )
-    user.set_password(password)
-    user.save()
-    
-    # Create or update profile
-    profile, _ = UserProfile.objects.get_or_create(user=user)
-    profile.role = role
-    profile.save()
-```
-
-## 🎯 Usage Guide
-
-### Face Registration Process
-1. Login as Admin
-2. Navigate to "Register Face"
-3. Enter student details (Name, Roll Number, Course)
-4. Allow camera access
-5. AI automatically captures 5 face images
-6. System processes and stores facial data
-7. Redirects to face attendance page
-
-### Face Attendance Process
-1. Login as appropriate user
-2. Navigate to "Face Attendance"
-3. Camera activates for real-time face detection
-4. AI recognizes registered faces
-5. Automatically marks attendance
-6. Real-time status updates
-
-### Manual Attendance
-1. Login as Teacher
-2. Go to "Add Attendance"
-3. Select student from dropdown
-4. Mark Present/Absent
-5. Save record
-
-## 🔗 API Endpoints
-
-### Authentication
-- `POST /api/login/` - User login
-- `POST /api/register/` - User registration
-- `POST /api/logout/` - User logout
-
-### Face Recognition
-- `POST /register-face/` - Register student face
-- `GET /face-attendance-page/` - Face attendance interface
-- `POST /start-face-attendance/` - Start face attendance session
-
-### Students
-- `GET /api/students/` - List all students
-- `POST /api/students/` - Add new student
-- `GET /api/students/{id}/` - Get student details
-- `PUT /api/students/{id}/` - Update student
-- `DELETE /api/students/{id}/` - Delete student
-
-### Attendance
-- `GET /api/attendance/` - List attendance records
-- `POST /api/attendance/` - Mark attendance
-- `GET /api/attendance/{id}/` - Get attendance details
-
-### Analytics
-- `GET /api/analytics/` - Get analytics data
-- `GET /api/reports/` - Generate reports
-
-## 📊 Key Routes
-
-| Route | Method | Purpose | Access |
-|-------|--------|---------|--------|
-| `/` | GET | Home/Login page | Public |
-| `/login/` | GET/POST | User login | Public |
-| `/register/` | GET/POST | User registration | Public |
-| `/dashboard/` | GET | Role-based redirect | Authenticated |
-| `/admin-dashboard/` | GET | Admin dashboard | Admin |
-| `/teacher-dashboard/` | GET | Teacher dashboard | Teacher |
-| `/student-dashboard/` | GET | Student dashboard | Student |
-| `/register-face/` | GET/POST | Face registration | Admin |
-| `/face-attendance-page/` | GET | Face attendance | Authenticated |
-| `/start-face-attendance/` | GET | Start face attendance | Authenticated |
-| `/students/` | GET | Student list | Admin/Teacher |
-| `/add-student/` | GET/POST | Add student | Admin |
-| `/teachers/` | GET | Teacher list | Admin |
-| `/add-teacher/` | GET/POST | Add teacher | Admin |
-| `/add-attendance/` | GET/POST | Manual attendance | Teacher |
-| `/attendance-list/` | GET | Attendance records | Authenticated |
-| `/analytics/` | GET | Analytics dashboard | Admin |
-| `/reports/` | GET | Reports page | Admin |
-| `/settings/` | GET | System settings | Admin |
-
-## 🤖 AI Features Details
-
-### Face Recognition Pipeline
-1. **Camera Access**: Real-time video stream capture
-2. **Face Detection**: OpenCV Haar cascades for face localization
-3. **Feature Extraction**: dlib facial landmark detection
-4. **Encoding**: face-recognition library generates 128D face encodings
-5. **Storage**: Encodings stored in MongoDB with student metadata
-6. **Matching**: Euclidean distance comparison for recognition
-7. **Attendance**: Automatic marking with confidence scoring
-
-### Accuracy Metrics
-- **Detection Rate**: 98% accuracy in controlled environments
-- **False Positive Rate**: <2% with proper lighting
-- **Processing Speed**: Real-time (30 FPS) on standard hardware
-- **Distance Tolerance**: Optimized for 1-3 meters range
-
-## 🔧 Configuration
-
-### Environment Variables
-Create a `.env` file in the backend directory:
-
-```env
-SECRET_KEY=your-secret-key-here
-DEBUG=True
-DATABASE_URL=mongodb://localhost:27017/campus_db
-ALLOWED_HOSTS=localhost,127.0.0.1
-```
-
-### MongoDB Setup
-```javascript
-// MongoDB Database: campus_db
-// Collections: students, face_encodings
-```
-
-## 🧪 Testing
-
-### Run Tests
-```bash
-python manage.py test
-```
-
-### Face Recognition Testing
-1. Register test students
-2. Test recognition under different lighting
-3. Verify attendance marking accuracy
-
-## 🚀 Deployment
-
-### Production Setup
-1. Set `DEBUG=False` in settings.py
-2. Configure production database
-3. Set up static files serving
-4. Configure WebSocket channels
-5. Set up reverse proxy (nginx/apache)
-
-### Docker Support (Future)
-```dockerfile
-# Dockerfile will be added for containerized deployment
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📞 Support
-
-For support and questions:
-- Create an issue in the repository
-- Contact the development team
-- Check the documentation in `/docs/`
-
-## 🔄 Future Enhancements
-
-- [ ] Mobile app development
-- [ ] Advanced analytics with ML
-- [ ] Integration with campus ERP systems
-- [ ] Multi-camera support
-- [ ] Voice recognition features
-- [ ] IoT device integration
-- [ ] Cloud deployment options
-
----
-
-**Built with ❤️ for smarter campus management**
-
-## Databases
-
-The project currently uses both SQLite and MongoDB:
-
-- SQLite stores Django auth users, `UserProfile`, sessions, teachers, and attendance records.
-- MongoDB stores student-management records used by the students module.
-
-MongoDB connection file:
-
-```text
-backend/database/mongo.py
-```
-
-Default MongoDB URL:
-
-```text
-mongodb://localhost:27017/
-```
-
-## Common Commands
-
-```powershell
-python manage.py check
-python manage.py makemigrations
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
 ```
 
-Using the existing `campus_env`:
+Open:
+
+```text
+http://127.0.0.1:8000/
+```
+
+If your machine uses the Python launcher or a named environment, replace `python` with the correct executable, for example:
 
 ```powershell
-C:\Users\admin\miniconda3\envs\campus_env\python.exe manage.py check
-C:\Users\admin\miniconda3\envs\campus_env\python.exe manage.py migrate
-C:\Users\admin\miniconda3\envs\campus_env\python.exe manage.py runserver
+py manage.py runserver
 ```
 
-## Troubleshooting
+## MongoDB
 
-### Student Dropdown Is Empty
+MongoDB is configured in:
 
-Create users with `userprofile.role = "student"`:
-
-```python
-from django.contrib.auth.models import User
-
-user = User.objects.create_user(
-    username="student1",
-    password="student123",
-    email="student1@gmail.com",
-)
-user.userprofile.role = "student"
-user.userprofile.save()
+```text
+backend/database/mongo.py
 ```
 
-### Attendance Is Not Showing
+Default connection:
 
-Check that records exist:
+```text
+mongodb://localhost:27017/
+```
+
+Default database:
+
+```text
+smart_campus_db
+```
+
+Common collections used by the app:
+
+- `students`
+- `attendance_logs`
+- `login_logs`
+- `analytics_cache`
+- `attendance_sessions`
+
+Student face records should include a `face_encodings` field containing one or more 128-value face encoding arrays. Face registration also stores `face_samples` for fallback matching.
+
+## User Roles
+
+Roles are stored in `UserProfile`:
+
+- `admin`
+- `teacher`
+- `student`
+
+Create or update roles in the Django shell:
 
 ```powershell
 python manage.py shell
 ```
 
 ```python
-from apps.attendance.models import Attendance
-Attendance.objects.count()
+from django.contrib.auth.models import User
+
+user = User.objects.create_user(
+    username="teacher1",
+    password="teacher123",
+    email="teacher1@example.com",
+)
+user.userprofile.role = "teacher"
+user.userprofile.save()
 ```
 
-### MongoDB Error
+Superusers are automatically created with the `admin` role.
 
-Make sure MongoDB is running locally before using MongoDB-backed student features.
+## Key Routes
 
-### Login Redirects Unexpectedly
+| Route | Purpose | Access |
+| --- | --- | --- |
+| `/` | Login page | Public |
+| `/login/` | Login | Public |
+| `/logout/` | Logout | Authenticated |
+| `/register/` | Access request / registration page | Public |
+| `/dashboard/` | Role-based dashboard redirect | Authenticated |
+| `/admin-dashboard/` | Admin dashboard | Admin |
+| `/teacher-dashboard/` | Teacher dashboard | Teacher |
+| `/student-dashboard/` | Student dashboard | Student |
+| `/students/` | Student list | Admin / Teacher |
+| `/add-student/` | Add student | Admin |
+| `/student/<student_id>/` | Student detail | Authenticated, role guarded |
+| `/teachers/` | Teacher list | Admin |
+| `/add-teacher/` | Add teacher | Admin |
+| `/add-attendance/` | Manual attendance | Admin / Teacher |
+| `/attendance-list/` | Attendance records | Admin / Teacher |
+| `/attendance-history/` | Attendance history | Authenticated |
+| `/register-face/` | Face registration | Admin |
+| `/face-attendance/` | Face attendance page | Authenticated |
+| `/start-face-attendance/` | Start OpenCV camera attendance | Authenticated |
+| `/process-face-attendance/` | Process browser camera frame | Authenticated |
+| `/analytics/` | Analytics dashboard | Admin |
+| `/reports/` | Reports page | Admin |
+| `/download-pdf-report/` | Download PDF report | Admin |
+| `/export-csv-report/` | Export CSV report | Admin |
+| `/settings/` | Settings page | Admin |
+
+## Face Registration Flow
+
+1. Login as an admin.
+2. Open `Register Face`.
+3. Enter student name, roll number, and course.
+4. Allow camera permission.
+5. Capture 5 face samples.
+6. The backend generates 128-value face encodings.
+7. The student record is saved in MongoDB.
+
+If encoding fails, the app returns an error instead of saving an empty `face_encodings` array. Keep the face centered, well lit, and visible inside the camera frame.
+
+## Face Attendance Flow
+
+1. Open `Face Attendance`.
+2. Start the camera.
+3. The app compares the live face with MongoDB `face_encodings`.
+4. If matched, it marks attendance in `attendance_logs`.
+5. First detection marks `IN`; second detection marks `OUT`.
+
+## Manual Attendance Flow
+
+1. Login as admin or teacher.
+2. Open `Add Attendance`.
+3. Select a student from the dropdown.
+4. Choose the attendance date and status.
+5. Save the record.
+
+The dropdown reads students from MongoDB and supports records created through both normal student entry and face registration.
+
+## Common Commands
+
+```powershell
+cd backend
+python manage.py check
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+python manage.py test
+```
+
+## Troubleshooting
+
+### Python command is not found
+
+Use the Python launcher or your virtual environment path:
+
+```powershell
+py manage.py runserver
+.\venv\Scripts\python.exe manage.py runserver
+```
+
+### MongoDB connection error
+
+Make sure MongoDB is running locally:
+
+```text
+mongodb://localhost:27017/
+```
+
+Then verify `backend/database/mongo.py` still points to `smart_campus_db`.
+
+### Face registration saves no encoding
+
+Delete the bad student record with empty `face_encodings`, then register again with:
+
+- Good lighting
+- One face in the frame
+- Face centered inside the scan box
+- Camera permission enabled
+
+The current backend blocks new records when face encoding fails.
+
+### Student is not visible in attendance dropdown
+
+Check the MongoDB `students` collection. The student should have at least one usable name field:
+
+- `name`
+- `student_name`
+- `full_name`
+
+The app also supports `course`, `department`, `student_course`, `email`, and `student_email` fallbacks.
+
+### Login redirects to the wrong dashboard
 
 Check the user's role:
 
 ```python
 from django.contrib.auth.models import User
+
 user = User.objects.get(username="teacher1")
 user.userprofile.role
 ```
 
-## Notes
+Update if needed:
 
-- Keep `SECRET_KEY`, email passwords, and other secrets out of production code.
-- Use environment variables for production settings.
-- Set `DEBUG=False` and configure `ALLOWED_HOSTS` before deployment.
-- Do not commit local database files, virtual environments, cache files, or media uploads in production repositories.
+```python
+user.userprofile.role = "teacher"
+user.userprofile.save()
+```
+
+### Static files or images are missing
+
+During development, run the app with `DEBUG=True`. Uploaded files are served from:
+
+```text
+backend/media/
+```
+
+Static CSS files are in:
+
+```text
+backend/static/css/
+```
+
+## Development Notes
+
+- Keep secrets out of committed code in production.
+- Move `SECRET_KEY`, email credentials, and database settings to environment variables before deployment.
+- Set `DEBUG=False` and configure `ALLOWED_HOSTS` before production deployment.
+- Do not commit local database files, virtual environments, cache files, generated media, or `__pycache__` files.
+- Face recognition accuracy depends heavily on camera quality and lighting.
+
+## Status
+
+This is an active academic/project build. Core dashboards, role access, manual attendance, MongoDB-backed students, face registration, face attendance, reports, and notification UI are implemented.

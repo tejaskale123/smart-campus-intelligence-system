@@ -1,5 +1,4 @@
 import cv2
-import face_recognition
 import numpy as np
 import time
 
@@ -16,39 +15,40 @@ attendance_collection = db["attendance_logs"]
 students_collection = db["students"]
 
 
-# ==========================================
-# LOAD STUDENTS
-# ==========================================
+def load_known_faces():
+    known_faces = []
+    known_names = []
 
-known_faces = []
-known_names = []
+    print("Loading students from MongoDB...")
 
-print("Loading students from MongoDB...")
+    for student in students_collection.find():
+        student_name = (
+            student.get("student_name")
+            or student.get("name")
+            or ""
+        ).strip()
 
-students = students_collection.find()
-
-for student in students:
-
-    student_name = student.get("student_name", "").strip()
-
-    face_encodings = student.get(
-        "face_encodings",
-        []
-    )
-
-    for encoding in face_encodings:
-
-        known_faces.append(
-            np.array(encoding)
+        face_encodings = student.get(
+            "face_encodings",
+            []
         )
 
-        known_names.append(
-            student_name
-        )
+        for encoding in face_encodings:
+            if not encoding:
+                continue
 
-        print(f"Loaded: {student_name}")
+            known_faces.append(
+                np.array(encoding)
+            )
 
-print("Known Names:", known_names)
+            known_names.append(
+                student_name
+            )
+
+            print(f"Loaded: {student_name}")
+
+    print("Known Names:", known_names)
+    return known_faces, known_names
 
 
 # ==========================================
@@ -56,6 +56,20 @@ print("Known Names:", known_names)
 # ==========================================
 
 def recognize_faces():
+
+    try:
+        import face_recognition
+    except ImportError:
+        print("face_recognition package not installed. Face attendance cannot start.")
+        return
+
+    known_faces, known_names = load_known_faces()
+
+    if not known_faces:
+
+        print("No face encodings found in MongoDB.")
+
+        return
 
     # ==========================================
     # OPEN CAMERA

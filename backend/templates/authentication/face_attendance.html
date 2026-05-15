@@ -1,753 +1,311 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>
-        Smart AI Face Attendance
-    </title>
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart AI Face Attendance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-            font-family:'Poppins',sans-serif;
-        }
-
-        body{
-
-            background:
-            linear-gradient(
-                135deg,
-                #020617,
-                #071129,
-                #0f172a
-            );
-
-            color:white;
-
-            min-height:100vh;
-
-            overflow-x:hidden;
-        }
-
-        .main-container{
-
-            width:95%;
-
-            margin:auto;
-
-            padding-top:40px;
-
-            padding-bottom:50px;
-        }
-
-        .top-bar{
-
-            display:flex;
-
-            justify-content:space-between;
-
-            align-items:center;
-
-            margin-bottom:40px;
-        }
-
-        .logo{
-
-            font-size:55px;
-
-            font-weight:700;
-
-            background:linear-gradient(
-                to right,
-                #22d3ee,
-                #3b82f6
-            );
-
-            -webkit-background-clip:text;
-
-            -webkit-text-fill-color:transparent;
-        }
-
-        .status-badge{
-
-            background:#052e16;
-
-            color:#22c55e;
-
-            padding:12px 20px;
-
-            border-radius:12px;
-
-            font-size:16px;
-
-            border:1px solid #14532d;
-        }
-
-        .dashboard-grid{
-
-            display:grid;
-
-            grid-template-columns:2fr 1fr;
-
-            gap:30px;
-        }
-
-        .camera-section{
-
-            background:rgba(15,23,42,0.7);
-
-            border:1px solid rgba(255,255,255,0.08);
-
-            border-radius:30px;
-
-            padding:30px;
-
-            backdrop-filter:blur(20px);
-
-            box-shadow:
-            0 0 40px rgba(0,255,255,0.05);
-        }
-
-        .camera-header{
-
-            display:flex;
-
-            justify-content:space-between;
-
-            align-items:center;
-
-            margin-bottom:25px;
-        }
-
-        .camera-title{
-
-            font-size:34px;
-
-            font-weight:600;
-
-            color:#22d3ee;
-        }
-
-        .ai-dot{
-
-            width:14px;
-
-            height:14px;
-
-            border-radius:50%;
-
-            background:#22c55e;
-
-            animation:pulse 1s infinite;
-        }
-
-        @keyframes pulse{
-
-            0%{
-                transform:scale(1);
-                opacity:1;
-            }
-
-            50%{
-                transform:scale(1.3);
-                opacity:0.5;
-            }
-
-            100%{
-                transform:scale(1);
-                opacity:1;
-            }
-        }
-
-        .camera-container{
-
-            position:relative;
-
-            width:100%;
-
-            height:600px;
-
-            border-radius:25px;
-
-            overflow:hidden;
-
-            border:3px solid #22d3ee;
-
-            background:black;
-        }
-
-        #video{
-
-            width:100%;
-
-            height:100%;
-
-            object-fit:cover;
-        }
-
-        .camera-overlay{
-
-            position:absolute;
-
-            top:0;
-
-            left:0;
-
-            width:100%;
-
-            height:100%;
-
-            background:
-            linear-gradient(
-                to bottom,
-                rgba(0,0,0,0.1),
-                rgba(0,0,0,0.4)
-            );
-
-            pointer-events:none;
-        }
-
-        .scan-line{
-
-            position:absolute;
-
-            width:100%;
-
-            height:4px;
-
-            background:#22d3ee;
-
-            top:0;
-
-            box-shadow:0 0 20px #22d3ee;
-
-            animation:scan 4s linear infinite;
-        }
-
-        @keyframes scan{
-
-            0%{
-                top:0;
-            }
-
-            100%{
-                top:100%;
-            }
-        }
-
-        .face-box{
-
-            position:absolute;
-
-            width:240px;
-
-            height:240px;
-
-            border:5px solid #22d3ee;
-
-            border-radius:25px;
-
-            top:50%;
-
-            left:50%;
-
-            transform:translate(-50%,-50%);
-
-            box-shadow:
-            0 0 30px rgba(34,211,238,0.8);
-        }
-
-        .controls{
-
-            margin-top:30px;
-
-            display:flex;
-
-            gap:20px;
-        }
-
-        .btn{
-
-            padding:16px 30px;
-
-            border:none;
-
-            border-radius:14px;
-
-            font-size:18px;
-
-            cursor:pointer;
-
-            transition:0.3s;
-
-            color:white;
-
-            font-weight:600;
-        }
-
-        .start-btn{
-
-            background:
-            linear-gradient(
-                to right,
-                #06b6d4,
-                #3b82f6
-            );
-        }
-
-        .start-btn:hover{
-
-            transform:translateY(-3px);
-
-            box-shadow:
-            0 10px 25px rgba(59,130,246,0.4);
-        }
-
-        .stop-btn{
-
-            background:#7f1d1d;
-        }
-
-        .stop-btn:hover{
-
-            background:#991b1b;
-        }
-
-        .side-panel{
-
-            display:flex;
-
-            flex-direction:column;
-
-            gap:25px;
-        }
-
-        .card{
-
-            background:rgba(15,23,42,0.7);
-
-            border-radius:25px;
-
-            padding:25px;
-
-            border:1px solid rgba(255,255,255,0.08);
-
-            backdrop-filter:blur(20px);
-        }
-
-        .card h2{
-
-            margin-bottom:20px;
-
-            color:#22d3ee;
-        }
-
-        .student-card{
-
-            display:flex;
-
-            align-items:center;
-
-            gap:20px;
-        }
-
-        .avatar{
-
-            width:80px;
-
-            height:80px;
-
-            border-radius:50%;
-
-            background:
-            linear-gradient(
-                to right,
-                #06b6d4,
-                #3b82f6
-            );
-
-            display:flex;
-
-            justify-content:center;
-
-            align-items:center;
-
-            font-size:30px;
-
-            font-weight:700;
-        }
-
-        .student-info h3{
-
-            font-size:24px;
-        }
-
-        .student-info p{
-
-            color:#94a3b8;
-
-            margin-top:5px;
-        }
-
-        .stats{
-
-            display:grid;
-
-            grid-template-columns:1fr 1fr;
-
-            gap:15px;
-        }
-
-        .stat-box{
-
-            background:#0f172a;
-
-            padding:20px;
-
-            border-radius:20px;
-
-            text-align:center;
-        }
-
-        .stat-box h1{
-
-            color:#22d3ee;
-
-            font-size:38px;
-        }
-
-        .attendance-status{
-
-            margin-top:20px;
-
-            padding:15px;
-
-            background:#052e16;
-
-            border-radius:14px;
-
-            color:#22c55e;
-
-            text-align:center;
-
-            font-size:18px;
-        }
-
-        @media(max-width:1100px){
-
-            .dashboard-grid{
-
-                grid-template-columns:1fr;
-            }
-
-            .camera-container{
-
-                height:400px;
-            }
-        }
-
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{background:#07111f;color:#f8fafc;font-family:Poppins,Arial,sans-serif;min-height:100vh}
+        .page{width:min(1480px,94vw);margin:0 auto;padding:28px 0 44px}
+        .topbar{align-items:flex-end;display:flex;gap:20px;justify-content:space-between;margin-bottom:22px}
+        .title h1{font-size:clamp(34px,5vw,64px);line-height:1.05;background:linear-gradient(90deg,#22d3ee,#3b82f6);-webkit-background-clip:text;color:transparent}
+        .title p{color:#9fb0c8;font-size:16px;margin-top:8px}
+        .badge{background:#05351b;border:1px solid #176b38;border-radius:14px;color:#35e875;font-weight:600;padding:12px 18px;white-space:nowrap}
+        .grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(380px,1fr);gap:24px}
+        .panel{background:#0f172acc;border:1px solid #23314f;border-radius:22px;box-shadow:0 18px 60px #0005;padding:24px}
+        .panel-head{align-items:center;display:flex;justify-content:space-between;margin-bottom:16px}
+        .panel h2{color:#22d3ee;font-size:28px}
+        .live-dot{background:#22c55e;border-radius:999px;height:13px;box-shadow:0 0 0 8px #22c55e1f;width:13px}
+        .camera{aspect-ratio:16/9;background:#020617;border:3px solid #22d3ee;border-radius:20px;overflow:hidden;position:relative}
+        video{display:block;height:100%;object-fit:cover;transform:scaleX(-1);width:100%}
+        .camera-message{align-items:center;background:#020617;display:flex;inset:0;justify-content:center;padding:24px;position:absolute;text-align:center;color:#9fb0c8}
+        .camera-message.is-hidden{display:none}
+        .scan{border:4px solid #22d3ee;border-radius:22px;box-shadow:0 0 24px #22d3ee99;height:44%;left:50%;position:absolute;top:50%;transform:translate(-50%,-50%);width:34%}
+        .scan::after{background:#22d3ee;box-shadow:0 0 18px #22d3ee;content:"";height:3px;left:-85%;position:absolute;right:-85%;top:50%}
+        .controls{display:flex;gap:14px;margin-top:18px}
+        button{border:0;border-radius:14px;color:#fff;cursor:pointer;font:600 16px Poppins,Arial,sans-serif;padding:15px 20px}
+        button:disabled{cursor:not-allowed;opacity:.55}
+        .primary{background:linear-gradient(90deg,#06b6d4,#2563eb)}
+        .muted{background:#23314f}
+        .danger{background:#991b1b}
+        .side{display:grid;gap:20px}
+        .student{align-items:center;display:flex;gap:16px}
+        .avatar{align-items:center;background:linear-gradient(135deg,#22d3ee,#2563eb);border-radius:50%;display:flex;font-size:34px;font-weight:700;height:82px;justify-content:center;width:82px}
+        .student h3{font-size:26px}
+        .student p,.hint{color:#9fb0c8;margin-top:5px}
+        .status{border-radius:16px;font-size:17px;font-weight:600;margin-top:18px;padding:16px;text-align:center}
+        .status.waiting{background:#1e293b;color:#cbd5e1}
+        .status.ready{background:#06344a;color:#22d3ee}
+        .status.marked{background:#05351b;color:#35e875}
+        .status.done{background:#422006;color:#fbbf24}
+        .status.error{background:#450a0a;color:#fca5a5}
+        .flow-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+        .flow-card{background:#111c31;border:1px solid #243552;border-radius:16px;padding:18px}
+        .flow-card strong{display:block;font-size:28px;margin-bottom:8px}
+        .flow-card span{color:#9fb0c8;font-size:14px}
+        .flow-card.in strong{color:#35e875}
+        .flow-card.out strong{color:#fb7185}
+        .flow-card.complete{border-color:#fbbf244d}
+        .stats{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+        .stat{background:#111c31;border-radius:16px;padding:18px;text-align:center}
+        .stat strong{color:#22d3ee;display:block;font-size:31px}
+        .stat span{color:#cbd5e1}
+        .timeline{display:grid;gap:12px;margin-top:14px;max-height:220px;overflow:auto}
+        .event{align-items:center;background:#111c31;border-radius:14px;display:flex;gap:12px;justify-content:space-between;padding:14px 16px}
+        .event b{min-width:46px}
+        .event.in b{color:#35e875}
+        .event.out b{color:#fb7185}
+        .event.done b{color:#fbbf24}
+        .event span{color:#9fb0c8;text-align:right}
+        canvas{display:none}
+        @media(max-width:1050px){.grid{grid-template-columns:1fr}.topbar{align-items:flex-start;flex-direction:column}.controls{flex-wrap:wrap}.scan{width:46%}}
     </style>
-
 </head>
-
 <body>
-
-<div class="main-container">
-
-    <div class="top-bar">
-
-        <div class="logo">
-            Smart AI Face Attendance
+<main class="page">
+    <div class="topbar">
+        <div class="title">
+            <h1>Smart AI Face Attendance</h1>
+            <p>Camera scan will mark check-in first and check-out second. Completed students are not marked again.</p>
         </div>
-
-        <div class="status-badge">
-            AI System Active ✅
-        </div>
-
+        <div class="badge" id="systemBadge">Camera waiting</div>
     </div>
 
-    <div class="dashboard-grid">
-
-        <div class="camera-section">
-
-            <div class="camera-header">
-
-                <div class="camera-title">
-                    Live Face Recognition
-                </div>
-
-                <div class="ai-dot"></div>
-
+    <section class="grid">
+        <div class="panel">
+            <div class="panel-head">
+                <h2>Live Recognition</h2>
+                <div class="live-dot"></div>
             </div>
-
-            <div class="camera-container">
-
-                <video
-                    id="video"
-                    autoplay
-                    playsinline
-                    muted
-                ></video>
-
-                <div class="camera-overlay"></div>
-
-                <div class="scan-line"></div>
-
-                <div class="face-box"></div>
-
+            <div class="camera">
+                <video id="video" autoplay muted playsinline></video>
+                <div class="camera-message" id="cameraMessage">Press Start Camera and allow permission.</div>
+                <div class="scan"></div>
             </div>
-
             <div class="controls">
-
-                <button
-                    id="startBtn"
-                    class="btn start-btn"
-                >
-
-                    START AI ATTENDANCE
-
-                </button>
-
-                <button
-                    id="stopBtn"
-                    class="btn stop-btn"
-                >
-
-                    STOP CAMERA
-
-                </button>
-
+                <button class="primary" id="startBtn">Start Camera</button>
+                <button class="muted" id="scanBtn" disabled>Start Scan</button>
+                <button class="danger" id="stopBtn" disabled>Stop</button>
             </div>
-
         </div>
 
-        <div class="side-panel">
-
-            <div class="card">
-
+        <aside class="side">
+            <div class="panel">
                 <h2>Detected Student</h2>
-
-                <div class="student-card">
-
-                    <div
-                        class="avatar"
-                        id="avatarLetter"
-                    >
-                        ?
+                <div class="student">
+                    <div class="avatar" id="avatarLetter">?</div>
+                    <div>
+                        <h3 id="studentName">Waiting...</h3>
+                        <p id="studentMeta">No face scanned yet</p>
                     </div>
-
-                    <div class="student-info">
-
-                        <h3 id="studentName">
-                            Waiting...
-                        </h3>
-
-                        <p id="studentCourse">
-                            AI Recognition Active
-                        </p>
-
-                    </div>
-
                 </div>
-
-                <div
-                    class="attendance-status"
-                    id="attendanceStatus"
-                >
-
-                    Waiting For Face Detection...
-
+                <div class="status waiting" id="attendanceStatus">Camera not started.</div>
+                <div class="flow-grid">
+                    <div class="flow-card in" id="inCard"><strong>IN</strong><span id="inTime">Not marked</span></div>
+                    <div class="flow-card out" id="outCard"><strong>OUT</strong><span id="outTime">Not marked</span></div>
                 </div>
-
             </div>
 
-            <div class="card">
-
+            <div class="panel">
                 <h2>Realtime Stats</h2>
-
                 <div class="stats">
-
-                    <div class="stat-box">
-
-                        <h1>98%</h1>
-
-                        <p>Confidence</p>
-
-                    </div>
-
-                    <div class="stat-box">
-
-                        <h1 id="detectedCount">0</h1>
-
-                        <p>Detected</p>
-
-                    </div>
-
-                    <div class="stat-box">
-
-                        <h1>24</h1>
-
-                        <p>Today</p>
-
-                    </div>
-
-                    <div class="stat-box">
-
-                        <h1>AI</h1>
-
-                        <p>Status</p>
-
-                    </div>
-
+                    <div class="stat"><strong id="confidence">0%</strong><span>Confidence</span></div>
+                    <div class="stat"><strong id="detectedCount">0</strong><span>Detected</span></div>
+                    <div class="stat"><strong id="lastType">--</strong><span>Last Mark</span></div>
+                    <div class="stat"><strong id="scanState">Idle</strong><span>Status</span></div>
                 </div>
-
             </div>
 
-        </div>
+            <div class="panel">
+                <h2>Today Flow</h2>
+                <p class="hint">IN and OUT are recorded separately in attendance history.</p>
+                <div class="timeline" id="timeline"></div>
+            </div>
+        </aside>
+    </section>
+</main>
 
-    </div>
-
-</div>
+<canvas id="canvas" width="640" height="480"></canvas>
 
 <script>
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const startBtn = document.getElementById("startBtn");
+const scanBtn = document.getElementById("scanBtn");
+const stopBtn = document.getElementById("stopBtn");
+const cameraMessage = document.getElementById("cameraMessage");
+const attendanceStatus = document.getElementById("attendanceStatus");
+const studentName = document.getElementById("studentName");
+const studentMeta = document.getElementById("studentMeta");
+const avatarLetter = document.getElementById("avatarLetter");
+const confidence = document.getElementById("confidence");
+const detectedCount = document.getElementById("detectedCount");
+const lastType = document.getElementById("lastType");
+const scanState = document.getElementById("scanState");
+const systemBadge = document.getElementById("systemBadge");
+const timeline = document.getElementById("timeline");
+const inTime = document.getElementById("inTime");
+const outTime = document.getElementById("outTime");
+const inCard = document.getElementById("inCard");
+const outCard = document.getElementById("outCard");
 
-const attendanceStatus =
-document.getElementById("attendanceStatus");
+let stream = null;
+let scanTimer = null;
+let scanning = false;
+let processing = false;
+let detections = 0;
+let lastEventKey = "";
 
-const studentName =
-document.getElementById("studentName");
-
-const studentCourse =
-document.getElementById("studentCourse");
-
-const avatarLetter =
-document.getElementById("avatarLetter");
-
-const detectedCount =
-document.getElementById("detectedCount");
-
-
-
-// ==========================================
-// START ATTENDANCE
-// ==========================================
-
-function startAttendance(){
-
-    attendanceStatus.innerHTML =
-    "Starting AI Face Recognition...";
-
-    fetch("/start-face-attendance/")
-
-    .then(response => response.text())
-
-    .then(data => {
-
-        console.log(data);
-
-        attendanceStatus.innerHTML =
-        "Face Recognition Running ✅";
-
-        studentName.innerHTML =
-        "Face Detection Active";
-
-        studentCourse.innerHTML =
-        "OpenCV AI Camera Running";
-
-        avatarLetter.innerHTML =
-        "AI";
-
-        detectedCount.innerHTML =
-        "1";
-
-    })
-
-    .catch(error => {
-
-        console.log(error);
-
-        attendanceStatus.innerHTML =
-        "System Error";
-
-    });
-
+function setStatus(text, mode){
+    attendanceStatus.textContent = text;
+    attendanceStatus.className = "status " + mode;
 }
 
-
-
-// ==========================================
-// STOP
-// ==========================================
-
-function stopAttendance(){
-
-    attendanceStatus.innerHTML =
-    "Camera Stopped";
-
-    studentName.innerHTML =
-    "Waiting...";
-
-    studentCourse.innerHTML =
-    "AI Recognition Active";
-
-    avatarLetter.innerHTML =
-    "?";
-
-    detectedCount.innerHTML =
-    "0";
-
+function addEvent(type, time, message){
+    const key = `${type}-${time}-${message}`;
+    if(key === lastEventKey){
+        return;
+    }
+    lastEventKey = key;
+    const row = document.createElement("div");
+    row.className = "event " + type.toLowerCase();
+    row.innerHTML = `<b>${type}</b><span>${time || "--"} - ${message}</span>`;
+    timeline.prepend(row);
 }
 
-
-
-// ==========================================
-// BUTTON EVENTS
-// ==========================================
-
-document
-.getElementById("startBtn")
-.addEventListener(
-
-    "click",
-
-    function(){
-
-        startAttendance();
-
+async function startCamera(){
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+        setStatus("Camera API is not supported in this browser.", "error");
+        return;
     }
 
-);
+    try{
+        setStatus("Opening camera...", "ready");
+        stream = await navigator.mediaDevices.getUserMedia({
+            video:{width:{ideal:1280},height:{ideal:720},facingMode:"user"},
+            audio:false
+        });
+        video.srcObject = stream;
+        await video.play();
+        cameraMessage.classList.add("is-hidden");
+        systemBadge.textContent = "Camera active";
+        setStatus("Camera ready. Start scan when the face is clear.", "ready");
+        startBtn.disabled = true;
+        scanBtn.disabled = false;
+        stopBtn.disabled = false;
+    }catch(error){
+        console.error(error);
+        setStatus("Camera failed. Allow permission and close other camera apps.", "error");
+        systemBadge.textContent = "Camera blocked";
+    }
+}
 
+function stopAll(){
+    scanning = false;
+    clearInterval(scanTimer);
+    scanTimer = null;
+    if(stream){
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+    }
+    video.srcObject = null;
+    cameraMessage.classList.remove("is-hidden");
+    cameraMessage.textContent = "Camera stopped.";
+    systemBadge.textContent = "Camera stopped";
+    scanState.textContent = "Idle";
+    startBtn.disabled = false;
+    scanBtn.disabled = true;
+    stopBtn.disabled = true;
+    setStatus("Camera stopped.", "waiting");
+}
 
+function startScan(){
+    if(!stream || scanning){
+        return;
+    }
+    scanning = true;
+    scanState.textContent = "Scanning";
+    scanBtn.disabled = true;
+    setStatus("Scanning face for IN / OUT attendance...", "ready");
+    processFrame();
+    scanTimer = setInterval(processFrame, 3500);
+}
 
-document
-.getElementById("stopBtn")
-.addEventListener(
-
-    "click",
-
-    function(){
-
-        stopAttendance();
-
+async function processFrame(){
+    if(processing || !scanning || video.readyState < 2){
+        return;
     }
 
-);
+    processing = true;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const image = canvas.toDataURL("image/jpeg", 0.78);
+    const formData = new FormData();
+    formData.append("image", image);
 
+    try{
+        const response = await fetch("/process-face-attendance/", {
+            method:"POST",
+            headers:{"X-CSRFToken":"{{ csrf_token }}"},
+            body:formData
+        });
+        const data = await response.json();
+        handleResult(data);
+    }catch(error){
+        console.error(error);
+        setStatus("Recognition request failed.", "error");
+    }finally{
+        processing = false;
+    }
+}
+
+function handleResult(data){
+    if(data.status === "no_face"){
+        setStatus(data.message, "waiting");
+        return;
+    }
+
+    if(data.status === "unknown" || data.status === "error"){
+        setStatus(data.message, "error");
+        return;
+    }
+
+    if(data.student_name){
+        detections += 1;
+        detectedCount.textContent = detections;
+        studentName.textContent = data.student_name;
+        studentMeta.textContent = `${data.roll_number || "No roll"} | ${data.course || "No course"}`;
+        avatarLetter.textContent = data.student_name.charAt(0).toUpperCase();
+        confidence.textContent = `${data.confidence || 0}%`;
+    }
+
+    if(data.status === "marked"){
+        lastType.textContent = data.attendance_type;
+        if(data.attendance_type === "IN"){
+            inTime.textContent = data.time;
+            inCard.classList.add("complete");
+        }
+        if(data.attendance_type === "OUT"){
+            outTime.textContent = data.time;
+            outCard.classList.add("complete");
+        }
+        addEvent(data.attendance_type, data.time, data.message);
+        setStatus(`${data.attendance_type} marked at ${data.time}`, "marked");
+        return;
+    }
+
+    if(data.status === "already_marked"){
+        lastType.textContent = "DONE";
+        addEvent("DONE", data.time, data.message);
+        setStatus("Attendance already completed today.", "done");
+    }
+}
+
+startBtn.addEventListener("click", startCamera);
+scanBtn.addEventListener("click", startScan);
+stopBtn.addEventListener("click", stopAll);
 </script>
+</body>
+</html>

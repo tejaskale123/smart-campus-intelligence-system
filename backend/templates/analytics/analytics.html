@@ -1,590 +1,142 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Campus Analytics</title>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <style>
-
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-            font-family:'Poppins',sans-serif;
-        }
-
-        body{
-            background:#020617;
-            color:white;
-            display:flex;
-            overflow-x:hidden;
-        }
-
-        ::-webkit-scrollbar{
-            width:8px;
-        }
-
-        ::-webkit-scrollbar-thumb{
-            background:#22d3ee;
-            border-radius:20px;
-        }
-
-        .sidebar{
-            width:280px;
-            height:100vh;
-            background:#081028;
-            position:fixed;
-            left:0;
-            top:0;
-            padding:30px 20px;
-            border-right:1px solid rgba(255,255,255,0.08);
-            z-index:1000;
-        }
-
-        .logo{
-            font-size:42px;
-            font-weight:800;
-            color:#22d3ee;
-            line-height:1.2;
-            margin-bottom:50px;
-        }
-
-        .menu a{
-            display:flex;
-            align-items:center;
-            gap:12px;
-            text-decoration:none;
-            color:#cbd5e1;
-            padding:18px;
-            margin-bottom:15px;
-            border-radius:16px;
-            transition:0.3s ease;
-            font-size:18px;
-            font-weight:500;
-        }
-
-        .menu a:hover,
-        .menu a.active{
-            background:linear-gradient(90deg,#06b6d4,#2563eb);
-            transform:translateX(5px);
-            color:white;
-        }
-
-        .main{
-            margin-left:280px;
-            width:calc(100% - 280px);
-            padding:40px;
-        }
-
-        .top-title p{
-            color:#22d3ee;
-            letter-spacing:3px;
-            font-weight:600;
-            margin-bottom:10px;
-        }
-
-        .top-title h1{
-            font-size:78px;
-            font-weight:800;
-            line-height:1;
-        }
-
-        .underline{
-            width:90px;
-            height:5px;
-            background:#22d3ee;
-            border-radius:20px;
-            margin-top:20px;
-        }
-
-        .cards{
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-            gap:25px;
-            margin-top:50px;
-        }
-
-        .card{
-            background:linear-gradient(145deg,#1e293b,#172033);
-            padding:35px;
-            border-radius:28px;
-            transition:0.4s;
-            border:1px solid rgba(255,255,255,0.05);
-            position:relative;
-            overflow:hidden;
-        }
-
-        .card::before{
-            content:'';
-            position:absolute;
-            width:120px;
-            height:120px;
-            background:rgba(34,211,238,0.08);
-            border-radius:50%;
-            top:-40px;
-            right:-40px;
-        }
-
-        .card:hover{
-            transform:translateY(-10px);
-            box-shadow:0 20px 50px rgba(0,0,0,0.5);
-        }
-
-        .card h2{
-            font-size:64px;
-            margin-bottom:10px;
-            font-weight:800;
-        }
-
-        .card p{
-            color:#94a3b8;
-            font-size:20px;
-        }
-
-        .charts{
-            display:grid;
-            grid-template-columns:1fr 1fr;
-            gap:30px;
-            margin-top:50px;
-        }
-
-        .chart-box{
-            background:#111827;
-            padding:30px;
-            border-radius:28px;
-            min-height:450px;
-            position:relative;
-            border:1px solid rgba(255,255,255,0.05);
-        }
-
-        .chart-box h3{
-            margin-bottom:25px;
-            color:#22d3ee;
-            font-size:32px;
-        }
-
-        canvas{
-            width:100% !important;
-            height:330px !important;
-        }
-
-        .ai-box{
-            margin-top:50px;
-            background:linear-gradient(135deg,#0f172a,#1e293b);
-            padding:35px;
-            border-radius:28px;
-            border:1px solid rgba(255,255,255,0.05);
-        }
-
-        .ai-box h2{
-            color:#22d3ee;
-            margin-bottom:20px;
-            font-size:36px;
-        }
-
-        .ai-box ul{
-            padding-left:20px;
-        }
-
-        .ai-box li{
-            margin-bottom:15px;
-            color:#cbd5e1;
-            font-size:20px;
-        }
-
-        .table-box{
-            margin-top:50px;
-            background:#111827;
-            border-radius:28px;
-            padding:30px;
-            overflow-x:auto;
-            border:1px solid rgba(255,255,255,0.05);
-        }
-
-        table{
-            width:100%;
-            border-collapse:collapse;
-        }
-
-        th{
-            background:black;
-            color:#22d3ee;
-            padding:22px;
-            text-align:left;
-            font-size:18px;
-        }
-
-        td{
-            padding:22px;
-            border-bottom:1px solid rgba(255,255,255,0.05);
-            font-size:18px;
-        }
-
-        tr{
-            transition:0.3s;
-        }
-
-        tr:hover{
-            background:rgba(255,255,255,0.03);
-        }
-
-        .student-info{
-            display:flex;
-            align-items:center;
-            gap:15px;
-        }
-
-        .avatar{
-            width:48px;
-            height:48px;
-            border-radius:50%;
-            background:#06b6d4;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-weight:700;
-            font-size:18px;
-        }
-
-        .alert-box{
-            margin-top:50px;
-            background:linear-gradient(135deg,#991b1b,#7f1d1d);
-            padding:35px;
-            border-radius:28px;
-        }
-
-        .alert-box h2{
-            margin-bottom:15px;
-            font-size:36px;
-        }
-
-        .alert-box p{
-            font-size:18px;
-        }
-
-        .activity-box{
-            margin-top:50px;
-            background:#111827;
-            padding:35px;
-            border-radius:28px;
-            border:1px solid rgba(255,255,255,0.05);
-        }
-
-        .activity-box h2{
-            margin-bottom:25px;
-            font-size:36px;
-        }
-
-        .activity-item{
-            padding:18px 0;
-            border-bottom:1px solid rgba(255,255,255,0.05);
-            color:#cbd5e1;
-            font-size:18px;
-        }
-
-        @media(max-width:1100px){
-
-            .charts{
-                grid-template-columns:1fr;
-            }
-
-            .top-title h1{
-                font-size:50px;
-            }
-
-        }
-
-        @media(max-width:768px){
-
-            .sidebar{
-                width:100%;
-                height:auto;
-                position:relative;
-            }
-
-            .main{
-                margin-left:0;
-                width:100%;
-            }
-
-            body{
-                flex-direction:column;
-            }
-
-        }
-
-    </style>
-
-</head>
-
-<body>
-
-<div class="sidebar">
-
-    <div class="logo">
-        Smart<br>Campus
-    </div>
-
-    <div class="menu">
-
-        <a href="/admin-dashboard/">Dashboard</a>
-        <a href="/students/">Students</a>
-        <a href="/teachers/">Teachers</a>
-        <a href="/attendance-list/">Attendance</a>
-        <a href="/analytics/" class="active">Analytics</a>
-        <a href="/reports/">Reports</a>
-        <a href="/logout/">Logout</a>
-
-    </div>
-
-</div>
-
-<div class="main">
-
-    <div class="top-title">
-
-        <p>SMART CAMPUS ANALYTICS</p>
-
+{% extends "base/base.html" %}
+
+{% block content %}
+<style>
+    .analytics-page{color:#f8fafc}
+    .eyebrow{color:#22d3ee;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+    .header h1{font-size:clamp(34px,4vw,54px);line-height:1.05;margin:8px 0}
+    .header p{color:#9fb0c8;margin-bottom:24px}
+    .cards{display:grid;gap:16px;grid-template-columns:repeat(4,1fr);margin-bottom:22px}
+    .card,.chart-box,.panel,.table-wrap{background:#0f172acc;border:1px solid #23314f;border-radius:20px}
+    .card{padding:20px}
+    .card strong{color:#22d3ee;display:block;font-size:34px}
+    .card span{color:#cbd5e1}
+    .charts{display:grid;gap:22px;grid-template-columns:1fr 1fr;margin-bottom:22px}
+    .chart-box{height:360px;padding:22px}
+    .chart-box h2,.panel h2{color:#22d3ee;font-size:24px;margin-bottom:16px}
+    canvas{height:280px!important;width:100%!important}
+    .panels{display:grid;gap:22px;grid-template-columns:1fr 1fr;margin-bottom:22px}
+    .panel{padding:22px}
+    .list{display:grid;gap:12px}
+    .list-item{background:#111c31;border-radius:14px;color:#cbd5e1;padding:13px 15px}
+    .table-wrap{overflow:auto}
+    table{border-collapse:collapse;width:100%}
+    th{background:#07111f;color:#22d3ee;font-size:13px;letter-spacing:1px;padding:15px;text-align:left;text-transform:uppercase}
+    td{border-top:1px solid #1f2d49;color:#e2e8f0;padding:15px;white-space:nowrap}
+    .avatar{align-items:center;background:#12304a;border-radius:50%;color:#22d3ee;display:inline-flex;font-weight:800;height:34px;justify-content:center;margin-right:10px;width:34px}
+    .muted{color:#9fb0c8}
+    @media(max-width:1100px){.cards,.charts,.panels{grid-template-columns:1fr 1fr}}
+    @media(max-width:700px){.cards,.charts,.panels{grid-template-columns:1fr}}
+</style>
+
+<div class="analytics-page">
+    <div class="header">
+        <div class="eyebrow">Smart Campus Analytics</div>
         <h1>Analytics Dashboard</h1>
-
-        <div class="underline"></div>
-
+        <p>Live student, course and attendance analytics from the current database.</p>
     </div>
 
     <div class="cards">
-
-        <div class="card">
-            <h2>{{ total_students }}</h2>
-            <p>Total Students</p>
-        </div>
-
-        <div class="card">
-            <h2>{{ present_students }}</h2>
-            <p>Present Students</p>
-        </div>
-
-        <div class="card">
-            <h2>{{ absent_students }}</h2>
-            <p>Absent Students</p>
-        </div>
-
-        <div class="card">
-            <h2>{{ attendance_percentage }}%</h2>
-            <p>Attendance Percentage</p>
-        </div>
-
+        <div class="card"><strong>{{ total_students }}</strong><span>Total Students</span></div>
+        <div class="card"><strong>{{ present_students }}</strong><span>Present Records</span></div>
+        <div class="card"><strong>{{ absent_students }}</strong><span>Absent Records</span></div>
+        <div class="card"><strong>{{ attendance_percentage }}%</strong><span>Attendance Rate</span></div>
     </div>
 
     <div class="charts">
-
         <div class="chart-box">
-
-            <h3>Attendance Overview</h3>
-
+            <h2>Attendance Overview</h2>
             <canvas id="attendanceChart"></canvas>
-
         </div>
-
         <div class="chart-box">
-
-            <h3>Course Distribution</h3>
-
+            <h2>Course Distribution</h2>
             <canvas id="courseChart"></canvas>
-
         </div>
-
     </div>
 
-    <div class="ai-box">
-
-        <h2>🤖 AI Insights</h2>
-
-        <ul>
-            <li>Attendance increased by 12% this week</li>
-            <li>MCA students have lower attendance</li>
-            <li>3 students require attendance warning</li>
-            <li>Best performing course is BCA</li>
-        </ul>
-
+    <div class="panels">
+        <div class="panel">
+            <h2>AI Insights</h2>
+            <div class="list">
+                {% for insight in ai_insights %}
+                    <div class="list-item">{{ insight }}</div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="panel">
+            <h2>Recent Activity</h2>
+            <div class="list">
+                {% for activity in recent_activities %}
+                    <div class="list-item">{{ activity }}</div>
+                {% empty %}
+                    <div class="list-item">No recent activity available.</div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 
-    <div class="table-box">
-
+    <div class="table-wrap">
         <table>
-
             <thead>
-
                 <tr>
                     <th>Name</th>
                     <th>Course</th>
                     <th>Email</th>
+                    <th>Attendance</th>
                 </tr>
-
             </thead>
-
             <tbody>
-
                 {% for student in students %}
-
-                <tr>
-
-                    <td>
-
-                        <div class="student-info">
-
-                            <div class="avatar">
-                                {{ student.name|slice:":1" }}
-                            </div>
-
-                            {{ student.name }}
-
-                        </div>
-
-                    </td>
-
-                    <td>{{ student.course }}</td>
-
-                    <td>{{ student.email }}</td>
-
-                </tr>
-
+                    <tr>
+                        <td><span class="avatar">{{ student.name|slice:":1" }}</span>{{ student.name }}</td>
+                        <td>{{ student.course }}</td>
+                        <td class="muted">{{ student.email }}</td>
+                        <td>{{ student.attendance_percentage }}%</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4" class="muted">No students available.</td></tr>
                 {% endfor %}
-
             </tbody>
-
         </table>
-
     </div>
-
-    <div class="alert-box">
-
-        <h2>⚠ Low Attendance Alerts</h2>
-
-        <p>Students below 75% attendance require attention.</p>
-
-    </div>
-
-    <div class="activity-box">
-
-        <h2>📌 Recent Activity</h2>
-
-        <div class="activity-item">✔ Rohit marked present today</div>
-        <div class="activity-item">✔ Teacher uploaded attendance</div>
-        <div class="activity-item">✔ New student added to BCA</div>
-
-    </div>
-
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+const presentStudents = {{ present_students|default:0 }};
+const absentStudents = {{ absent_students|default:0 }};
+const courseLabels = {{ course_labels|safe }};
+const courseValues = {{ course_values|safe }};
 
-    const presentStudents = {{ present_students }};
-    const absentStudents = {{ absent_students }};
+new Chart(document.getElementById("attendanceChart"), {
+    type:"doughnut",
+    data:{
+        labels:["Present","Absent"],
+        datasets:[{
+            data:[presentStudents, absentStudents],
+            backgroundColor:["#22d3ee","#ef4444"],
+            borderColor:"#0f172a",
+            borderWidth:3
+        }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:"#f8fafc"}}}}
+});
 
-    new Chart(
-        document.getElementById('attendanceChart'),
-        {
-            type:'doughnut',
-
-            data:{
-                labels:['Present','Absent'],
-
-                datasets:[{
-                    data:[
-                        presentStudents,
-                        absentStudents
-                    ],
-
-                    backgroundColor:[
-                        '#22d3ee',
-                        '#ef4444'
-                    ],
-
-                    borderWidth:2,
-                    borderColor:'#111827',
-                    hoverOffset:20
-                }]
-            },
-
-            options:{
-                responsive:true,
-                maintainAspectRatio:false,
-
-                plugins:{
-                    legend:{
-                        labels:{
-                            color:'white',
-                            font:{
-                                size:16
-                            }
-                        }
-                    }
-                }
-            }
+new Chart(document.getElementById("courseChart"), {
+    type:"bar",
+    data:{
+        labels:courseLabels,
+        datasets:[{label:"Students",data:courseValues,backgroundColor:"#3b82f6",borderRadius:10}]
+    },
+    options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:"#f8fafc"}}},
+        scales:{
+            x:{ticks:{color:"#f8fafc"},grid:{color:"rgba(255,255,255,.06)"}},
+            y:{ticks:{color:"#f8fafc",precision:0},grid:{color:"rgba(255,255,255,.06)"}}
         }
-    );
-
-    new Chart(
-        document.getElementById('courseChart'),
-        {
-            type:'bar',
-
-            data:{
-                labels:['BCA','MCA','B.Tech','B.Com'],
-
-                datasets:[{
-                    label:'Students',
-
-                    data:[12,8,10,6],
-
-                    backgroundColor:'#3b82f6',
-                    borderRadius:10
-                }]
-            },
-
-            options:{
-                responsive:true,
-                maintainAspectRatio:false,
-
-                plugins:{
-                    legend:{
-                        labels:{
-                            color:'white'
-                        }
-                    }
-                },
-
-                scales:{
-                    x:{
-                        ticks:{
-                            color:'white'
-                        },
-
-                        grid:{
-                            color:'rgba(255,255,255,0.05)'
-                        }
-                    },
-
-                    y:{
-                        ticks:{
-                            color:'white'
-                        },
-
-                        grid:{
-                            color:'rgba(255,255,255,0.05)'
-                        }
-                    }
-                }
-            }
-        }
-    );
-
+    }
+});
 </script>
-
-</body>
-</html>
+{% endblock %}

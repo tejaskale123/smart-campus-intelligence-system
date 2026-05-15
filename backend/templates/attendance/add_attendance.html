@@ -1,126 +1,132 @@
-{% extends 'base/base.html' %}
-{% load static %}
+{% extends "base/base.html" %}
 
 {% block content %}
+<style>
+    .attendance-page{color:#f8fafc}
+    .page-head{align-items:flex-end;display:flex;gap:18px;justify-content:space-between;margin-bottom:26px}
+    .eyebrow{color:#22d3ee;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+    .page-head h1{font-size:clamp(34px,4vw,54px);line-height:1.05;margin:8px 0}
+    .page-head p{color:#9fb0c8;max-width:680px}
+    .head-actions{display:flex;gap:12px}
+    .link-btn,.save-btn{border:0;border-radius:12px;color:#fff;display:inline-flex;font-weight:700;padding:13px 18px;text-decoration:none}
+    .link-btn{background:#23314f}
+    .save-btn{background:linear-gradient(90deg,#06b6d4,#2563eb);cursor:pointer;font-size:16px;justify-content:center;width:100%}
+    .layout{display:grid;gap:24px;grid-template-columns:minmax(0,1.4fr) minmax(320px,.6fr)}
+    .panel{background:#0f172acc;border:1px solid #23314f;border-radius:20px;padding:24px}
+    .form-grid{display:grid;gap:20px}
+    .field label{color:#cbd5e1;display:block;font-size:14px;font-weight:700;margin-bottom:9px}
+    .control{background:#07111f;border:1px solid #2b3b5d;border-radius:14px;color:#f8fafc;font:600 16px Inter,Arial,sans-serif;outline:none;padding:15px;width:100%}
+    .control:focus{border-color:#22d3ee;box-shadow:0 0 0 4px #22d3ee22}
+    .student-card{background:#111c31;border:1px solid #243552;border-radius:16px;margin-top:14px;padding:16px}
+    .student-card strong{display:block;font-size:20px}
+    .student-card span{color:#9fb0c8;display:block;margin-top:5px}
+    .status-grid{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+    .radio-card{background:#111c31;border:1px solid #243552;border-radius:16px;cursor:pointer;padding:18px}
+    .radio-card input{margin-right:10px}
+    .radio-card strong{font-size:18px}
+    .radio-card p{color:#9fb0c8;margin-top:6px}
+    .side-stat{background:#111c31;border-radius:16px;margin-bottom:14px;padding:18px}
+    .side-stat strong{color:#22d3ee;display:block;font-size:32px}
+    .side-stat span{color:#cbd5e1}
+    @media(max-width:950px){.page-head{align-items:flex-start;flex-direction:column}.layout,.status-grid{grid-template-columns:1fr}}
+</style>
 
-<div class="dashboard-content">
-
-    <div class="page-header">
-
+<div class="attendance-page">
+    <div class="page-head">
         <div>
-
-            <p class="page-subtitle">
-                ATTENDANCE MANAGEMENT
-            </p>
-
-            <h1 class="page-title">
-                Add Attendance
-            </h1>
-
-            <div class="title-underline"></div>
-
-            <p class="page-description">
-                Mark and manage student attendance records.
-            </p>
-
+            <div class="eyebrow">Attendance Management</div>
+            <h1>Add Attendance</h1>
+            <p>Select an added student, choose the date, and save a clean manual attendance record.</p>
         </div>
-
+        <div class="head-actions">
+            <a class="link-btn" href="{% url 'attendance_list' %}">View Records</a>
+        </div>
     </div>
 
-    <div class="attendance-form-card">
-
-        <form method="POST">
-
+    <div class="layout">
+        <form method="POST" class="panel">
             {% csrf_token %}
+            <div class="form-grid">
+                <div class="field">
+                    <label for="studentSelect">Select Student</label>
+                    <select id="studentSelect" name="student_id" class="control" required>
+                        <option value="">Select Student</option>
+                        {% for student in students %}
+                            <option
+                                value="{{ student.id }}"
+                                data-name="{{ student.display_name|default:'Unnamed Student' }}"
+                                data-course="{{ student.display_course|default:'-' }}"
+                                data-email="{{ student.display_email|default:'-' }}"
+                            >
+                                {{ student.display_name|default:"Unnamed Student" }} - {{ student.display_course|default:"-" }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <div class="student-card" id="studentPreview">
+                        <strong id="studentPreviewName">No student selected</strong>
+                        <span id="studentPreviewMeta">Added students will appear in the dropdown above.</span>
+                    </div>
+                </div>
 
-            <div class="form-group">
+                <div class="field">
+                    <label for="attendanceDate">Attendance Date</label>
+                    <input id="attendanceDate" type="date" name="attendance_date" class="control" required>
+                </div>
 
-                <label>
-                    Select Student
-                </label>
+                <div class="field">
+                    <label>Attendance Status</label>
+                    <div class="status-grid">
+                        <label class="radio-card">
+                            <input type="radio" name="status" value="Present" checked>
+                            <strong>Present</strong>
+                            <p>Student attended the class.</p>
+                        </label>
+                        <label class="radio-card">
+                            <input type="radio" name="status" value="Absent">
+                            <strong>Absent</strong>
+                            <p>Student missed the class.</p>
+                        </label>
+                    </div>
+                </div>
 
-                <select
-                    name="student_id"
-                    required
-                    class="form-control"
-                >
-
-                    <option value="">
-                        Select Student
-                    </option>
-
-                    {% for student in students %}
-
-                    <option value="{{ student.id }}">
-
-                        {{ student.name }}
-                        -
-                        {{ student.email }}
-
-                    </option>
-
-                    {% endfor %}
-
-                </select>
-
+                <button type="submit" class="save-btn">Save Attendance</button>
             </div>
-
-            <div class="form-group">
-
-                <label>
-                    Attendance Date
-                </label>
-
-                <input
-                    type="date"
-                    name="attendance_date"
-                    required
-                    class="form-control"
-                >
-
-            </div>
-
-            <div class="form-group">
-
-                <label>
-                    Attendance Status
-                </label>
-
-                <select
-                    name="status"
-                    required
-                    class="form-control"
-                >
-
-                    <option value="Present">
-
-                        Present
-
-                    </option>
-
-                    <option value="Absent">
-
-                        Absent
-
-                    </option>
-
-                </select>
-
-            </div>
-
-            <button
-                type="submit"
-                class="save-btn"
-            >
-
-                SAVE ATTENDANCE
-
-            </button>
-
         </form>
 
+        <aside class="panel">
+            <div class="side-stat">
+                <strong>{{ students|length }}</strong>
+                <span>Students Available</span>
+            </div>
+            <div class="side-stat">
+                <strong>Manual</strong>
+                <span>Attendance Mode</span>
+            </div>
+            <div class="side-stat">
+                <strong>Face AI</strong>
+                <span>Use Face Attendance for IN / OUT records.</span>
+            </div>
+        </aside>
     </div>
-
 </div>
 
+<script>
+const studentSelect = document.getElementById("studentSelect");
+const studentPreviewName = document.getElementById("studentPreviewName");
+const studentPreviewMeta = document.getElementById("studentPreviewMeta");
+const attendanceDate = document.getElementById("attendanceDate");
+
+attendanceDate.valueAsDate = new Date();
+
+studentSelect.addEventListener("change", () => {
+    const selected = studentSelect.options[studentSelect.selectedIndex];
+    if(!selected.value){
+        studentPreviewName.textContent = "No student selected";
+        studentPreviewMeta.textContent = "Added students will appear in the dropdown above.";
+        return;
+    }
+    studentPreviewName.textContent = selected.dataset.name;
+    studentPreviewMeta.textContent = `${selected.dataset.course} | ${selected.dataset.email}`;
+});
+</script>
 {% endblock %}

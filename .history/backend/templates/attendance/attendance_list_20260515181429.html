@@ -1,0 +1,155 @@
+{% extends "base/base.html" %}
+
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/attendance.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="attendance-container">
+
+    <div class="top-section">
+
+        <div class="page-title">
+
+            <p>ATTENDANCE MANAGEMENT</p>
+
+            <h1>Attendance Records</h1>
+
+            <div class="underline"></div>
+
+        </div>
+
+        <a href="{% url 'add_attendance' %}" class="add-btn">
+
+            + Add Attendance
+
+        </a>
+
+    </div>
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <h3>{{ total_attendance }}</h3>
+            <p>Total Attendance</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>{{ present_count }}</h3>
+            <p>Present</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>{{ absent_count }}</h3>
+            <p>Absent</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>{{ attendance_percentage }}%</h3>
+            <p>Attendance Rate</p>
+        </div>
+
+    </div>
+
+    <div class="table-box">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Student</th>
+
+                    <th>Email</th>
+
+                    <th>Course</th>
+
+                    <th>Date</th>
+
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for attendance in attendance_records %}
+
+                <tr>
+
+                    <td>
+
+                        {{ attendance.student_name }}
+
+                    </td>
+
+                    <td>
+
+                        {{ attendance.student_email }}
+
+                    </td>
+
+                    <td>
+
+                        {{ attendance.student_course }}
+
+                    </td>
+
+                    <td>
+
+                        {{ attendance.attendance_date }}
+
+                    </td>
+
+                    <td>
+
+                        {% if attendance.status == "Present" %}
+
+                            <span class="status present">
+
+                                Present
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="status absent">
+
+                                Absent
+
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="5" class="empty-row">
+
+                        No attendance records found.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

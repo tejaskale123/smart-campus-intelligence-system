@@ -1,1125 +1,323 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>
-        Smart AI Face Registration
-    </title>
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet"
-    >
-
-<style>
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Poppins',sans-serif;
-}
-
-body{
-
-    background:
-    linear-gradient(
-        135deg,
-        #020617,
-        #071133,
-        #020617
-    );
-
-    min-height:100vh;
-
-    color:white;
-
-    overflow-x:hidden;
-}
-
-.container{
-
-    width:95%;
-
-    max-width:1600px;
-
-    margin:auto;
-
-    padding:35px;
-}
-
-.header{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin-bottom:35px;
-}
-
-.logo{
-
-    font-size:46px;
-
-    font-weight:700;
-
-    color:#22d3ee;
-}
-
-.ai-status{
-
-    padding:14px 24px;
-
-    background:#052e16;
-
-    border:1px solid #22c55e;
-
-    border-radius:14px;
-
-    color:#22c55e;
-
-    font-size:18px;
-}
-
-.grid{
-
-    display:grid;
-
-    grid-template-columns:2fr 1fr;
-
-    gap:30px;
-}
-
-.card{
-
-    background:rgba(8,15,40,0.95);
-
-    border:1px solid rgba(34,211,238,0.15);
-
-    border-radius:30px;
-
-    padding:30px;
-
-    backdrop-filter:blur(20px);
-
-    box-shadow:
-    0 0 40px rgba(0,255,255,0.08);
-}
-
-.section-title{
-
-    font-size:34px;
-
-    color:#22d3ee;
-
-    margin-bottom:25px;
-}
-
-.camera-wrapper{
-
-    position:relative;
-
-    border-radius:24px;
-
-    overflow:hidden;
-
-    border:3px solid #22d3ee;
-}
-
-video{
-
-    width:100%;
-
-    height:550px;
-
-    object-fit:cover;
-
-    display:block;
-
-    background:black;
-}
-
-.scan-line{
-
-    position:absolute;
-
-    width:100%;
-
-    height:4px;
-
-    background:#22d3ee;
-
-    box-shadow:0 0 20px #22d3ee;
-
-    animation:scan 3s linear infinite;
-}
-
-@keyframes scan{
-
-    0%{
-        top:0%;
-    }
-
-    100%{
-        top:100%;
-    }
-}
-
-.face-box{
-
-    position:absolute;
-
-    top:50%;
-    left:50%;
-
-    transform:translate(-50%,-50%);
-
-    width:220px;
-    height:280px;
-
-    border:4px solid #22d3ee;
-
-    border-radius:18px;
-
-    box-shadow:
-    0 0 30px #22d3ee;
-}
-
-.form-area{
-
-    margin-top:30px;
-}
-
-.input-group{
-
-    margin-bottom:20px;
-}
-
-label{
-
-    display:block;
-
-    margin-bottom:10px;
-
-    color:#cbd5e1;
-
-    font-size:16px;
-}
-
-input{
-
-    width:100%;
-
-    padding:18px;
-
-    background:#132252;
-
-    border:none;
-
-    border-radius:16px;
-
-    color:white;
-
-    font-size:18px;
-
-    outline:none;
-}
-
-input:focus{
-
-    border:2px solid #22d3ee;
-}
-
-.btn{
-
-    width:100%;
-
-    padding:18px;
-
-    border:none;
-
-    border-radius:16px;
-
-    font-size:20px;
-
-    font-weight:600;
-
-    cursor:pointer;
-
-    transition:0.3s;
-}
-
-.register-btn{
-
-    background:#22c55e;
-
-    color:white;
-
-    margin-top:25px;
-}
-
-.register-btn:hover{
-
-    transform:scale(1.02);
-
-    box-shadow:
-    0 0 25px #22c55e;
-}
-
-.register-btn:disabled{
-
-    opacity:0.5;
-
-    cursor:not-allowed;
-}
-
-.progress-card{
-
-    background:#0f172a;
-
-    padding:22px;
-
-    border-radius:18px;
-
-    margin-top:25px;
-}
-
-.progress-text{
-
-    text-align:center;
-
-    font-size:24px;
-
-    color:#22c55e;
-
-    margin-bottom:15px;
-}
-
-.progress-bar{
-
-    width:100%;
-
-    height:12px;
-
-    background:#1e293b;
-
-    border-radius:20px;
-
-    overflow:hidden;
-}
-
-.progress-fill{
-
-    width:0%;
-
-    height:100%;
-
-    background:#22d3ee;
-
-    transition:0.4s;
-}
-
-.preview-container{
-
-    display:flex;
-
-    flex-wrap:wrap;
-
-    margin-top:18px;
-}
-
-.preview-container img{
-
-    width:90px;
-
-    height:90px;
-
-    object-fit:cover;
-
-    border-radius:12px;
-
-    margin:5px;
-
-    border:2px solid #22d3ee;
-}
-
-.student-card{
-
-    text-align:center;
-}
-
-.avatar{
-
-    width:120px;
-    height:120px;
-
-    border-radius:50%;
-
-    margin:auto;
-
-    background:
-    linear-gradient(
-        135deg,
-        #22d3ee,
-        #2563eb
-    );
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    font-size:50px;
-
-    font-weight:700;
-
-    margin-bottom:20px;
-}
-
-.student-name{
-
-    font-size:30px;
-
-    font-weight:600;
-}
-
-.student-course{
-
-    color:#94a3b8;
-
-    margin-top:10px;
-
-    font-size:18px;
-}
-
-.success{
-
-    margin-top:25px;
-
-    background:#052e16;
-
-    border:1px solid #22c55e;
-
-    padding:16px;
-
-    border-radius:14px;
-
-    color:#22c55e;
-}
-
-.stats{
-
-    display:grid;
-
-    grid-template-columns:1fr 1fr;
-
-    gap:18px;
-
-    margin-top:30px;
-}
-
-.stat{
-
-    background:#0f172a;
-
-    padding:25px;
-
-    border-radius:18px;
-
-    text-align:center;
-}
-
-.stat h2{
-
-    font-size:38px;
-
-    color:#22d3ee;
-}
-
-.stat p{
-
-    margin-top:8px;
-
-    color:#cbd5e1;
-}
-
-#statusBox{
-
-    margin-top:20px;
-
-    text-align:center;
-
-    font-size:18px;
-
-    color:#22c55e;
-}
-
-.auto-box{
-
-    margin-top:25px;
-
-    background:#0f172a;
-
-    padding:20px;
-
-    border-radius:18px;
-
-    text-align:center;
-
-    border:1px solid #22d3ee;
-}
-
-@media(max-width:1100px){
-
-    .grid{
-        grid-template-columns:1fr;
-    }
-
-    video{
-        height:420px;
-    }
-}
-
-</style>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart AI Face Registration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{background:#07111f;color:#f8fafc;font-family:Poppins,Arial,sans-serif;min-height:100vh}
+        .page{width:min(1480px,94vw);margin:0 auto;padding:28px 0 44px}
+        .topbar{align-items:flex-end;display:flex;gap:20px;justify-content:space-between;margin-bottom:22px}
+        .title h1{color:#22d3ee;font-size:clamp(32px,4vw,54px);line-height:1.05}
+        .title p{color:#9fb0c8;font-size:16px;margin-top:8px}
+        .badge{background:#05351b;border:1px solid #176b38;border-radius:14px;color:#35e875;font-weight:600;padding:12px 18px;white-space:nowrap}
+        .panel{background:#0f172acc;border:1px solid #23314f;border-radius:22px;box-shadow:0 18px 60px #0005;padding:24px}
+        .details{display:grid;gap:16px;grid-template-columns:repeat(3,1fr);margin-bottom:18px}
+        label{color:#cbd5e1;display:block;font-size:14px;font-weight:600;margin-bottom:8px}
+        input{background:#e8f1ff;border:1px solid #b7c8e8;border-radius:14px;color:#020617;font:600 16px Poppins,Arial,sans-serif;outline:none;padding:16px;width:100%}
+        input:focus{border-color:#22d3ee;box-shadow:0 0 0 4px #22d3ee22}
+        .workspace{display:grid;gap:22px;grid-template-columns:minmax(0,2fr) minmax(330px,1fr)}
+        .camera-card h2,.status-card h2,.samples-card h2{color:#22d3ee;font-size:26px;margin-bottom:16px}
+        .camera{aspect-ratio:16/9;background:#020617;border:3px solid #22d3ee;border-radius:20px;overflow:hidden;position:relative}
+        video{display:block;height:100%;object-fit:cover;transform:scaleX(-1);width:100%}
+        .camera-message{align-items:center;background:#020617;display:flex;inset:0;justify-content:center;padding:24px;position:absolute;text-align:center;color:#9fb0c8}
+        .camera-message.is-hidden{display:none}
+        .scan{border:4px solid #22d3ee;border-radius:22px;box-shadow:0 0 24px #22d3ee99;height:48%;left:50%;position:absolute;top:50%;transform:translate(-50%,-50%);width:34%}
+        .scan::after{background:#22d3ee;box-shadow:0 0 18px #22d3ee;content:"";height:3px;left:-85%;position:absolute;right:-85%;top:50%}
+        .controls{display:flex;gap:14px;margin-top:18px}
+        button{border:0;border-radius:14px;color:#fff;cursor:pointer;font:600 16px Poppins,Arial,sans-serif;padding:15px 20px}
+        button:disabled{cursor:not-allowed;opacity:.55}
+        .primary{background:linear-gradient(90deg,#06b6d4,#2563eb)}
+        .success{background:#16a34a}
+        .danger{background:#991b1b}
+        .status{background:#111c31;border-radius:16px;color:#cbd5e1;font-weight:600;margin-top:16px;padding:16px;text-align:center}
+        .status.good{background:#05351b;color:#35e875}
+        .status.warn{background:#422006;color:#fbbf24}
+        .status.bad{background:#450a0a;color:#fca5a5}
+        .profile{align-items:center;display:flex;flex-direction:column;text-align:center}
+        .avatar{align-items:center;background:linear-gradient(135deg,#22d3ee,#2563eb);border-radius:50%;display:flex;font-size:42px;font-weight:700;height:108px;justify-content:center;margin-bottom:16px;width:108px}
+        .profile h3{font-size:27px}
+        .profile p,.hint{color:#9fb0c8;margin-top:8px}
+        .stats{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}
+        .stat{background:#111c31;border-radius:16px;padding:18px;text-align:center}
+        .stat strong{color:#22d3ee;display:block;font-size:32px}
+        .progress{background:#111c31;border-radius:999px;height:12px;margin-top:16px;overflow:hidden}
+        .fill{background:#22d3ee;height:100%;transition:.25s;width:0}
+        .samples-card{margin-top:22px}
+        .preview{display:grid;gap:12px;grid-template-columns:repeat(5,1fr)}
+        .preview img{aspect-ratio:1;border:2px solid #22d3ee;border-radius:14px;object-fit:cover;width:100%}
+        .empty-samples{align-items:center;background:#111c31;border:1px dashed #334563;border-radius:16px;color:#9fb0c8;display:flex;justify-content:center;min-height:130px;text-align:center}
+        canvas{display:none}
+        @media(max-width:1050px){.topbar{align-items:flex-start;flex-direction:column}.details,.workspace{grid-template-columns:1fr}.preview{grid-template-columns:repeat(3,1fr)}.controls{flex-wrap:wrap}}
+    </style>
 </head>
-
 <body>
-
-<div class="container">
-
-    <div class="header">
-
-        <div class="logo">
-
-            Smart AI Face Registration
-
+<main class="page">
+    <div class="topbar">
+        <div class="title">
+            <h1>Smart AI Face Registration</h1>
+            <p>Fill details first. Camera will automatically capture 5 samples, one every 3 seconds.</p>
         </div>
-
-        <div class="ai-status">
-
-            AI System Active ✅
-
-        </div>
-
+        <div class="badge" id="systemBadge">Camera waiting</div>
     </div>
 
-    <div class="grid">
-
-        <div class="card">
-
-            <div class="section-title">
-
-                Live AI Camera
-
+    <section class="panel">
+        <div class="details">
+            <div>
+                <label for="student_name">Student Name</label>
+                <input id="student_name" type="text" placeholder="Enter student name">
             </div>
-
-            <div class="camera-wrapper">
-
-                <video
-                    id="video"
-                    autoplay
-                    muted
-                    playsinline
-                ></video>
-
-                <div class="scan-line"></div>
-
-                <div class="face-box"></div>
-
+            <div>
+                <label for="roll_number">Roll Number</label>
+                <input id="roll_number" type="text" placeholder="Enter roll number">
             </div>
-
-            <div class="form-area">
-
-                <div class="input-group">
-
-                    <label>
-                        Student Name
-                    </label>
-
-                    <input
-                        type="text"
-                        id="student_name"
-                        placeholder="Enter Student Name"
-                    >
-
-                </div>
-
-                <div class="input-group">
-
-                    <label>
-                        Roll Number
-                    </label>
-
-                    <input
-                        type="text"
-                        id="roll_number"
-                        placeholder="Enter Roll Number"
-                    >
-
-                </div>
-
-                <div class="input-group">
-
-                    <label>
-                        Course / Department
-                    </label>
-
-                    <input
-                        type="text"
-                        id="course"
-                        placeholder="Enter Course"
-                    >
-
-                </div>
-
-                <div class="auto-box">
-
-                    <h2 id="captureStatus">
-
-                        AI Auto Capture Ready
-
-                    </h2>
-
-                    <p
-                        id="imageCount"
-                        style="margin-top:10px;"
-                    >
-
-                        0 / 5 Images Captured
-
-                    </p>
-
-                </div>
-
-                <div class="progress-card">
-
-                    <div class="progress-bar">
-
-                        <div
-                            class="progress-fill"
-                            id="progressFill"
-                        ></div>
-
-                    </div>
-
-                </div>
-
-                <div
-                    class="preview-container"
-                    id="previewContainer"
-                ></div>
-
-                <div id="statusBox"></div>
-
-                <button
-                    type="button"
-                    id="registerBtn"
-                    class="btn register-btn"
-                    onclick="registerStudent()"
-                    disabled
-                >
-
-                    🚀 Register Student
-
-                </button>
-
+            <div>
+                <label for="course">Course / Department</label>
+                <input id="course" type="text" placeholder="Enter course">
             </div>
-
         </div>
 
-        <div class="card">
-
-            <div class="section-title">
-
-                AI Detection
-
+        <div class="workspace">
+            <div class="camera-card">
+                <h2>Live Camera</h2>
+                <div class="camera">
+                    <video id="video" autoplay muted playsinline></video>
+                    <div class="camera-message" id="cameraMessage">Press Start Camera and allow permission.</div>
+                    <div class="scan"></div>
+                </div>
+                <div class="controls">
+                    <button class="primary" type="button" id="startBtn">Start Camera</button>
+                    <button class="success" type="button" id="registerBtn" disabled>Register Student</button>
+                    <button class="danger" type="button" id="resetBtn">Reset</button>
+                </div>
+                <div class="status" id="statusBox">Camera not started.</div>
+                <div class="progress"><div class="fill" id="progressFill"></div></div>
             </div>
 
-            <div class="student-card">
-
-                <div class="avatar">
-
-                    AI
-
+            <aside class="status-card">
+                <h2>Registration Status</h2>
+                <div class="profile">
+                    <div class="avatar" id="avatarLetter">AI</div>
+                    <h3 id="previewName">Student Profile</h3>
+                    <p id="previewMeta">Fill details and start camera.</p>
                 </div>
-
-                <div class="student-name">
-
-                    Smart Recognition
-
+                <div class="stats">
+                    <div class="stat"><strong id="imageCount">0/5</strong><span>Samples</span></div>
+                    <div class="stat"><strong id="readyState">Idle</strong><span>Status</span></div>
                 </div>
-
-                <div class="student-course">
-
-                    Automatic Face Analysis
-
-                </div>
-
-                <div class="success">
-
-                    Realtime AI Tracking Active ✅
-
-                </div>
-
-            </div>
-
-            <div class="stats">
-
-                <div class="stat">
-
-                    <h2>98%</h2>
-
-                    <p>Accuracy</p>
-
-                </div>
-
-                <div class="stat">
-
-                    <h2>AI</h2>
-
-                    <p>Realtime</p>
-
-                </div>
-
-                <div class="stat">
-
-                    <h2>5</h2>
-
-                    <p>Auto Scan</p>
-
-                </div>
-
-                <div class="stat">
-
-                    <h2>LIVE</h2>
-
-                    <p>Tracking</p>
-
-                </div>
-
-            </div>
-
+                <p class="hint">Keep one face inside the box. Good light gives better attendance matching.</p>
+            </aside>
         </div>
 
-    </div>
+        <div class="samples-card">
+            <h2>Captured Images</h2>
+            <div class="empty-samples" id="emptySamples">Captured face samples will appear here.</div>
+            <div class="preview" id="previewContainer"></div>
+        </div>
+    </section>
+</main>
 
-</div>
-
-<canvas
-    id="canvas"
-    width="640"
-    height="480"
-    style="display:none;"
-></canvas>
+<canvas id="canvas" width="640" height="480"></canvas>
 
 <script>
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const startBtn = document.getElementById("startBtn");
+const registerBtn = document.getElementById("registerBtn");
+const resetBtn = document.getElementById("resetBtn");
+const statusBox = document.getElementById("statusBox");
+const progressFill = document.getElementById("progressFill");
+const previewContainer = document.getElementById("previewContainer");
+const emptySamples = document.getElementById("emptySamples");
+const imageCount = document.getElementById("imageCount");
+const readyState = document.getElementById("readyState");
+const cameraMessage = document.getElementById("cameraMessage");
+const systemBadge = document.getElementById("systemBadge");
+const studentName = document.getElementById("student_name");
+const rollNumber = document.getElementById("roll_number");
+const course = document.getElementById("course");
+const previewName = document.getElementById("previewName");
+const previewMeta = document.getElementById("previewMeta");
+const avatarLetter = document.getElementById("avatarLetter");
 
+let stream = null;
 let capturedImages = [];
+let captureTimer = null;
+let countdownTimer = null;
+let secondsLeft = 3;
 
-let captureIndex = 0;
+function setStatus(text, mode){
+    statusBox.textContent = text;
+    statusBox.className = "status " + (mode || "");
+}
 
-let autoCaptureStarted = false;
+function updateProfile(){
+    const name = studentName.value.trim();
+    previewName.textContent = name || "Student Profile";
+    previewMeta.textContent = `${rollNumber.value.trim() || "Roll number"} | ${course.value.trim() || "Course"}`;
+    avatarLetter.textContent = name ? name.charAt(0).toUpperCase() : "AI";
+}
 
-const video =
-document.getElementById("video");
+function updateProgress(){
+    imageCount.textContent = `${capturedImages.length}/5`;
+    progressFill.style.width = `${capturedImages.length * 20}%`;
+    registerBtn.disabled = capturedImages.length < 5;
+    readyState.textContent = capturedImages.length >= 5 ? "Ready" : "Auto";
+    emptySamples.style.display = capturedImages.length ? "none" : "flex";
+}
 
-const canvas =
-document.getElementById("canvas");
+function validateDetails(){
+    updateProfile();
+    if(!studentName.value.trim() || !rollNumber.value.trim() || !course.value.trim()){
+        setStatus("Fill student name, roll number, and course before starting camera.", "bad");
+        return false;
+    }
+    return true;
+}
 
-const ctx =
-canvas.getContext("2d");
-
-
-
-// START CAMERA
 async function startCamera(){
-
-    const statusBox =
-    document.getElementById("statusBox");
-
-    // CHECK CAMERA SUPPORT
-    if(
-        !navigator.mediaDevices ||
-        !navigator.mediaDevices.getUserMedia
-    ){
-
-        statusBox.innerHTML =
-        "❌ Camera API Not Supported";
-
-        alert(
-            "Browser Camera Support Nahi"
-        );
-
+    if(!validateDetails()){
+        return;
+    }
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+        setStatus("Camera API is not supported in this browser.", "bad");
         return;
     }
 
     try{
-
-        statusBox.innerHTML =
-        "⌛ Starting Camera...";
-
-        const stream =
-        await navigator.mediaDevices.getUserMedia({
-
-            video:{
-                width:{ ideal:1280 },
-                height:{ ideal:720 },
-                facingMode:"user"
-            },
-
+        setStatus("Opening camera...", "warn");
+        stream = await navigator.mediaDevices.getUserMedia({
+            video:{width:{ideal:1280},height:{ideal:720},facingMode:"user"},
             audio:false
         });
-
         video.srcObject = stream;
-
-        video.onloadedmetadata =
-        async ()=>{
-
-            try{
-
-                await video.play();
-
-                statusBox.innerHTML =
-                "✅ Camera Started Successfully";
-
-            }
-
-            catch(playError){
-
-                console.log(playError);
-
-                statusBox.innerHTML =
-                "❌ Video Play Failed";
-
-            }
-
-        };
-
+        await video.play();
+        cameraMessage.classList.add("is-hidden");
+        startBtn.disabled = true;
+        systemBadge.textContent = "Auto capture active";
+        readyState.textContent = "Auto";
+        setStatus("Camera ready. First sample in 3 seconds.", "good");
+        startAutoCapture();
+    }catch(error){
+        console.error(error);
+        setStatus("Camera failed. Allow permission and close other camera apps.", "bad");
+        systemBadge.textContent = "Camera blocked";
     }
-
-    catch(error){
-
-        console.log("Camera Error:", error);
-
-        if(error.name === "NotAllowedError"){
-
-            alert(
-                "Camera Permission Allow Kara"
-            );
-
-        }
-
-        else if(
-            error.name === "NotFoundError"
-        ){
-
-            alert(
-                "Camera Device Sapadla Nahi"
-            );
-
-        }
-
-        else{
-
-            alert(
-                "Camera Start Failed"
-            );
-
-        }
-
-        statusBox.innerHTML =
-        "❌ Camera Access Failed";
-
-    }
-
 }
 
-
-// AUTO CAPTURE
 function startAutoCapture(){
+    clearInterval(captureTimer);
+    clearInterval(countdownTimer);
+    secondsLeft = 3;
 
-    if(autoCaptureStarted){
-
-        return;
-
-    }
-
-    autoCaptureStarted = true;
-
-    document
-    .getElementById(
-        "captureStatus"
-    ).innerHTML =
-
-    "🤖 AI Capturing Faces...";
-
-
-
-    let interval = setInterval(()=>{
-
-        if(captureIndex >= 5){
-
-            clearInterval(interval);
-
-            document
-            .getElementById(
-                "captureStatus"
-            ).innerHTML =
-
-            "✅ All Images Captured";
-
-
-
-            document
-            .getElementById(
-                "registerBtn"
-            ).disabled = false;
-
+    countdownTimer = setInterval(() => {
+        if(capturedImages.length >= 5){
+            clearInterval(countdownTimer);
             return;
-
         }
+        setStatus(`Auto capturing sample ${capturedImages.length + 1} in ${secondsLeft} seconds...`, "warn");
+        secondsLeft -= 1;
+        if(secondsLeft < 0){
+            secondsLeft = 3;
+        }
+    }, 1000);
 
+    captureTimer = setInterval(() => {
         captureFace();
-
-        captureIndex++;
-
-        document
-        .getElementById(
-            "imageCount"
-        ).innerText =
-
-        captureIndex +
-        " / 5 Images Captured";
-
-
-
-        document
-        .getElementById(
-            "progressFill"
-        ).style.width =
-
-        (captureIndex * 20) + "%";
-
-
-
-    },5000);
-
+        secondsLeft = 3;
+        if(capturedImages.length >= 5){
+            clearInterval(captureTimer);
+            clearInterval(countdownTimer);
+            setStatus("All 5 samples captured. You can register now.", "good");
+            systemBadge.textContent = "Ready to register";
+        }
+    }, 3000);
 }
 
-
-
-// CAPTURE IMAGE
 function captureFace(){
-
-    ctx.drawImage(
-
-        video,
-
-        0,
-        0,
-
-        canvas.width,
-        canvas.height
-
-    );
-
-
-
-    const imageData =
-    canvas.toDataURL(
-        "image/jpeg",
-        0.6
-    );
-
-
-
-    capturedImages.push(
-        imageData
-    );
-
-
-
-    const img =
-    document.createElement("img");
-
-    img.src = imageData;
-
-    document
-    .getElementById(
-        "previewContainer"
-    )
-    .appendChild(img);
-
-
-
-    document
-    .getElementById(
-        "statusBox"
-    ).innerHTML =
-
-    "📸 Image " +
-    captureIndex +
-    " Captured";
-
-}
-
-
-
-// REGISTER
-async function registerStudent(){
-
-    const student_name =
-    document.getElementById(
-        "student_name"
-    ).value;
-
-    const roll_number =
-    document.getElementById(
-        "roll_number"
-    ).value;
-
-    const course =
-    document.getElementById(
-        "course"
-    ).value;
-
-    if(
-        !student_name ||
-        !roll_number ||
-        !course
-    ){
-
-        alert(
-            "Fill All Fields"
-        );
-
+    if(!stream || video.readyState < 2 || capturedImages.length >= 5){
         return;
     }
 
-    const formData =
-    new FormData();
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const imageData = canvas.toDataURL("image/jpeg", 0.82);
+    capturedImages.push(imageData);
 
-    formData.append(
-        "student_name",
-        student_name
-    );
+    const img = document.createElement("img");
+    img.src = imageData;
+    previewContainer.appendChild(img);
+    updateProgress();
+}
 
-    formData.append(
-        "roll_number",
-        roll_number
-    );
+async function registerStudent(){
+    if(!validateDetails()){
+        return;
+    }
+    if(capturedImages.length < 5){
+        setStatus("Wait until 5 auto-captured samples are ready.", "bad");
+        return;
+    }
 
-    formData.append(
-        "course",
-        course
-    );
+    const formData = new FormData();
+    formData.append("student_name", studentName.value.trim());
+    formData.append("roll_number", rollNumber.value.trim());
+    formData.append("course", course.value.trim());
+    capturedImages.forEach(image => formData.append("images[]", image));
 
-
-
-    capturedImages.forEach(
-
-        (image)=>{
-
-            formData.append(
-                "images[]",
-                image
-            );
-
-        }
-
-    );
-
-
+    registerBtn.disabled = true;
+    setStatus("Registering face data...", "warn");
 
     try{
+        const response = await fetch("/register-face/", {
+            method:"POST",
+            headers:{"X-CSRFToken":"{{ csrf_token }}"},
+            body:formData
+        });
+        const data = await response.json();
 
-        const response =
-        await fetch(
-
-            "/register-face/",
-
-            {
-
-                method:"POST",
-
-                headers:{
-                    "X-CSRFToken":
-                    "{{ csrf_token }}"
-                },
-
-                body:formData
-
-            }
-
-        );
-
-
-
-        const data =
-        await response.json();
-
-
-
-        alert(
-            data.message
-        );
-
-
-
-        if(
-            data.status ===
-            "success"
-        ){
-
-            window.location.href =
-            "/start-face-attendance/";
-
+        if(data.status === "success"){
+            setStatus(`${data.message} (${data.engine || "face"} engine)`, "good");
+            readyState.textContent = "Done";
+            systemBadge.textContent = "Registered";
+            setTimeout(() => {
+                window.location.href = "/face-attendance/";
+            }, 900);
+        }else{
+            registerBtn.disabled = false;
+            setStatus(data.message || "Registration failed.", "bad");
         }
-
+    }catch(error){
+        console.error(error);
+        registerBtn.disabled = false;
+        setStatus("Registration request failed.", "bad");
     }
-
-    catch(error){
-
-        console.log(error);
-
-        alert(
-            "Registration Failed"
-        );
-
-    }
-
 }
 
+function resetForm(){
+    clearInterval(captureTimer);
+    clearInterval(countdownTimer);
+    capturedImages = [];
+    previewContainer.innerHTML = "";
+    progressFill.style.width = "0";
+    imageCount.textContent = "0/5";
+    registerBtn.disabled = true;
+    startBtn.disabled = false;
+    readyState.textContent = stream ? "Auto" : "Idle";
+    systemBadge.textContent = stream ? "Camera active" : "Camera waiting";
+    emptySamples.style.display = "flex";
+    setStatus(stream ? "Ready. Press Start Camera to auto-capture again." : "Camera not started.", stream ? "warn" : "");
+}
 
-
-// START
-window.onload = async function(){
-
-    await startCamera();
-
-    setTimeout(()=>{
-
-        startAutoCapture();
-
-    },3000);
-
-};
-
+studentName.addEventListener("input", updateProfile);
+rollNumber.addEventListener("input", updateProfile);
+course.addEventListener("input", updateProfile);
+startBtn.addEventListener("click", startCamera);
+registerBtn.addEventListener("click", registerStudent);
+resetBtn.addEventListener("click", resetForm);
 </script>
-
 </body>
 </html>

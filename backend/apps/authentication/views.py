@@ -74,6 +74,35 @@ def serialize_student(student):
     return student
 
 
+def clean_value(value, fallback="-"):
+    value = "" if value is None else str(value).strip()
+    return value or fallback
+
+
+def student_display_name(student):
+    return clean_value(
+        student.get("name")
+        or student.get("student_name")
+        or student.get("full_name"),
+        "Unnamed Student"
+    )
+
+
+def prepare_student_option(student):
+    student["id"] = str(student["_id"])
+    student["display_name"] = student_display_name(student)
+    student["display_course"] = clean_value(
+        student.get("course")
+        or student.get("department")
+        or student.get("student_course")
+    )
+    student["display_email"] = clean_value(
+        student.get("email")
+        or student.get("student_email")
+    )
+    return student
+
+
 def serialize_attendance(cursor):
     records = []
     for record in cursor:
@@ -640,6 +669,7 @@ def add_student(request):
                 for chunk in profile_image.chunks():
                     destination.write(chunk)
 
+        messages.success(request, "Student added successfully.")
         return redirect("students_list")
 
     return render(request, "students/add_student.html")
@@ -894,15 +924,11 @@ def attendance_list(request):
 @teacher_or_admin
 def add_attendance(request):
 
-    students = list(
-
-        STUDENTS_COLLECTION.find().sort("name", 1)
-
-    )
-
-    for student in students:
-
-        student["id"] = str(student["_id"])
+    students = [
+        prepare_student_option(student)
+        for student in STUDENTS_COLLECTION.find()
+    ]
+    students.sort(key=lambda item: item["display_name"].lower())
 
     if request.method == "POST":
 
@@ -990,11 +1016,18 @@ def add_attendance(request):
 
             "student_id": str(student["_id"]),
 
-            "student_name": student.get("name"),
+            "student_name": student_display_name(student),
 
-            "student_email": student.get("email"),
+            "student_email": clean_value(
+                student.get("email")
+                or student.get("student_email")
+            ),
 
-            "student_course": student.get("course"),
+            "student_course": clean_value(
+                student.get("course")
+                or student.get("department")
+                or student.get("student_course")
+            ),
 
             "attendance_date": attendance_date,
 

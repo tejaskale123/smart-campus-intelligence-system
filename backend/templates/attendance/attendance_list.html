@@ -1,199 +1,122 @@
-{% extends 'base/base.html' %}
-{% load static %}
+{% extends "base/base.html" %}
 
 {% block content %}
+<style>
+    .attendance-page{color:#f8fafc}
+    .page-head{align-items:flex-end;display:flex;gap:18px;justify-content:space-between;margin-bottom:24px}
+    .eyebrow{color:#22d3ee;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+    .page-head h1{font-size:clamp(34px,4vw,52px);line-height:1.05;margin:8px 0}
+    .page-head p{color:#9fb0c8}
+    .actions{display:flex;gap:12px}
+    .btn{border-radius:12px;color:#fff;display:inline-flex;font-weight:700;padding:13px 18px;text-decoration:none}
+    .btn-primary{background:linear-gradient(90deg,#06b6d4,#2563eb)}
+    .btn-muted{background:#23314f}
+    .stats{display:grid;gap:16px;grid-template-columns:repeat(4,1fr);margin-bottom:22px}
+    .stat{background:#0f172acc;border:1px solid #23314f;border-radius:18px;padding:20px}
+    .stat strong{color:#22d3ee;display:block;font-size:34px}
+    .stat span{color:#cbd5e1}
+    .toolbar{align-items:center;background:#0f172acc;border:1px solid #23314f;border-radius:18px;display:flex;gap:14px;justify-content:space-between;margin-bottom:18px;padding:16px}
+    .search{background:#07111f;border:1px solid #2b3b5d;border-radius:12px;color:#f8fafc;font:600 15px Inter,Arial,sans-serif;max-width:360px;outline:none;padding:13px 15px;width:100%}
+    .table-wrap{background:#0f172acc;border:1px solid #23314f;border-radius:20px;overflow:auto}
+    table{border-collapse:collapse;width:100%}
+    th{background:#07111f;color:#22d3ee;font-size:13px;letter-spacing:1px;padding:16px;text-align:left;text-transform:uppercase;white-space:nowrap}
+    td{border-top:1px solid #1f2d49;color:#e2e8f0;padding:16px;white-space:nowrap}
+    tr:hover td{background:#111c31}
+    .student-name{font-weight:700}
+    .muted{color:#9fb0c8}
+    .badge{border-radius:999px;display:inline-flex;font-size:13px;font-weight:800;padding:8px 12px}
+    .present,.in{background:#05351b;color:#35e875}
+    .absent,.out{background:#450a0a;color:#fca5a5}
+    .method{color:#22d3ee;font-weight:700}
+    .empty{color:#9fb0c8;padding:34px;text-align:center}
+    @media(max-width:1050px){.page-head,.toolbar{align-items:flex-start;flex-direction:column}.stats{grid-template-columns:1fr 1fr}}
+    @media(max-width:650px){.stats{grid-template-columns:1fr}}
+</style>
 
-<div class="dashboard-content">
-
-    <div class="page-header">
-
+<div class="attendance-page">
+    <div class="page-head">
         <div>
-
-            <p class="page-subtitle">
-                ATTENDANCE MANAGEMENT
-            </p>
-
-            <h1 class="page-title">
-                Attendance Records
-            </h1>
-
-            <div class="title-underline"></div>
-
-            <p class="page-description">
-                Monitor all student attendance activity.
-            </p>
-
+            <div class="eyebrow">Attendance Management</div>
+            <h1>Attendance Records</h1>
+            <p>Manual attendance and Face AI IN / OUT entries in one clean view.</p>
         </div>
-
-        <a
-            href="{% url 'add_attendance' %}"
-            class="add-btn"
-        >
-
-            + Add Attendance
-
-        </a>
-
+        <div class="actions">
+            <a href="{% url 'add_attendance' %}" class="btn btn-primary">Add Attendance</a>
+            <a href="{% url 'face_attendance' %}" class="btn btn-muted">Face Attendance</a>
+        </div>
     </div>
 
-    <div class="attendance-summary-grid">
-
-        <div class="summary-card">
-
-            <h2>
-                {{ total_attendance }}
-            </h2>
-
-            <p>
-                Total Attendance
-            </p>
-
-        </div>
-
-        <div class="summary-card">
-
-            <h2>
-                {{ present_count }}
-            </h2>
-
-            <p>
-                Present
-            </p>
-
-        </div>
-
-        <div class="summary-card">
-
-            <h2>
-                {{ absent_count }}
-            </h2>
-
-            <p>
-                Absent
-            </p>
-
-        </div>
-
-        <div class="summary-card">
-
-            <h2>
-                {{ attendance_percentage }}%
-            </h2>
-
-            <p>
-                Attendance Rate
-            </p>
-
-        </div>
-
+    <div class="stats">
+        <div class="stat"><strong>{{ total_attendance }}</strong><span>Total Records</span></div>
+        <div class="stat"><strong>{{ present_count }}</strong><span>Present</span></div>
+        <div class="stat"><strong>{{ absent_count }}</strong><span>Absent</span></div>
+        <div class="stat"><strong>{{ attendance_percentage }}%</strong><span>Attendance Rate</span></div>
     </div>
 
-    <div class="attendance-table-card">
+    <div class="toolbar">
+        <div class="muted">Showing latest attendance records first.</div>
+        <input class="search" id="recordSearch" type="search" placeholder="Search student, course, status...">
+    </div>
 
-        <table class="attendance-table">
-
+    <div class="table-wrap">
+        <table id="attendanceTable">
             <thead>
-
                 <tr>
-
-                    <th>
-                        Student
-                    </th>
-
-                    <th>
-                        Email
-                    </th>
-
-                    <th>
-                        Course
-                    </th>
-
-                    <th>
-                        Date
-                    </th>
-
-                    <th>
-                        Status
-                    </th>
-
+                    <th>Student</th>
+                    <th>Email</th>
+                    <th>Course</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Method</th>
                 </tr>
-
             </thead>
-
             <tbody>
-
                 {% for attendance in attendance_records %}
-
-                <tr>
-
-                    <td>
-
-                        {{ attendance.student_name }}
-
-                    </td>
-
-                    <td>
-
-                        {{ attendance.student_email }}
-
-                    </td>
-
-                    <td>
-
-                        {{ attendance.student_course }}
-
-                    </td>
-
-                    <td>
-
-                        {{ attendance.attendance_date }}
-
-                    </td>
-
-                    <td>
-
-                        {% if attendance.status == "Present" %}
-
-                        <span class="present-badge">
-
-                            Present
-
-                        </span>
-
-                        {% else %}
-
-                        <span class="absent-badge">
-
-                            Absent
-
-                        </span>
-
-                        {% endif %}
-
-                    </td>
-
-                </tr>
-
+                    <tr>
+                        <td class="student-name">{{ attendance.student_name|default:"-" }}</td>
+                        <td class="muted">{{ attendance.student_email|default:"-" }}</td>
+                        <td>{{ attendance.student_course|default:"-" }}</td>
+                        <td>{{ attendance.attendance_date|default:"-" }}</td>
+                        <td>{{ attendance.time|default:"-" }}</td>
+                        <td>
+                            {% if attendance.type == "IN" %}
+                                <span class="badge in">IN</span>
+                            {% elif attendance.type == "OUT" %}
+                                <span class="badge out">OUT</span>
+                            {% else %}
+                                <span class="badge present">Manual</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if attendance.status == "Absent" %}
+                                <span class="badge absent">Absent</span>
+                            {% else %}
+                                <span class="badge present">Present</span>
+                            {% endif %}
+                        </td>
+                        <td class="method">{{ attendance.method|default:"Manual" }}</td>
+                    </tr>
                 {% empty %}
-
-                <tr>
-
-                    <td colspan="5" class="empty-row">
-
-                        No attendance records found.
-
-                    </td>
-
-                </tr>
-
+                    <tr>
+                        <td colspan="8" class="empty">No attendance records found.</td>
+                    </tr>
                 {% endfor %}
-
             </tbody>
-
         </table>
-
     </div>
-
 </div>
 
+<script>
+const recordSearch = document.getElementById("recordSearch");
+const rows = Array.from(document.querySelectorAll("#attendanceTable tbody tr"));
+
+recordSearch.addEventListener("input", () => {
+    const value = recordSearch.value.toLowerCase();
+    rows.forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(value) ? "" : "none";
+    });
+});
+</script>
 {% endblock %}

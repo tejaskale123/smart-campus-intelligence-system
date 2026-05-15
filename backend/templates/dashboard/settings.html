@@ -1,63 +1,96 @@
 {% extends 'base/base.html' %}
-{% load static %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+    .settings-page{color:#f8fafc}
+    .page-head{align-items:flex-end;display:flex;gap:18px;justify-content:space-between;margin-bottom:24px}
+    .eyebrow{color:#22d3ee;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+    .page-head h1{font-size:clamp(34px,4vw,54px);line-height:1.05;margin:8px 0}
+    .page-head p{color:#9fb0c8;max-width:720px}
+    .layout{display:grid;gap:24px;grid-template-columns:minmax(0,1.4fr) minmax(320px,.6fr)}
+    .panel,.info-card{background:#0f172acc;border:1px solid #23314f;border-radius:20px;padding:24px}
+    .form-grid{display:grid;gap:18px;grid-template-columns:1fr 1fr}
+    .field.full{grid-column:1 / -1}
+    label{color:#cbd5e1;display:block;font-size:14px;font-weight:700;margin-bottom:9px}
+    input,select{background:#07111f;border:1px solid #2b3b5d;border-radius:14px;color:#f8fafc;font:600 16px Inter,Arial,sans-serif;outline:none;padding:15px;width:100%}
+    input:focus,select:focus{border-color:#22d3ee;box-shadow:0 0 0 4px #22d3ee22}
+    .save-btn{background:linear-gradient(90deg,#06b6d4,#2563eb);border:0;border-radius:14px;color:#fff;cursor:pointer;font-size:16px;font-weight:800;padding:15px 20px;width:100%}
+    .messages{display:grid;gap:10px;margin-bottom:18px}
+    .message{border-radius:12px;padding:13px 16px}
+    .message.success{background:#05351b;color:#35e875}
+    .message.info{background:#12304a;color:#22d3ee}
+    .message.error{background:#450a0a;color:#fca5a5}
+    .info-card{margin-bottom:16px}
+    .info-card strong{color:#22d3ee;display:block;font-size:30px}
+    .info-card span{color:#cbd5e1}
+    .note{background:#111c31;border:1px solid #243552;border-radius:16px;color:#9fb0c8;line-height:1.6;padding:18px}
+    @media(max-width:900px){.page-head{align-items:flex-start;flex-direction:column}.layout,.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}}
+</style>
 
-<div class="form-container">
-    <div class="form-card">
-        <div class="form-heading">
-            <p class="students-kicker">Admin Preferences</p>
-            <h1 class="form-title">
-                Settings
-            </h1>
-            <p>Manage campus display details and admin preferences.</p>
+<div class="settings-page">
+    <div class="page-head">
+        <div>
+            <div class="eyebrow">Admin Preferences</div>
+            <h1>Settings</h1>
+            <p>Manage campus display details, admin email and password preferences.</p>
         </div>
+    </div>
 
-        <form method="POST">
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="layout">
+        <form method="POST" class="panel">
             {% csrf_token %}
+            <div class="form-grid">
+                <div class="field">
+                    <label for="campusName">Campus Name</label>
+                    <input id="campusName" type="text" name="campus_name" value="{{ campus_name }}" placeholder="Smart Campus">
+                </div>
 
-            <div class="form-group">
-                <label>Campus Name</label>
-                <input
-                    type="text"
-                    name="campus_name"
-                    placeholder="Smart Campus"
-                >
+                <div class="field">
+                    <label for="theme">Theme</label>
+                    <select id="theme" name="theme">
+                        <option value="Dark" {% if theme == "Dark" %}selected{% endif %}>Dark</option>
+                        <option value="Neon" {% if theme == "Neon" %}selected{% endif %}>Neon</option>
+                        <option value="Classic" {% if theme == "Classic" %}selected{% endif %}>Classic</option>
+                    </select>
+                </div>
+
+                <div class="field full">
+                    <label for="adminEmail">Admin Email</label>
+                    <input id="adminEmail" type="email" name="admin_email" value="{{ request.user.email }}" placeholder="admin@example.com">
+                </div>
+
+                <div class="field full">
+                    <label for="password">Change Password</label>
+                    <input id="password" type="password" name="password" placeholder="Leave blank to keep current password">
+                </div>
+
+                <div class="field full">
+                    <button type="submit" class="save-btn">Save Settings</button>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label>Admin Email</label>
-                <input
-                    type="email"
-                    name="admin_email"
-                    placeholder="admin@gmail.com"
-                    value="{{ request.user.email }}"
-                >
-            </div>
-
-            <div class="form-group">
-                <label>Theme</label>
-                <input
-                    type="text"
-                    name="theme"
-                    placeholder="Dark Neon"
-                >
-            </div>
-
-            <div class="form-group">
-                <label>Change Password</label>
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="New Password"
-                >
-            </div>
-
-            <button type="submit" class="submit-btn">
-                Save Settings
-            </button>
         </form>
+
+        <aside>
+            <div class="info-card">
+                <strong>{{ campus_name }}</strong>
+                <span>Campus Display Name</span>
+            </div>
+            <div class="info-card">
+                <strong>{{ theme }}</strong>
+                <span>Selected Theme</span>
+            </div>
+            <div class="note">
+                Password changes are applied immediately. After changing password, the system logs you out so you can sign in again securely.
+            </div>
+        </aside>
     </div>
 </div>
 {% endblock %}

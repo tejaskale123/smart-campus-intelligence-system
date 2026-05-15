@@ -1,0 +1,257 @@
+{% extends "base/base.html" %}
+
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/attendance.css' %}">
+{% endblock %}
+
+{% block content %}
+
+    .stat-card h2{
+        font-size:45px;
+        margin-bottom:10px;
+        color:#22d3ee;
+    }
+
+    .stat-card p{
+        color:#94a3b8;
+        font-size:17px;
+    }
+
+    .table-box{
+        background:#111827;
+        border-radius:24px;
+        overflow:hidden;
+        border:1px solid rgba(255,255,255,0.05);
+    }
+
+    table{
+        width:100%;
+        border-collapse:collapse;
+    }
+
+    thead{
+        background:#06b6d4;
+    }
+
+    thead th{
+        padding:20px;
+        color:#020617;
+        text-align:left;
+        font-size:15px;
+        font-weight:700;
+    }
+
+    tbody tr{
+        border-bottom:1px solid rgba(255,255,255,0.05);
+        transition:0.3s;
+    }
+
+    tbody tr:hover{
+        background:#1e293b;
+    }
+
+    tbody td{
+        padding:20px;
+        color:#e2e8f0;
+        font-size:15px;
+    }
+
+    .status{
+        padding:8px 18px;
+        border-radius:30px;
+        font-size:13px;
+        font-weight:700;
+        display:inline-block;
+    }
+
+    .present{
+        background:#16a34a;
+        color:white;
+    }
+
+    .absent{
+        background:#ef4444;
+        color:white;
+    }
+
+    .empty-row{
+        text-align:center;
+        padding:30px;
+        color:#94a3b8;
+    }
+
+    @media(max-width:1200px){
+
+        .stats-grid{
+            grid-template-columns:repeat(2,1fr);
+        }
+    }
+
+    @media(max-width:768px){
+
+        .stats-grid{
+            grid-template-columns:1fr;
+        }
+
+        .page-title h1{
+            font-size:38px;
+        }
+
+        .attendance-container{
+            padding:20px;
+        }
+
+        table{
+            min-width:800px;
+        }
+    }
+
+</style>
+
+<div class="attendance-container">
+
+    <div class="top-section">
+
+        <div class="page-title">
+
+            <p>ATTENDANCE MANAGEMENT</p>
+
+            <h1>Attendance Records</h1>
+
+            <div class="underline"></div>
+
+        </div>
+
+        <a href="{% url 'add_attendance' %}" class="add-btn">
+
+            + Add Attendance
+
+        </a>
+
+    </div>
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <h3>{{ total_attendance }}</h3>
+            <p>Total Attendance</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>{{ present_count }}</h3>
+            <p>Present</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>{{ absent_count }}</h3>
+            <p>Absent</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>{{ attendance_percentage }}%</h3>
+            <p>Attendance Rate</p>
+        </div>
+
+    </div>
+
+    <div class="table-box">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Student</th>
+
+                    <th>Email</th>
+
+                    <th>Course</th>
+
+                    <th>Date</th>
+
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for attendance in attendance_records %}
+
+                <tr>
+
+                    <td>
+
+                        {{ attendance.student_name }}
+
+                    </td>
+
+                    <td>
+
+                        {{ attendance.student_email }}
+
+                    </td>
+
+                    <td>
+
+                        {{ attendance.student_course }}
+
+                    </td>
+
+                    <td>
+
+                        {{ attendance.attendance_date }}
+
+                    </td>
+
+                    <td>
+
+                        {% if attendance.status == "Present" %}
+
+                            <span class="status present">
+
+                                Present
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="status absent">
+
+                                Absent
+
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="5" class="empty-row">
+
+                        No attendance records found.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

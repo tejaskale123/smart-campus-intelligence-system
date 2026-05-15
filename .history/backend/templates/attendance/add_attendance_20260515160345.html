@@ -1,0 +1,316 @@
+{% extends "base/base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<style>
+
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+        font-family:'Poppins',sans-serif;
+    }
+
+    .attendance-page{
+        padding:30px;
+        color:white;
+    }
+
+    .page-header{
+        margin-bottom:35px;
+    }
+
+    .page-header p{
+        color:#22d3ee;
+        letter-spacing:2px;
+        font-size:14px;
+        margin-bottom:10px;
+    }
+
+    .page-header h1{
+        font-size:55px;
+        font-weight:800;
+        margin-bottom:10px;
+    }
+
+    .underline{
+        width:70px;
+        height:4px;
+        background:#22d3ee;
+        border-radius:20px;
+    }
+
+    .attendance-form{
+        background:#111827;
+        padding:35px;
+        border-radius:24px;
+        border:1px solid rgba(255,255,255,0.05);
+    }
+
+    .form-group{
+        margin-bottom:30px;
+    }
+
+    .form-group label{
+        display:block;
+        margin-bottom:12px;
+        color:#cbd5e1;
+        font-size:16px;
+        font-weight:500;
+    }
+
+    .form-control{
+        width:100%;
+        padding:18px;
+        border-radius:14px;
+        border:1px solid rgba(255,255,255,0.08);
+        background:#020617;
+        color:white;
+        font-size:16px;
+        outline:none;
+        transition:0.3s;
+    }
+
+    .form-control:focus{
+        border-color:#22d3ee;
+        box-shadow:0 0 10px rgba(34,211,238,0.2);
+    }
+
+    .submit-btn{
+        width:100%;
+        padding:18px;
+        border:none;
+        border-radius:14px;
+        background:#2563eb;
+        color:white;
+        font-size:17px;
+        font-weight:700;
+        cursor:pointer;
+        transition:0.3s;
+    }
+
+    .submit-btn:hover{
+        background:#1d4ed8;
+        transform:translateY(-2px);
+    }
+
+    .top-cards{
+        display:grid;
+        grid-template-columns:repeat(3,1fr);
+        gap:25px;
+        margin-bottom:35px;
+    }
+
+    .card{
+        background:linear-gradient(145deg,#1e293b,#172033);
+        border-radius:22px;
+        padding:30px;
+        text-align:center;
+        border:1px solid rgba(255,255,255,0.05);
+    }
+
+    .card h2{
+        font-size:40px;
+        color:#22d3ee;
+        margin-bottom:10px;
+    }
+
+    .card p{
+        color:#94a3b8;
+        font-size:15px;
+    }
+
+    @media(max-width:992px){
+
+        .top-cards{
+            grid-template-columns:1fr;
+        }
+    }
+
+    @media(max-width:768px){
+
+        .attendance-page{
+            padding:20px;
+        }
+
+        .page-header h1{
+            font-size:38px;
+        }
+
+        .attendance-form{
+            padding:25px;
+        }
+    }
+
+</style>
+
+<div class="attendance-page">
+
+    <div class="page-header">
+
+        <p>
+
+            ATTENDANCE MANAGEMENT
+
+        </p>
+
+        <h1>
+
+            Add Attendance
+
+        </h1>
+
+        <div class="underline"></div>
+
+    </div>
+
+    <div class="top-cards">
+
+        <div class="card">
+
+            <h2>
+
+                📅
+
+            </h2>
+
+            <p>
+
+                Smart Attendance System
+
+            </p>
+
+        </div>
+
+        <div class="card">
+
+            <h2>
+
+                🤖
+
+            </h2>
+
+            <p>
+
+                AI Attendance Tracking
+
+            </p>
+
+        </div>
+
+        <div class="card">
+
+            <h2>
+
+                ⚡
+
+            </h2>
+
+            <p>
+
+                Fast Student Management
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <form method="POST" class="attendance-form">
+
+        {% csrf_token %}
+
+        <div class="form-group">
+
+            <label>
+
+                Select Student
+
+            </label>
+
+            <select
+                name="student_id"
+                class="form-control"
+                required
+            >
+
+                <option value="">
+
+                    Select Student
+
+                </option>
+
+                {% for student in students %}
+
+                <option value="{{ student.id }}">
+
+                    {{ student.name }}
+
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+
+                Attendance Date
+
+            </label>
+
+            <input
+                type="date"
+                name="attendance_date"
+                class="form-control"
+                required
+            >
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+
+                Attendance Status
+
+            </label>
+
+            <select
+                name="status"
+                class="form-control"
+                required
+            >
+
+                <option value="Present">
+
+                    Present
+
+                </option>
+
+                <option value="Absent">
+
+                    Absent
+
+                </option>
+
+            </select>
+
+        </div>
+
+        <button type="submit" class="submit-btn">
+
+            SAVE ATTENDANCE
+
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}
