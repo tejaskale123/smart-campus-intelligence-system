@@ -61,10 +61,6 @@ attendance_collection = db["attendance_logs"]
 STUDENTS_COLLECTION = db["students"]
 ATTENDANCE_COLLECTION = db["attendance_logs"]
 TEACHERS_COLLECTION = db["teachers"]
-LOGIN_LOGS = db["login_logs"]
-NOTIFICATION_LOGS = db["notification_logs"]
-SECURITY_LOGS = db["security_logs"]
-ATTENDANCE_SESSIONS = db["attendance_sessions"]
 VALID_ATTENDANCE_STATUS = ["Present", "Absent"]
 
 
@@ -91,62 +87,6 @@ def student_display_name(student):
         or student.get("full_name"),
         "Unnamed Student"
     )
-
-
-def log_login_event(request, user, role):
-    try:
-        LOGIN_LOGS.insert_one({
-            "username": user.username,
-            "role": role,
-            "login_time": datetime.now(),
-            "ip_address": request.META.get("REMOTE_ADDR"),
-        })
-    except Exception as error:
-        print("Login Log Error:", error)
-
-
-def log_attendance_notification(student_name, status):
-    try:
-        if status == "Absent":
-            message = "Student is absent today"
-            notification_type = "warning"
-        else:
-            message = "Attendance marked successfully"
-            notification_type = "success"
-
-        NOTIFICATION_LOGS.insert_one({
-            "student_name": student_name,
-            "message": message,
-            "type": notification_type,
-            "created_at": datetime.now(),
-        })
-    except Exception as error:
-        print("Notification Log Error:", error)
-
-
-def log_security_event(request, event, username=None):
-    try:
-        SECURITY_LOGS.insert_one({
-            "event": event,
-            "username": username,
-            "ip_address": request.META.get("REMOTE_ADDR"),
-            "created_at": datetime.now(),
-        })
-    except Exception as error:
-        print("Security Log Error:", error)
-
-
-def log_attendance_session(request, student_name, attendance_date, status):
-    try:
-        ATTENDANCE_SESSIONS.insert_one({
-            "teacher_name": request.user.username,
-            "student_name": student_name,
-            "attendance_date": attendance_date,
-            "status": status,
-            "session_time": datetime.now(),
-        })
-    except Exception as error:
-        print("Attendance Session Log Error:", error)
 
 
 def prepare_student_option(student):
@@ -398,8 +338,6 @@ def login_page(request):
                     {"error": "Profile not found. Please contact admin."}
                 )
 
-            log_login_event(request, user, profile.role)
-
             if profile.role == "admin":
                 return redirect("admin_dashboard")
             if profile.role == "teacher":
@@ -413,8 +351,6 @@ def login_page(request):
                 "authentication/login.html",
                 {"error": "Invalid role assigned. Please contact admin."}
             )
-
-        log_security_event(request, "Failed Login", username)
 
         return render(
             request,
@@ -1132,17 +1068,6 @@ def add_attendance(request):
             "created_at": datetime.now()
 
         })
-
-        log_attendance_notification(
-            student_display_name(student),
-            status
-        )
-        log_attendance_session(
-            request,
-            student_display_name(student),
-            attendance_date,
-            status
-        )
 
         messages.success(
 

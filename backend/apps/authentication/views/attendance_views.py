@@ -12,6 +12,8 @@ from database.mongo import db
 
 STUDENTS_COLLECTION = db["students"]
 ATTENDANCE_COLLECTION = db["attendance_logs"]
+NOTIFICATION_LOGS = db["notification_logs"]
+ATTENDANCE_SESSIONS = db["attendance_sessions"]
 
 
 def clean_value(value, fallback="-"):
@@ -41,6 +43,38 @@ def prepare_student_option(student):
         or student.get("student_email")
     )
     return student
+
+
+def _log_attendance_notification(student_name, status):
+    try:
+        if status == "Absent":
+            message = "Student is absent today"
+            notification_type = "warning"
+        else:
+            message = "Attendance marked successfully"
+            notification_type = "success"
+
+        NOTIFICATION_LOGS.insert_one({
+            "student_name": student_name,
+            "message": message,
+            "type": notification_type,
+            "created_at": datetime.now(),
+        })
+    except Exception as error:
+        print("Notification Log Error:", error)
+
+
+def _log_attendance_session(request, student_name, attendance_date, status):
+    try:
+        ATTENDANCE_SESSIONS.insert_one({
+            "teacher_name": request.user.username,
+            "student_name": student_name,
+            "attendance_date": attendance_date,
+            "status": status,
+            "session_time": datetime.now(),
+        })
+    except Exception as error:
+        print("Attendance Session Log Error:", error)
 
 
 @login_required
@@ -175,6 +209,17 @@ def add_attendance(request):
             "created_at": datetime.now()
 
         })
+
+        _log_attendance_notification(
+            student_display_name(student),
+            status
+        )
+        _log_attendance_session(
+            request,
+            student_display_name(student),
+            attendance_date,
+            status
+        )
 
         messages.success(
             request,

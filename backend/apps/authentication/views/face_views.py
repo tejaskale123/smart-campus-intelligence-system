@@ -11,6 +11,10 @@ from database.mongo import db
 from datetime import datetime
 from apps.authentication.face_utils import recognize_faces
 
+CAMERA_LOGS = db["camera_logs"]
+SECURITY_LOGS = db["security_logs"]
+FACE_COLLECTION = db["face_encodings"]
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 FACES_DIR = os.path.join(BASE_DIR, "media", "faces")
 os.makedirs(FACES_DIR, exist_ok=True)
@@ -19,6 +23,42 @@ FACE_SAMPLE_SIZE = (96, 96)
 FACE_MATCH_THRESHOLD = 0.62
 FACE_DUPLICATE_THRESHOLD = 0.96
 FACE_ENCODING_MIN_COUNT = 1
+
+
+def _log_camera_event(camera_status, face_detected=False, student_name=None, **extra):
+    try:
+        log_data = {
+            "camera_status": camera_status,
+            "face_detected": face_detected,
+            "created_at": datetime.now(),
+        }
+        if student_name:
+            log_data["student_name"] = student_name
+        log_data.update(extra)
+        CAMERA_LOGS.insert_one(log_data)
+    except Exception as error:
+        print("Camera Log Error:", error)
+
+
+def _log_security_event(request, event, **extra):
+    try:
+        log_data = {
+            "event": event,
+            "ip_address": request.META.get("REMOTE_ADDR"),
+            "created_at": datetime.now(),
+        }
+        log_data.update(extra)
+        SECURITY_LOGS.insert_one(log_data)
+    except Exception as error:
+        print("Security Log Error:", error)
+
+
+def _save_face_documents(face_documents):
+    try:
+        if face_documents:
+            FACE_COLLECTION.insert_many(face_documents)
+    except Exception as error:
+        print("Face Collection Save Error:", error)
 
 
 def _decode_base64_image(image_data):
@@ -177,6 +217,36 @@ def _find_best_sample_match(captured_sample, students):
 
 def _load_registered_students():
     students = []
+    grouped_faces = {}
+
+    for face in FACE_COLLECTION.find():
+        student_name = (face.get("student_name") or "").strip()
+        if not student_name:
+            continue
+
+        key = (
+            student_name,
+            face.get("roll_number", ""),
+            face.get("course", ""),
+        )
+        grouped_faces.setdefault(key, {
+            "student_name": student_name,
+            "roll_number": face.get("roll_number", ""),
+            "course": face.get("course", ""),
+            "face_encodings": [],
+            "face_samples": [],
+        })
+
+        encoding = face.get("encoding")
+        if encoding:
+            grouped_faces[key]["face_encodings"].append(np.array(encoding))
+
+        sample = face.get("face_sample")
+        if sample:
+            grouped_faces[key]["face_samples"].append(sample)
+
+    students.extend(grouped_faces.values())
+
     for student in db.students.find():
         encodings = [
             np.array(encoding)
@@ -255,6 +325,7 @@ def start_face_attendance(request):
         camera_thread = threading.Thread(target=recognize_faces)
         camera_thread.daemon = True
         camera_thread.start()
+        _log_camera_event("Started", face_detected=True)
         return JsonResponse({"status": "success", "message": "Camera Started"})
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e)})
@@ -277,6 +348,7 @@ def process_face_attendance(request):
 
     students = _load_registered_students()
     if not students:
+        _log_camera_event("Unknown Face", face_detected=False)
         return JsonResponse({
             "status": "error",
             "message": "No registered face data found."
@@ -318,6 +390,16 @@ def process_face_attendance(request):
             best_student = None
 
     if not best_student:
+        _log_camera_event(
+            "Unknown Face",
+            face_detected=False,
+            confidence=confidence
+        )
+        _log_security_event(
+            request,
+            "Face Mismatch",
+            confidence=confidence
+        )
         return JsonResponse({
             "status": "unknown",
             "message": "Face not matched with registered students.",
@@ -325,6 +407,16 @@ def process_face_attendance(request):
         })
 
     attendance_result = _mark_face_attendance(best_student)
+    _log_camera_event(
+        "Face Detected",
+        face_detected=True,
+        student_name=best_student["student_name"],
+        roll_number=best_student.get("roll_number", ""),
+        course=best_student.get("course", ""),
+        confidence=confidence,
+        attendance_status=attendance_result.get("status"),
+        attendance_type=attendance_result.get("attendance_type"),
+    )
 
     return JsonResponse({
         **attendance_result,
@@ -414,6 +506,19 @@ def register_face(request):
             "face_encodings": encodings_list,
             "face_samples": face_samples
         })
+
+        face_documents = []
+        for index, encoding in enumerate(encodings_list):
+            face_documents.append({
+                "student_name": student_name,
+                "roll_number": roll_number,
+                "course": course,
+                "encoding": encoding,
+                "face_sample": face_samples[index] if index < len(face_samples) else "",
+                "created_at": datetime.now(),
+            })
+
+        _save_face_documents(face_documents)
 
         return JsonResponse({
             "status": "success",

@@ -1,9 +1,13 @@
 import json
 from collections import Counter, defaultdict
+from datetime import datetime
+
 from django.shortcuts import render
 from database.mongo import db
 
 
+ANALYTICS_COLLECTION = db["analytics_cache"]
+AI_COLLECTION = db["ai_predictions"]
 STUDENTS_COLLECTION = db["students"]
 ATTENDANCE_COLLECTION = db["attendance_logs"]
 
@@ -101,5 +105,23 @@ def analytics_view(request):
         "low_attendance_students": low_attendance_students,
         "recent_activities": recent_activities,
     }
+
+    ANALYTICS_COLLECTION.insert_one({
+        "total_students": total_students,
+        "present_students": present_students,
+        "absent_students": absent_students,
+        "attendance_percentage": attendance_percentage,
+        "created_at": datetime.now(),
+    })
+
+    prediction = "Good"
+    if attendance_percentage < 75:
+        prediction = "Low Attendance Risk"
+
+    AI_COLLECTION.insert_one({
+        "attendance_percentage": attendance_percentage,
+        "prediction": prediction,
+        "created_at": datetime.now(),
+    })
 
     return render(request, "analytics/analytics.html", context)

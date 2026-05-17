@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -6,6 +8,10 @@ from apps.authentication.models import UserProfile
 from apps.authentication.decorators import (
     admin_only,
 )
+from database.mongo import db
+
+
+TEACHERS_COLLECTION = db["teachers"]
 
 
 @login_required
@@ -49,6 +55,17 @@ def add_teacher(request):
         profile.department = department
         profile.save()
 
+        TEACHERS_COLLECTION.insert_one({
+            "auth_user_id": teacher_user.id,
+            "profile_id": profile.id,
+            "name": username,
+            "email": email,
+            "phone": "",
+            "department": department,
+            "subject": department,
+            "created_at": datetime.now(),
+        })
+
         messages.success(request, "Teacher created successfully.")
         return redirect("admin_teachers")
 
@@ -88,6 +105,25 @@ def update_teacher(request, teacher_id):
         profile.department = department
         profile.save()
 
+        TEACHERS_COLLECTION.update_one(
+            {"auth_user_id": profile.user.id},
+            {
+                "$set": {
+                    "profile_id": profile.id,
+                    "name": username,
+                    "email": email,
+                    "department": department,
+                    "subject": department,
+                    "updated_at": datetime.now(),
+                },
+                "$setOnInsert": {
+                    "phone": "",
+                    "created_at": datetime.now(),
+                },
+            },
+            upsert=True,
+        )
+
         messages.success(request, "Teacher updated successfully.")
         return redirect("admin_teachers")
 
@@ -102,6 +138,7 @@ def update_teacher(request, teacher_id):
 @admin_only
 def delete_teacher(request, teacher_id):
     profile = get_object_or_404(UserProfile, id=teacher_id, role="teacher")
+    TEACHERS_COLLECTION.delete_one({"auth_user_id": profile.user.id})
     profile.user.delete()
     messages.success(request, "Teacher deleted successfully.")
     return redirect("admin_teachers")

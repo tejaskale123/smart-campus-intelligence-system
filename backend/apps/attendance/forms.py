@@ -1,17 +1,12 @@
 from django import forms
-from .models import Attendance
 
 
-class AttendanceForm(forms.ModelForm):
-
-    class Meta:
-
-        model = Attendance
-
-        fields = [
-
-            'student',
-            'date',
-            'status'
-
-        ]
+class AttendanceForm(forms.Form):
+    student_id = forms.CharField()
+    attendance_date = forms.DateField()
+    status = forms.ChoiceField(
+        choices=(
+            ("Present", "Present"),
+            ("Absent", "Absent"),
+        )
+    )

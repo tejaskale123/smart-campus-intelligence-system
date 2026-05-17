@@ -1,3 +1,4 @@
-from django.shortcuts import render
+from apps.authentication.views.analytics_views import analytics_view
 
-# Create your views here.
+
+analytics = analytics_view
