@@ -2,83 +2,127 @@
 
 {% block content %}
 
-<div class="card" style="width: 100%; padding: 40px; border-top: 4px solid var(--neon-blue);">
-
-    <div style="text-align: center; margin-bottom: 30px;">
-        <div style="width: 80px; height: 80px; background: rgba(0, 102, 255, 0.05); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 15px auto; border: 1px dashed rgba(255, 255, 255, 0.2);">
-            <i class="fas fa-shield-alt" style="font-size: 35px; color: var(--neon-blue);"></i>
-        </div>
-        <h2 style="font-size: 24px; margin-bottom: 5px; color: var(--text-primary);">System Authentication</h2>
-        <p style="color: var(--text-secondary); font-size: 14px;">Secure access to the Smart Campus ERP</p>
-    </div>
-
-    {% if error %}
-    <div style="background: rgba(255, 0, 85, 0.1); color: var(--danger); padding: 15px; margin-bottom: 25px; border-radius: 8px; border: 1px solid rgba(255, 0, 85, 0.3); font-weight: 500; text-align: center; font-size: 14px;">
-        <i class="fas fa-exclamation-triangle" style="margin-right: 5px;"></i> {{ error }}
-    </div>
-    {% endif %}
-
-    <form method="POST" id="loginForm">
-        {% csrf_token %}
-        <div class="form-group" style="margin-bottom: 20px;">
-            <label><i class="fas fa-user" style="color: var(--neon-blue); margin-right: 5px;"></i> Username</label>
-            <input type="text" name="username" required placeholder="Enter your username" style="padding-left: 20px;">
+<section class="auth-shell">
+    <aside class="auth-hero">
+        <div class="brand-mark">
+            <span class="brand-icon">
+                <i class="fas fa-graduation-cap"></i>
+            </span>
+            <span>Smart Campus Intelligence</span>
         </div>
 
-        <div class="form-group" style="margin-bottom: 15px;">
-            <label><i class="fas fa-lock" style="color: var(--neon-blue); margin-right: 5px;"></i> Password</label>
-            <div style="position: relative;">
-                <input type="password" id="passwordInput" name="password" required placeholder="Enter your password" style="padding-left: 20px; width: 100%; padding-right: 40px;">
-                <i class="fas fa-eye" id="togglePassword" style="position: absolute; right: 15px; top: 18px; color: var(--text-secondary); cursor: pointer; transition: 0.3s;"></i>
+        <div class="brand-copy">
+            <h1>Secure campus access for every role.</h1>
+            <p>Manage attendance, students, teachers, reports, analytics, and AI face recognition from one clean dashboard.</p>
+
+            <div class="auth-stats">
+                <div class="auth-stat">
+                    <strong>AI</strong>
+                    <span>Face attendance</span>
+                </div>
+                <div class="auth-stat">
+                    <strong>3</strong>
+                    <span>User roles</span>
+                </div>
+                <div class="auth-stat">
+                    <strong>24/7</strong>
+                    <span>Campus records</span>
+                </div>
             </div>
         </div>
+    </aside>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; font-size: 13px;">
-            <label style="display: flex; align-items: center; gap: 8px; color: var(--text-secondary); cursor: pointer; text-transform: none; letter-spacing: normal;">
-                <input type="checkbox" name="remember_me" style="width: 14px; height: 14px; margin: 0; cursor: pointer; accent-color: var(--neon-blue);">
-                Remember Me
-            </label>
-            <a href="#" style="color: var(--neon-blue); font-weight: 500;">Forgot Password?</a>
+    <div class="auth-card">
+        <div class="auth-card-head">
+            <span class="auth-icon">
+                <i class="fas fa-shield-halved"></i>
+            </span>
+            <h2>System Authentication</h2>
+            <p>Login to continue to Smart Campus ERP.</p>
         </div>
 
-        <button type="submit" id="loginBtn" class="btn" style="width: 100%; font-size: 15px; padding: 15px; display: flex; justify-content: center; align-items: center; gap: 8px;">
-            <i class="fas fa-sign-in-alt" id="loginIcon"></i> 
-            <span id="loginText">Access Account</span>
+        {% if error %}
+            <div class="auth-alert">
+                <i class="fas fa-triangle-exclamation"></i>
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <form method="POST" id="loginForm">
+            {% csrf_token %}
+
+            <div class="auth-field">
+                <label for="usernameInput">Username</label>
+                <div class="input-wrap">
+                    <i class="fas fa-user"></i>
+                    <input id="usernameInput" type="text" name="username" required placeholder="Enter your username" autocomplete="username">
+                </div>
+            </div>
+
+            <div class="auth-field">
+                <label for="passwordInput">Password</label>
+                <div class="input-wrap">
+                    <i class="fas fa-lock"></i>
+                    <input id="passwordInput" type="password" name="password" required placeholder="Enter your password" autocomplete="current-password">
+                    <span class="toggle-password" id="togglePassword" aria-label="Show password">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                </div>
+            </div>
+
+            <div class="auth-row">
+                <label class="remember">
+                    <input type="checkbox" name="remember_me">
+                    Remember me
+                </label>
+                <a class="auth-link" href="#">Forgot Password?</a>
+            </div>
+
+            <button type="submit" id="loginBtn" class="auth-submit">
+                <i class="fas fa-right-to-bracket" id="loginIcon"></i>
+                <span id="loginText">Access Account</span>
+            </button>
+        </form>
+
+        <div class="auth-divider">or</div>
+
+        <button type="button" class="auth-google" id="googleLoginBtn">
+            <i class="fa-brands fa-google"></i>
+            Continue with Google
         </button>
-    </form>
+        <p class="auth-note">Google OAuth can be connected from backend settings.</p>
 
-    <script>
-        // Toggle Password Visibility
-        const togglePassword = document.getElementById('togglePassword');
-        const passwordInput = document.getElementById('passwordInput');
-
-        togglePassword.addEventListener('click', function () {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.classList.toggle('fa-eye-slash');
-            this.style.color = type === 'text' ? 'var(--neon-blue)' : 'var(--text-secondary)';
-        });
-
-        // Loading State
-        document.getElementById('loginForm').addEventListener('submit', function() {
-            const btn = document.getElementById('loginBtn');
-            const icon = document.getElementById('loginIcon');
-            const text = document.getElementById('loginText');
-            
-            btn.style.opacity = '0.8';
-            btn.style.cursor = 'not-allowed';
-            icon.className = 'fas fa-spinner fa-spin';
-            text.innerText = 'Authenticating...';
-        });
-    </script>
-
-    <div style="text-align: center; margin-top: 30px; color: var(--text-secondary); font-size: 14px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
-        Don't have an account?
-        <a href="/register/" style="margin-left: 5px; font-weight: 600; color: var(--neon-blue);">
-            <i class="fas fa-user-plus"></i> Request Access
-        </a>
+        <div class="auth-footer">
+            Don't have an account?
+            <a class="auth-link" href="/register/">
+                Request Access
+            </a>
+        </div>
     </div>
+</section>
 
-</div>
+<script>
+const togglePassword = document.getElementById("togglePassword");
+const passwordInput = document.getElementById("passwordInput");
+const loginForm = document.getElementById("loginForm");
+
+togglePassword.addEventListener("click", () => {
+    const isPassword = passwordInput.getAttribute("type") === "password";
+    passwordInput.setAttribute("type", isPassword ? "text" : "password");
+    togglePassword.innerHTML = isPassword ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+});
+
+loginForm.addEventListener("submit", () => {
+    const btn = document.getElementById("loginBtn");
+    const icon = document.getElementById("loginIcon");
+    const text = document.getElementById("loginText");
+
+    btn.style.opacity = "0.82";
+    btn.style.cursor = "not-allowed";
+    icon.className = "fas fa-spinner fa-spin";
+    text.textContent = "Authenticating...";
+});
+
+</script>
 
 {% endblock %}

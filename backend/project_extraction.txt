@@ -43,10 +43,10 @@ backend/
 │   │   ├── decorators.py
 │   │   ├── face_utils.py
 │   │   ├── models.py
-│   │   ├── old_views.py
 │   │   ├── services.py
 │   │   ├── tests.py
 │   │   ├── urls.py
+│   │   ├── views.py
 │   │   ├── migrations/
 │   │   │   ├── 0001_userprofile.py
 │   │   │   ├── 0002_userprofile_department.py
@@ -63,8 +63,13 @@ backend/
 │   │       ├── settings_views.py
 │   │       ├── student_views.py
 │   │       └── teacher_views.py
+│   ├── devices/
+│   ├── library/
 │   ├── media/
 │   │   └── faces/
+│   ├── notifications/
+│   ├── realtime/
+│   ├── security/
 │   ├── students/
 │   │   ├── __init__.py
 │   │   ├── admin.py
@@ -84,6 +89,7 @@ backend/
 │       ├── views.py
 │       └── migrations/
 │           └── __init__.py
+├── components/
 ├── config/
 │   ├── __init__.py
 │   ├── asgi.py
@@ -94,7 +100,11 @@ backend/
 │   └── mongo.py
 ├── media/
 │   ├── Screenshot From 2025-11-30 23-45-21.png
-│   └── faces/
+│   ├── faces/
+│   └── students/
+│       ├── Screenshot 2026-05-05 134433.png
+│       └── Screenshot 2026-05-05 144604.png
+├── services/
 ├── static/
 │   ├── css/
 │   │   ├── analytics.css
@@ -103,7 +113,6 @@ backend/
 │   │   ├── auth.css
 │   │   ├── components.css
 │   │   ├── dashboard.css
-│   │   ├── responsive.css
 │   │   └── style.css
 │   ├── fonts/
 │   ├── icons/
@@ -118,44 +127,45 @@ backend/
 │       ├── register_face.js
 │       ├── security.js
 │       └── websocket.js
-└── templates/
-    ├── analytics/
-    │   └── analytics.html
-    ├── attendance/
-    │   ├── add_attendance.html
-    │   └── attendance_list.html
-    ├── authentication/
-    │   ├── attendance_history.html
-    │   ├── face_attendance.html
-    │   ├── login.html
-    │   ├── register.html
-    │   └── register_face.html
-    ├── base/
-    │   ├── auth_base.html
-    │   └── base.html
-    ├── canteen/
-    ├── dashboard/
-    │   ├── admin_dashboard.html
-    │   ├── performance_report.html
-    │   ├── reports.html
-    │   ├── settings.html
-    │   ├── student_dashboard.html
-    │   └── teacher_dashboard.html
-    ├── library/
-    ├── notifications/
-    ├── security/
-    ├── students/
-    │   ├── add_student.html
-    │   ├── my_attendance.html
-    │   ├── my_profile.html
-    │   ├── performance.html
-    │   ├── student_dashboard.html
-    │   ├── student_detail.html
-    │   ├── students_list.html
-    │   └── update_student.html
-    └── teachers/
-        ├── add_teacher.html
-        └── teachers_list.html
+├── templates/
+│   ├── analytics/
+│   │   └── analytics.html
+│   ├── attendance/
+│   │   ├── add_attendance.html
+│   │   └── attendance_list.html
+│   ├── authentication/
+│   │   ├── attendance_history.html
+│   │   ├── face_attendance.html
+│   │   ├── login.html
+│   │   ├── register.html
+│   │   └── register_face.html
+│   ├── base/
+│   │   ├── auth_base.html
+│   │   └── base.html
+│   ├── canteen/
+│   ├── dashboard/
+│   │   ├── admin_dashboard.html
+│   │   ├── performance_report.html
+│   │   ├── reports.html
+│   │   ├── settings.html
+│   │   ├── student_dashboard.html
+│   │   └── teacher_dashboard.html
+│   ├── library/
+│   ├── notifications/
+│   ├── security/
+│   ├── students/
+│   │   ├── add_student.html
+│   │   ├── my_attendance.html
+│   │   ├── my_profile.html
+│   │   ├── performance.html
+│   │   ├── student_dashboard.html
+│   │   ├── student_detail.html
+│   │   ├── students_list.html
+│   │   └── update_student.html
+│   └── teachers/
+│       ├── add_teacher.html
+│       └── teachers_list.html
+└── utils/
 
 
 ================================================================================
@@ -418,77 +428,10 @@ urlpatterns = [
 FILE: apps\attendance\views.py
 ================================================================================
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
-
-from .models import Attendance
-
-from apps.authentication.models import UserProfile
-
-
-@login_required
-def attendance_list(request):
-
-    attendance_records = Attendance.objects.all().order_by('-id')
-
-    context = {
-
-        'attendance_records': attendance_records
-
-    }
-
-    return render(
-
-        request,
-
-        'attendance/attendance_list.html',
-
-        context
-    )
-
-
-@login_required
-def add_attendance(request):
-
-    students = User.objects.filter(
-
-        userprofile__role='student'
-    )
-
-    if request.method == 'POST':
-
-        student_id = request.POST.get('student')
-
-        status = request.POST.get('status')
-
-        if student_id and status:
-
-            student = User.objects.get(id=student_id)
-
-            Attendance.objects.create(
-
-                student=student,
-
-                status=status
-            )
-
-            return redirect('attendance_list')
-
-    context = {
-
-        'students': students
-
-    }
-
-    return render(
-
-        request,
-
-        'attendance/add_attendance.html',
-
-        context
-    )
+from apps.authentication.views.attendance_views import (
+    add_attendance,
+    attendance_list,
+)
 
 
 ================================================================================
@@ -625,39 +568,40 @@ attendance_collection = db["attendance_logs"]
 students_collection = db["students"]
 
 
-# ==========================================
-# LOAD STUDENTS
-# ==========================================
+def load_known_faces():
+    known_faces = []
+    known_names = []
 
-known_faces = []
-known_names = []
+    print("Loading students from MongoDB...")
 
-print("Loading students from MongoDB...")
+    for student in students_collection.find():
+        student_name = (
+            student.get("student_name")
+            or student.get("name")
+            or ""
+        ).strip()
 
-students = students_collection.find()
-
-for student in students:
-
-    student_name = student.get("student_name", "").strip()
-
-    face_encodings = student.get(
-        "face_encodings",
-        []
-    )
-
-    for encoding in face_encodings:
-
-        known_faces.append(
-            np.array(encoding)
+        face_encodings = student.get(
+            "face_encodings",
+            []
         )
 
-        known_names.append(
-            student_name
-        )
+        for encoding in face_encodings:
+            if not encoding:
+                continue
 
-        print(f"Loaded: {student_name}")
+            known_faces.append(
+                np.array(encoding)
+            )
 
-print("Known Names:", known_names)
+            known_names.append(
+                student_name
+            )
+
+            print(f"Loaded: {student_name}")
+
+    print("Known Names:", known_names)
+    return known_faces, known_names
 
 
 # ==========================================
@@ -670,6 +614,14 @@ def recognize_faces():
         import face_recognition
     except ImportError:
         print("face_recognition package not installed. Face attendance cannot start.")
+        return
+
+    known_faces, known_names = load_known_faces()
+
+    if not known_faces:
+
+        print("No face encodings found in MongoDB.")
+
         return
 
     # ==========================================
@@ -970,6 +922,7 @@ def recognize_faces():
 
     cv2.destroyAllWindows()
 
+
 ================================================================================
 FILE: apps\authentication\migrations\0001_userprofile.py
 ================================================================================
@@ -1102,7 +1055,189 @@ def create_or_update_user_profile(sender, instance, created, **kwargs):
 
 
 ================================================================================
-FILE: apps\authentication\old_views.py
+FILE: apps\authentication\services.py
+================================================================================
+
+from bson import ObjectId
+
+from database.mongo import db
+
+
+STUDENTS_COLLECTION = db["students"]
+ATTENDANCE_COLLECTION = db["attendance_logs"]
+
+
+def to_object_id(value):
+    try:
+        return ObjectId(value)
+    except Exception:
+        return None
+
+
+# ==============================
+# STUDENTS
+# ==============================
+
+def create_student(data):
+    return STUDENTS_COLLECTION.insert_one(data)
+
+
+def get_all_students(query=None):
+    return STUDENTS_COLLECTION.find(query or {}).sort("name", 1)
+
+
+def get_student_by_id(student_id):
+    object_id = to_object_id(student_id)
+    if not object_id:
+        return None
+
+    return STUDENTS_COLLECTION.find_one({"_id": object_id})
+
+
+# Backward-compatible name used by existing views.
+def get_student(student_id):
+    return get_student_by_id(student_id)
+
+
+# ==============================
+# ATTENDANCE
+# ==============================
+
+def save_attendance(student, attendance_date, status):
+    if not student or status not in ["Present", "Absent"] or not attendance_date:
+        return None
+
+    attendance_data = {
+        "student_id": str(student["_id"]),
+        "student_name": student.get("name", ""),
+        "attendance_date": attendance_date,
+        "status": status,
+    }
+
+    return ATTENDANCE_COLLECTION.insert_one(attendance_data)
+
+
+def get_attendance_records(query=None, limit=None):
+    cursor = ATTENDANCE_COLLECTION.find(query or {}).sort("attendance_date", -1)
+    if limit:
+        cursor = cursor.limit(limit)
+    return cursor
+
+
+def attendance_stats(query=None):
+    records = list(get_attendance_records(query))
+    total = len(records)
+    present = len([
+        record for record in records
+        if record.get("status") == "Present"
+    ])
+    absent = total - present
+    percentage = round((present / total) * 100, 2) if total else 0
+
+    return {
+        "total_attendance": total,
+        "present_count": present,
+        "absent_count": absent,
+        "present_students": present,
+        "absent_students": absent,
+        "attendance_percentage": percentage,
+        "records": records,
+    }
+
+
+================================================================================
+FILE: apps\authentication\tests.py
+================================================================================
+
+from django.test import TestCase
+
+# Create your tests here.
+
+
+================================================================================
+FILE: apps\authentication\urls.py
+================================================================================
+
+from django.urls import path
+from .views import (
+    add_attendance,
+    add_student,
+    add_teacher,
+    admin_dashboard,
+    admin_teachers,
+    analytics_view,
+    attendance_history,
+    attendance_list,
+    dashboard,
+    delete_student,
+    delete_teacher,
+    login_page,
+    logout_page,
+    register_page,
+    reports_page,
+    settings_page,
+    student_detail,
+    students_list,
+    teacher_dashboard,
+    update_student,
+    update_teacher,
+    download_pdf_report,
+    performance_report,
+    export_csv_report,
+    register_face,
+    face_attendance_page,
+    start_face_attendance,
+    process_face_attendance,
+)
+
+
+
+urlpatterns = [
+    # AUTH
+    path("", login_page, name="login"),
+    path("login/", login_page, name="login"),
+    path("logout/", logout_page, name="logout"),
+    path("register/", register_page, name="register"),
+
+    # GENERAL ROLE REDIRECT HANDLER
+    path("dashboard/", dashboard, name="dashboard"),
+
+    # ADMIN
+    path("admin-dashboard/", admin_dashboard, name="admin_dashboard"),
+    path("add-student/", add_student, name="add_student"),
+    path("teachers/", admin_teachers, name="admin_teachers"),
+    path("add-teacher/", add_teacher, name="add_teacher"),
+    path("update-teacher/<int:teacher_id>/", update_teacher, name="update_teacher"),
+    path("delete-teacher/<int:teacher_id>/", delete_teacher, name="delete_teacher"),
+    path("analytics/", analytics_view, name="analytics"),
+    path("reports/", reports_page, name="reports"),
+    path("settings/", settings_page, name="settings"),
+    path("update-student/<str:student_id>/", update_student, name="update_student"),
+    path("delete-student/<str:student_id>/", delete_student, name="delete_student"),
+
+    # TEACHER
+    path("teacher-dashboard/", teacher_dashboard, name="teacher_dashboard"),
+    path("add-attendance/", add_attendance, name="add_attendance"),
+    path("attendance-list/", attendance_list, name="attendance_list"),
+    path("attendance-history/", attendance_history, name="attendance_history"),
+    path("students/", students_list, name="students_list"),
+    path("students-list/", students_list, name="students_list_legacy"),
+
+    # GENERAL DETAIL
+    path("student/<str:student_id>/", student_detail, name="student_detail"),
+
+    path("download-pdf-report/", download_pdf_report, name="download_pdf_report"),
+    path("export-csv-report/", export_csv_report, name="export_csv_report"),
+    path("performance-report/", performance_report, name="performance_report"),
+    path("face-attendance/", face_attendance_page, name="face_attendance"),
+    path("start-face-attendance/", start_face_attendance, name="start_face_attendance"),
+    path("process-face-attendance/", process_face_attendance, name="process_face_attendance"),
+    path("register-face/", register_face, name="register_face"),
+]
+
+
+================================================================================
+FILE: apps\authentication\views.py
 ================================================================================
 
 import numpy as np
@@ -1178,6 +1313,35 @@ def serialize_student(student):
     if not student:
         return None
     student["id"] = str(student["_id"])
+    return student
+
+
+def clean_value(value, fallback="-"):
+    value = "" if value is None else str(value).strip()
+    return value or fallback
+
+
+def student_display_name(student):
+    return clean_value(
+        student.get("name")
+        or student.get("student_name")
+        or student.get("full_name"),
+        "Unnamed Student"
+    )
+
+
+def prepare_student_option(student):
+    student["id"] = str(student["_id"])
+    student["display_name"] = student_display_name(student)
+    student["display_course"] = clean_value(
+        student.get("course")
+        or student.get("department")
+        or student.get("student_course")
+    )
+    student["display_email"] = clean_value(
+        student.get("email")
+        or student.get("student_email")
+    )
     return student
 
 
@@ -1747,6 +1911,7 @@ def add_student(request):
                 for chunk in profile_image.chunks():
                     destination.write(chunk)
 
+        messages.success(request, "Student added successfully.")
         return redirect("students_list")
 
     return render(request, "students/add_student.html")
@@ -2001,15 +2166,11 @@ def attendance_list(request):
 @teacher_or_admin
 def add_attendance(request):
 
-    students = list(
-
-        STUDENTS_COLLECTION.find().sort("name", 1)
-
-    )
-
-    for student in students:
-
-        student["id"] = str(student["_id"])
+    students = [
+        prepare_student_option(student)
+        for student in STUDENTS_COLLECTION.find()
+    ]
+    students.sort(key=lambda item: item["display_name"].lower())
 
     if request.method == "POST":
 
@@ -2097,11 +2258,18 @@ def add_attendance(request):
 
             "student_id": str(student["_id"]),
 
-            "student_name": student.get("name"),
+            "student_name": student_display_name(student),
 
-            "student_email": student.get("email"),
+            "student_email": clean_value(
+                student.get("email")
+                or student.get("student_email")
+            ),
 
-            "student_course": student.get("course"),
+            "student_course": clean_value(
+                student.get("course")
+                or student.get("department")
+                or student.get("student_course")
+            ),
 
             "attendance_date": attendance_date,
 
@@ -2993,185 +3161,6 @@ def attendance_history(request):
 
     )
 
-================================================================================
-FILE: apps\authentication\services.py
-================================================================================
-
-from bson import ObjectId
-
-from database.mongo import db
-
-
-STUDENTS_COLLECTION = db["students"]
-ATTENDANCE_COLLECTION = db["attendance_logs"]
-
-
-def to_object_id(value):
-    try:
-        return ObjectId(value)
-    except Exception:
-        return None
-
-
-# ==============================
-# STUDENTS
-# ==============================
-
-def create_student(data):
-    return STUDENTS_COLLECTION.insert_one(data)
-
-
-def get_all_students(query=None):
-    return STUDENTS_COLLECTION.find(query or {}).sort("name", 1)
-
-
-def get_student_by_id(student_id):
-    object_id = to_object_id(student_id)
-    if not object_id:
-        return None
-
-    return STUDENTS_COLLECTION.find_one({"_id": object_id})
-
-
-# Backward-compatible name used by existing views.
-def get_student(student_id):
-    return get_student_by_id(student_id)
-
-
-# ==============================
-# ATTENDANCE
-# ==============================
-
-def save_attendance(student, attendance_date, status):
-    if not student or status not in ["Present", "Absent"] or not attendance_date:
-        return None
-
-    attendance_data = {
-        "student_id": str(student["_id"]),
-        "student_name": student.get("name", ""),
-        "attendance_date": attendance_date,
-        "status": status,
-    }
-
-    return ATTENDANCE_COLLECTION.insert_one(attendance_data)
-
-
-def get_attendance_records(query=None, limit=None):
-    cursor = ATTENDANCE_COLLECTION.find(query or {}).sort("attendance_date", -1)
-    if limit:
-        cursor = cursor.limit(limit)
-    return cursor
-
-
-def attendance_stats(query=None):
-    records = list(get_attendance_records(query))
-    total = len(records)
-    present = len([
-        record for record in records
-        if record.get("status") == "Present"
-    ])
-    absent = total - present
-    percentage = round((present / total) * 100, 2) if total else 0
-
-    return {
-        "total_attendance": total,
-        "present_count": present,
-        "absent_count": absent,
-        "present_students": present,
-        "absent_students": absent,
-        "attendance_percentage": percentage,
-        "records": records,
-    }
-
-
-================================================================================
-FILE: apps\authentication\tests.py
-================================================================================
-
-from django.test import TestCase
-
-# Create your tests here.
-
-
-================================================================================
-FILE: apps\authentication\urls.py
-================================================================================
-
-from django.urls import path
-from .views import (
-    add_attendance,
-    add_student,
-    add_teacher,
-    admin_dashboard,
-    admin_teachers,
-    analytics_view,
-    attendance_history,
-    attendance_list,
-    dashboard,
-    delete_student,
-    delete_teacher,
-    login_page,
-    logout_page,
-    register_page,
-    reports_page,
-    settings_page,
-    student_detail,
-    students_list,
-    teacher_dashboard,
-    update_student,
-    update_teacher,
-    download_pdf_report,
-    performance_report,
-    export_csv_report,
-    register_face,
-    face_attendance_page,
-    start_face_attendance,
-)
-
-
-
-urlpatterns = [
-    # AUTH
-    path("", login_page, name="login"),
-    path("login/", login_page, name="login"),
-    path("logout/", logout_page, name="logout"),
-    path("register/", register_page, name="register"),
-
-    # GENERAL ROLE REDIRECT HANDLER
-    path("dashboard/", dashboard, name="dashboard"),
-
-    # ADMIN
-    path("admin-dashboard/", admin_dashboard, name="admin_dashboard"),
-    path("add-student/", add_student, name="add_student"),
-    path("teachers/", admin_teachers, name="admin_teachers"),
-    path("add-teacher/", add_teacher, name="add_teacher"),
-    path("update-teacher/<int:teacher_id>/", update_teacher, name="update_teacher"),
-    path("delete-teacher/<int:teacher_id>/", delete_teacher, name="delete_teacher"),
-    path("analytics/", analytics_view, name="analytics"),
-    path("reports/", reports_page, name="reports"),
-    path("settings/", settings_page, name="settings"),
-    path("update-student/<str:student_id>/", update_student, name="update_student"),
-    path("delete-student/<str:student_id>/", delete_student, name="delete_student"),
-
-    # TEACHER
-    path("teacher-dashboard/", teacher_dashboard, name="teacher_dashboard"),
-    path("add-attendance/", add_attendance, name="add_attendance"),
-    path("attendance-list/", attendance_list, name="attendance_list"),
-    path("attendance-history/", attendance_history, name="attendance_history"),
-    path("students/", students_list, name="students_list"),
-    path("students-list/", students_list, name="students_list_legacy"),
-
-    # GENERAL DETAIL
-    path("student/<str:student_id>/", student_detail, name="student_detail"),
-
-    path("download-pdf-report/", download_pdf_report, name="download_pdf_report"),
-    path("export-csv-report/", export_csv_report, name="export_csv_report"),
-    path("performance-report/", performance_report, name="performance_report"),
-    path("face-attendance/", face_attendance_page, name="face_attendance"),
-    path("start-face-attendance/", start_face_attendance, name="start_face_attendance"),
-    path("register-face/", register_face, name="register_face"),
-]
-
 
 ================================================================================
 FILE: apps\authentication\views\__init__.py
@@ -3194,22 +3183,71 @@ FILE: apps\authentication\views\analytics_views.py
 ================================================================================
 
 import json
-from collections import Counter
+from collections import Counter, defaultdict
 from django.shortcuts import render
+from database.mongo import db
+
+
+STUDENTS_COLLECTION = db["students"]
+ATTENDANCE_COLLECTION = db["attendance_logs"]
+
+
+def clean_value(value, fallback="-"):
+    value = "" if value is None else str(value).strip()
+    return value or fallback
+
+
+def student_name(student):
+    return clean_value(
+        student.get("name")
+        or student.get("student_name")
+        or student.get("full_name"),
+        "Unnamed Student"
+    )
 
 
 def analytics_view(request):
-    students = [
-        {"name": "Tejas Kale", "course": "BCA", "email": "tejas@gmail.com", "attendance_percentage": 82},
-        {"name": "Rohit", "course": "MCA", "email": "rohit@gmail.com", "attendance_percentage": 65},
-        {"name": "Soham", "course": "B.Tech", "email": "soham@gmail.com", "attendance_percentage": 90},
-        {"name": "Vijay", "course": "B.Com", "email": "vijay@gmail.com", "attendance_percentage": 70},
-    ]
+    students = []
+    for student in STUDENTS_COLLECTION.find():
+        students.append({
+            "id": str(student.get("_id")),
+            "name": student_name(student),
+            "course": clean_value(student.get("course")),
+            "email": clean_value(student.get("email")),
+            "attendance_percentage": 0,
+        })
 
+    attendance_records = list(ATTENDANCE_COLLECTION.find())
     total_students = len(students)
-    present_students = 3
-    absent_students = 1
-    attendance_percentage = round((present_students / total_students) * 100, 2)
+    total_attendance = len(attendance_records)
+    present_students = len([
+        record for record in attendance_records
+        if record.get("status") == "Present"
+    ])
+    absent_students = len([
+        record for record in attendance_records
+        if record.get("status") == "Absent"
+    ])
+    attendance_percentage = round(
+        (present_students / total_attendance) * 100,
+        2
+    ) if total_attendance else 0
+
+    stats_by_name = defaultdict(lambda: {"total": 0, "present": 0})
+    for record in attendance_records:
+        name = clean_value(record.get("student_name"), "")
+        if not name:
+            continue
+        stats_by_name[name.lower()]["total"] += 1
+        if record.get("status") == "Present":
+            stats_by_name[name.lower()]["present"] += 1
+
+    for student in students:
+        stats = stats_by_name.get(student["name"].lower(), {"total": 0, "present": 0})
+        student["attendance_percentage"] = round(
+            (stats["present"] / stats["total"]) * 100,
+            2
+        ) if stats["total"] else 0
 
     course_counts = Counter(student["course"] for student in students)
     course_labels = json.dumps(list(course_counts.keys()))
@@ -3217,21 +3255,23 @@ def analytics_view(request):
 
     low_attendance_students = [
         student for student in students
-        if student["attendance_percentage"] < 75
+        if student["attendance_percentage"] and student["attendance_percentage"] < 75
     ]
 
     ai_insights = [
-        "Attendance increased this week",
-        "BCA students performing well",
-        "2 students need attendance warning",
-        "Overall analytics are stable"
+        f"{total_students} students are currently registered.",
+        f"{total_attendance} attendance records are available for analysis.",
+        f"{len(low_attendance_students)} students are below 75% attendance.",
+        f"Overall attendance rate is {attendance_percentage}%.",
     ]
 
-    recent_activities = [
-        "Rohit marked present today",
-        "Teacher uploaded attendance",
-        "New student added to BCA"
-    ]
+    recent_activities = []
+    for record in ATTENDANCE_COLLECTION.find().sort("attendance_date", -1).limit(5):
+        recent_activities.append(
+            f"{clean_value(record.get('student_name'), 'Student')} - "
+            f"{clean_value(record.get('type'), record.get('status') or 'Attendance')} "
+            f"on {clean_value(record.get('attendance_date'))}"
+        )
 
     context = {
         "students": students,
@@ -3269,6 +3309,35 @@ STUDENTS_COLLECTION = db["students"]
 ATTENDANCE_COLLECTION = db["attendance_logs"]
 
 
+def clean_value(value, fallback="-"):
+    value = "" if value is None else str(value).strip()
+    return value or fallback
+
+
+def student_display_name(student):
+    return clean_value(
+        student.get("name")
+        or student.get("student_name")
+        or student.get("full_name"),
+        "Unnamed Student"
+    )
+
+
+def prepare_student_option(student):
+    student["id"] = str(student["_id"])
+    student["display_name"] = student_display_name(student)
+    student["display_course"] = clean_value(
+        student.get("course")
+        or student.get("department")
+        or student.get("student_course")
+    )
+    student["display_email"] = clean_value(
+        student.get("email")
+        or student.get("student_email")
+    )
+    return student
+
+
 @login_required
 @teacher_or_admin
 def attendance_list(request):
@@ -3291,6 +3360,10 @@ def attendance_list(request):
     attendance_records = serialize_attendance(
         ATTENDANCE_COLLECTION.find(attendance_filter).sort("attendance_date", -1)
     )
+    for record in attendance_records:
+        record["display_type"] = record.get("type") or record.get("status", "-")
+        record["student_course"] = record.get("student_course") or record.get("course") or "-"
+        record["student_email"] = record.get("student_email") or record.get("email") or "-"
 
     summary = get_attendance_summary(attendance_records)
 
@@ -3312,13 +3385,12 @@ def attendance_list(request):
 @teacher_or_admin
 def add_attendance(request):
 
-    students = list(
-        STUDENTS_COLLECTION.find().sort("student_name", 1)
-    )
+    students = [
+        prepare_student_option(student)
+        for student in STUDENTS_COLLECTION.find()
+    ]
 
-    for student in students:
-
-        student["id"] = str(student["_id"])
+    students.sort(key=lambda item: item["display_name"].lower())
 
     if request.method == "POST":
 
@@ -3346,6 +3418,15 @@ def add_attendance(request):
 
             return redirect("add_attendance")
 
+        if status not in VALID_ATTENDANCE_STATUS:
+
+            messages.error(
+                request,
+                "Invalid attendance status."
+            )
+
+            return redirect("add_attendance")
+
         student = STUDENTS_COLLECTION.find_one({
 
             "_id": ObjectId(student_id)
@@ -3365,15 +3446,26 @@ def add_attendance(request):
 
             "student_id": str(student["_id"]),
 
-            "student_name": student.get("student_name"),
+            "student_name": student_display_name(student),
 
-            "student_email": student.get("email"),
+            "student_email": clean_value(
+                student.get("email")
+                or student.get("student_email")
+            ),
 
-            "student_course": student.get("course"),
+            "student_course": clean_value(
+                student.get("course")
+                or student.get("department")
+                or student.get("student_course")
+            ),
 
             "attendance_date": attendance_date,
 
+            "time": datetime.now().strftime("%H:%M:%S"),
+
             "status": status,
+
+            "method": "Manual",
 
             "created_at": datetime.now()
 
@@ -3671,11 +3763,246 @@ from PIL import Image
 from django.http import JsonResponse
 from django.shortcuts import render
 from database.mongo import db
+from datetime import datetime
 from apps.authentication.face_utils import recognize_faces
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 FACES_DIR = os.path.join(BASE_DIR, "media", "faces")
 os.makedirs(FACES_DIR, exist_ok=True)
+
+FACE_SAMPLE_SIZE = (96, 96)
+FACE_MATCH_THRESHOLD = 0.62
+FACE_DUPLICATE_THRESHOLD = 0.96
+FACE_ENCODING_MIN_COUNT = 1
+
+
+def _decode_base64_image(image_data):
+    if not image_data or ";base64," not in image_data:
+        raise ValueError("Invalid camera image.")
+
+    _, imgstr = image_data.split(";base64,", 1)
+    image_bytes = base64.b64decode(imgstr)
+    image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+    return np.array(image)
+
+
+def _get_face_recognition():
+    try:
+        import face_recognition
+        return face_recognition
+    except ImportError:
+        return None
+
+
+def _extract_cv2_face_sample(frame):
+    gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+    gray = cv2.equalizeHist(gray)
+    cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+    detector = cv2.CascadeClassifier(cascade_path)
+    faces = detector.detectMultiScale(
+        gray,
+        scaleFactor=1.1,
+        minNeighbors=5,
+        minSize=(80, 80)
+    )
+
+    if len(faces) > 0:
+        x, y, width, height = max(faces, key=lambda item: item[2] * item[3])
+        padding = int(width * 0.18)
+        left = max(0, x - padding)
+        top = max(0, y - padding)
+        right = min(gray.shape[1], x + width + padding)
+        bottom = min(gray.shape[0], y + height + padding)
+        face = gray[top:bottom, left:right]
+    else:
+        height, width = gray.shape
+        crop_size = min(height, width)
+        left = (width - crop_size) // 2
+        top = (height - crop_size) // 2
+        face = gray[top:top + crop_size, left:left + crop_size]
+
+    return cv2.resize(face, FACE_SAMPLE_SIZE)
+
+
+def _detect_cv2_face_boxes(frame):
+    gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+    gray = cv2.equalizeHist(gray)
+    cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+    detector = cv2.CascadeClassifier(cascade_path)
+    faces = detector.detectMultiScale(
+        gray,
+        scaleFactor=1.08,
+        minNeighbors=4,
+        minSize=(60, 60)
+    )
+    return sorted(faces, key=lambda item: item[2] * item[3], reverse=True)
+
+
+def _cv2_box_to_face_location(frame, box):
+    x, y, width, height = box
+    padding = int(width * 0.22)
+    top = max(0, y - padding)
+    right = min(frame.shape[1], x + width + padding)
+    bottom = min(frame.shape[0], y + height + padding)
+    left = max(0, x - padding)
+    return (top, right, bottom, left)
+
+
+def _extract_face_encoding(face_recognition, frame):
+    if not face_recognition:
+        return None
+
+    face_locations = face_recognition.face_locations(
+        frame,
+        number_of_times_to_upsample=2,
+        model="hog"
+    )
+    encodings = face_recognition.face_encodings(frame, face_locations)
+    if encodings:
+        return encodings[0]
+
+    for box in _detect_cv2_face_boxes(frame):
+        face_location = _cv2_box_to_face_location(frame, box)
+        encodings = face_recognition.face_encodings(frame, [face_location])
+        if encodings:
+            return encodings[0]
+
+        top, right, bottom, left = face_location
+        face_crop = frame[top:bottom, left:right]
+        if face_crop.size == 0:
+            continue
+
+        crop_locations = face_recognition.face_locations(
+            face_crop,
+            number_of_times_to_upsample=2,
+            model="hog"
+        )
+        encodings = face_recognition.face_encodings(face_crop, crop_locations)
+        if encodings:
+            return encodings[0]
+
+    return None
+
+
+def _encode_face_sample(sample):
+    ok, buffer = cv2.imencode(".jpg", sample, [int(cv2.IMWRITE_JPEG_QUALITY), 82])
+    if not ok:
+        return ""
+    return base64.b64encode(buffer).decode("utf-8")
+
+
+def _decode_face_sample(sample_data):
+    image_bytes = base64.b64decode(sample_data)
+    image_array = np.frombuffer(image_bytes, dtype=np.uint8)
+    sample = cv2.imdecode(image_array, cv2.IMREAD_GRAYSCALE)
+    if sample is None:
+        return None
+    return cv2.resize(sample, FACE_SAMPLE_SIZE)
+
+
+def _sample_similarity(first, second):
+    first_vector = first.astype("float32").flatten() / 255.0
+    second_vector = second.astype("float32").flatten() / 255.0
+    denominator = np.linalg.norm(first_vector) * np.linalg.norm(second_vector)
+    if denominator == 0:
+        return 0
+
+    cosine = float(np.dot(first_vector, second_vector) / denominator)
+    mse = float(np.mean((first_vector - second_vector) ** 2))
+    return (0.72 * cosine) + (0.28 * (1 - mse))
+
+
+def _find_best_sample_match(captured_sample, students):
+    best_student = None
+    best_score = 0
+
+    for student in students:
+        for stored_sample in student.get("face_samples", []):
+            sample = _decode_face_sample(stored_sample)
+            if sample is None:
+                continue
+
+            score = _sample_similarity(captured_sample, sample)
+            if score > best_score:
+                best_score = score
+                best_student = student
+
+    return best_student, best_score
+
+
+def _load_registered_students():
+    students = []
+    for student in db.students.find():
+        encodings = [
+            np.array(encoding)
+            for encoding in student.get("face_encodings", [])
+            if encoding
+        ]
+        face_samples = [
+            sample
+            for sample in student.get("face_samples", [])
+            if sample
+        ]
+        if encodings or face_samples:
+            students.append({
+                "student_name": student.get("student_name", "").strip(),
+                "roll_number": student.get("roll_number", ""),
+                "course": student.get("course", ""),
+                "face_encodings": encodings,
+                "face_samples": face_samples,
+            })
+    return students
+
+
+def _mark_face_attendance(student):
+    today_date = datetime.now().strftime("%Y-%m-%d")
+    current_clock_time = datetime.now().strftime("%H:%M:%S")
+    student_name = student["student_name"]
+
+    base_query = {
+        "student_name": student_name,
+        "attendance_date": today_date,
+    }
+    check_in_record = db.attendance_logs.find_one({
+        **base_query,
+        "type": "IN",
+    })
+    check_out_record = db.attendance_logs.find_one({
+        **base_query,
+        "type": "OUT",
+    })
+
+    if not check_in_record:
+        attendance_type = "IN"
+        message = f"{student_name} check-in marked successfully."
+    elif not check_out_record:
+        attendance_type = "OUT"
+        message = f"{student_name} check-out marked successfully."
+    else:
+        return {
+            "status": "already_marked",
+            "attendance_type": "COMPLETED",
+            "message": f"{student_name} attendance already completed today.",
+            "time": current_clock_time,
+        }
+
+    db.attendance_logs.insert_one({
+        "student_name": student_name,
+        "roll_number": student.get("roll_number", ""),
+        "student_course": student.get("course", ""),
+        "status": "Present",
+        "attendance_date": today_date,
+        "time": current_clock_time,
+        "type": attendance_type,
+        "method": "Face Recognition",
+    })
+
+    return {
+        "status": "marked",
+        "attendance_type": attendance_type,
+        "message": message,
+        "time": current_clock_time,
+    }
 
 
 def start_face_attendance(request):
@@ -3686,6 +4013,81 @@ def start_face_attendance(request):
         return JsonResponse({"status": "success", "message": "Camera Started"})
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e)})
+
+
+def process_face_attendance(request):
+    if request.method != "POST":
+        return JsonResponse({
+            "status": "error",
+            "message": "POST request required."
+        }, status=405)
+
+    try:
+        frame = _decode_base64_image(request.POST.get("image"))
+    except ValueError as error:
+        return JsonResponse({
+            "status": "error",
+            "message": str(error)
+        }, status=400)
+
+    students = _load_registered_students()
+    if not students:
+        return JsonResponse({
+            "status": "error",
+            "message": "No registered face data found."
+        })
+
+    best_student = None
+    confidence = 0
+    face_recognition = _get_face_recognition()
+
+    if face_recognition:
+        captured_encoding = _extract_face_encoding(face_recognition, frame)
+        if captured_encoding is not None:
+            best_distance = 1.0
+
+            for student in students:
+                if not student.get("face_encodings"):
+                    continue
+
+                distances = face_recognition.face_distance(
+                    student["face_encodings"],
+                    captured_encoding
+                )
+                if len(distances) == 0:
+                    continue
+
+                min_distance = float(np.min(distances))
+                if min_distance < best_distance:
+                    best_distance = min_distance
+                    best_student = student
+
+            if best_student and best_distance <= 0.5:
+                confidence = max(0, min(100, round((1 - best_distance) * 100)))
+
+    if not best_student:
+        captured_sample = _extract_cv2_face_sample(frame)
+        best_student, best_score = _find_best_sample_match(captured_sample, students)
+        confidence = max(0, min(100, round(best_score * 100)))
+        if not best_student or best_score < FACE_MATCH_THRESHOLD:
+            best_student = None
+
+    if not best_student:
+        return JsonResponse({
+            "status": "unknown",
+            "message": "Face not matched with registered students.",
+            "confidence": confidence
+        })
+
+    attendance_result = _mark_face_attendance(best_student)
+
+    return JsonResponse({
+        **attendance_result,
+        "student_name": best_student["student_name"],
+        "roll_number": best_student.get("roll_number", ""),
+        "course": best_student.get("course", ""),
+        "confidence": confidence,
+    })
 
 
 def register_face(request):
@@ -3701,60 +4103,77 @@ def register_face(request):
         if len(images) < 5:
             return JsonResponse({"status": "error", "message": "Capture 5 Images"})
 
-        try:
-            import face_recognition
-        except ImportError:
-            return JsonResponse({
-                "status": "error",
-                "message": "Face recognition package is not installed. Please install face_recognition."
-            })
-
+        face_recognition = _get_face_recognition()
         encodings_list = []
-        all_students = db.students.find()
+        face_samples = []
+        existing_students = list(db.students.find())
         duplicate_found = False
 
         for image_data in images:
             try:
-                format, imgstr = image_data.split(";base64,")
-                image_bytes = base64.b64decode(imgstr)
-                image = Image.open(io.BytesIO(image_bytes))
-                image_np = np.array(image)
-                face_encodings = face_recognition.face_encodings(image_np)
+                image_np = _decode_base64_image(image_data)
+                sample = _extract_cv2_face_sample(image_np)
+                face_samples.append(_encode_face_sample(sample))
 
-                if len(face_encodings) > 0:
-                    encoding = face_encodings[0]
+                if not face_recognition:
+                    continue
 
-                    for student in all_students:
-                        stored_encodings = student.get("face_encodings", [])
-                        for stored_encoding in stored_encodings:
-                            matches = face_recognition.compare_faces(
-                                [np.array(stored_encoding)],
-                                encoding,
-                                tolerance=0.45
-                            )
-                            if True in matches:
-                                duplicate_found = True
-                                break
-                        if duplicate_found:
+                encoding = _extract_face_encoding(face_recognition, image_np)
+                if encoding is None:
+                    continue
+
+                for student in existing_students:
+                    stored_encodings = student.get("face_encodings", [])
+                    for stored_encoding in stored_encodings:
+                        matches = face_recognition.compare_faces(
+                            [np.array(stored_encoding)],
+                            encoding,
+                            tolerance=0.45
+                        )
+                        if True in matches:
+                            duplicate_found = True
                             break
-
                     if duplicate_found:
-                        return JsonResponse({"status": "error", "message": "Face Already Registered"})
+                        break
 
-                    encodings_list.append(encoding.tolist())
+                if duplicate_found:
+                    return JsonResponse({"status": "error", "message": "Face Already Registered"})
+
+                encodings_list.append(encoding.tolist())
             except Exception as e:
                 print("Encoding Error:", e)
 
+        if not face_samples:
+            return JsonResponse({
+                "status": "error",
+                "message": "No clear face found. Capture again with better light."
+            })
+
+        if len(encodings_list) < FACE_ENCODING_MIN_COUNT:
+            if not face_recognition:
+                return JsonResponse({
+                    "status": "error",
+                    "message": "face_recognition package is not available. Install it before registering faces."
+                })
+
+            return JsonResponse({
+                "status": "error",
+                "message": "Face encoding failed. Keep face clear inside the box and capture again."
+            })
+
         db.students.insert_one({
+            "name": student_name,
             "student_name": student_name,
             "roll_number": roll_number,
             "course": course,
-            "face_encodings": encodings_list
+            "face_encodings": encodings_list,
+            "face_samples": face_samples
         })
 
         return JsonResponse({
             "status": "success",
-            "message": f"{student_name} Registered Successfully"
+            "message": f"{student_name} Registered Successfully",
+            "engine": "face_recognition" if face_recognition else "opencv"
         })
 
     return render(request, "authentication/register_face.html")
@@ -3986,6 +4405,33 @@ ATTENDANCE_COLLECTION = db["attendance_logs"]
 STUDENTS_COLLECTION = db["students"]
 
 
+def clean_value(value, fallback="-"):
+    value = "" if value is None else str(value).strip()
+    return value or fallback
+
+
+def display_student_name(record):
+    return clean_value(
+        record.get("student_name")
+        or record.get("name")
+        or record.get("full_name"),
+        "Unknown Student"
+    )
+
+
+def serialize_report_record(record):
+    return {
+        "student_name": display_student_name(record),
+        "student_email": clean_value(record.get("student_email") or record.get("email")),
+        "student_course": clean_value(record.get("student_course") or record.get("course")),
+        "status": clean_value(record.get("status")),
+        "type": clean_value(record.get("type"), "Manual"),
+        "time": clean_value(record.get("time")),
+        "attendance_date": clean_value(record.get("attendance_date")),
+        "method": clean_value(record.get("method"), "Manual"),
+    }
+
+
 @login_required
 @admin_only
 def reports(request):
@@ -3995,8 +4441,13 @@ def reports(request):
 @login_required
 @admin_only
 def reports_page(request):
-    attendance_records = list(
-        ATTENDANCE_COLLECTION.find().sort("attendance_date", -1)
+    attendance_records = [
+        serialize_report_record(record)
+        for record in ATTENDANCE_COLLECTION.find().sort("attendance_date", -1)
+    ]
+    total_students = STUDENTS_COLLECTION.count_documents({})
+    face_records = len(
+        [record for record in attendance_records if record["method"] == "Face Recognition"]
     )
 
     total_attendance = len(attendance_records)
@@ -4015,6 +4466,9 @@ def reports_page(request):
 
     context = {
         "attendance_records": attendance_records,
+        "recent_records": attendance_records[:8],
+        "total_students": total_students,
+        "face_records": face_records,
         "total_attendance": total_attendance,
         "present_count": present_count,
         "absent_count": absent_count,
@@ -4036,17 +4490,24 @@ def export_csv_report(request):
         'Email',
         'Course',
         'Status',
-        'Date'
+        'Type',
+        'Time',
+        'Date',
+        'Method'
     ])
 
-    attendance_records = ATTENDANCE_COLLECTION.find()
+    attendance_records = ATTENDANCE_COLLECTION.find().sort("attendance_date", -1)
     for attendance in attendance_records:
+        record = serialize_report_record(attendance)
         writer.writerow([
-            attendance.get('student_name'),
-            attendance.get('student_email'),
-            attendance.get('student_course'),
-            attendance.get('status'),
-            attendance.get('attendance_date')
+            record["student_name"],
+            record["student_email"],
+            record["student_course"],
+            record["status"],
+            record["type"],
+            record["time"],
+            record["attendance_date"],
+            record["method"],
         ])
 
     return response
@@ -4061,34 +4522,48 @@ def download_pdf_report(request):
     pdf = canvas.Canvas(response, pagesize=letter)
     width, height = letter
 
-    pdf.setFont("Helvetica-Bold", 24)
-    pdf.drawString(180, 750, "SMART CAMPUS REPORT")
+    pdf.setFont("Helvetica-Bold", 22)
+    pdf.drawString(165, 750, "Smart Campus Attendance Report")
 
     pdf.setFont("Helvetica", 12)
     pdf.drawString(50, 720, f"Generated: {datetime.now().strftime('%d-%m-%Y %H:%M')}")
 
-    pdf.setFont("Helvetica-Bold", 14)
+    attendance_records = [
+        serialize_report_record(record)
+        for record in ATTENDANCE_COLLECTION.find().sort("attendance_date", -1)
+    ]
+    total = len(attendance_records)
+    present = len([record for record in attendance_records if record["status"] == "Present"])
+    absent = len([record for record in attendance_records if record["status"] == "Absent"])
+
+    pdf.setFont("Helvetica-Bold", 11)
+    pdf.drawString(50, 695, f"Total Records: {total}")
+    pdf.drawString(190, 695, f"Present: {present}")
+    pdf.drawString(300, 695, f"Absent: {absent}")
+
     y = 670
-    pdf.drawString(50, y, "Student")
-    pdf.drawString(250, y, "Status")
-    pdf.drawString(400, y, "Date")
+    pdf.drawString(40, y, "Student")
+    pdf.drawString(185, y, "Course")
+    pdf.drawString(275, y, "Status")
+    pdf.drawString(345, y, "Type")
+    pdf.drawString(405, y, "Date")
+    pdf.drawString(485, y, "Method")
 
     y -= 30
-    attendance_records = ATTENDANCE_COLLECTION.find()
-    pdf.setFont("Helvetica", 12)
+    pdf.setFont("Helvetica", 9)
 
     for attendance in attendance_records:
-        student_name = attendance.get('student_name', 'Unknown')
-        status = attendance.get('status', 'N/A')
-        date = attendance.get('attendance_date', 'N/A')
-
-        pdf.drawString(50, y, str(student_name))
-        pdf.drawString(250, y, str(status))
-        pdf.drawString(400, y, str(date))
+        pdf.drawString(40, y, attendance["student_name"][:24])
+        pdf.drawString(185, y, attendance["student_course"][:13])
+        pdf.drawString(275, y, attendance["status"][:10])
+        pdf.drawString(345, y, attendance["type"][:8])
+        pdf.drawString(405, y, attendance["attendance_date"][:12])
+        pdf.drawString(485, y, attendance["method"][:16])
 
         y -= 25
         if y < 60:
             pdf.showPage()
+            pdf.setFont("Helvetica", 9)
             y = 750
 
     pdf.save()
@@ -4098,7 +4573,14 @@ def download_pdf_report(request):
 @login_required
 @admin_only
 def performance_report(request):
-    students = list(STUDENTS_COLLECTION.find())
+    students = []
+    for student in STUDENTS_COLLECTION.find():
+        students.append({
+            "name": clean_value(student.get("name") or student.get("student_name"), "Unnamed Student"),
+            "course": clean_value(student.get("course")),
+            "email": clean_value(student.get("email")),
+        })
+
     attendance_records = list(ATTENDANCE_COLLECTION.find())
 
     total_students = len(students)
@@ -4146,8 +4628,13 @@ from apps.authentication.decorators import (
 @admin_only
 def settings_page(request):
     if request.method == "POST":
+        campus_name = (request.POST.get("campus_name") or "").strip()
+        theme = (request.POST.get("theme") or "").strip()
         email = (request.POST.get("admin_email") or "").strip()
         password = (request.POST.get("password") or "")
+
+        request.session["campus_name"] = campus_name or "Smart Campus"
+        request.session["theme"] = theme or "Dark"
 
         if email:
             request.user.email = email
@@ -4163,13 +4650,22 @@ def settings_page(request):
         messages.success(request, "Settings saved successfully.")
         return redirect("settings")
 
-    return render(request, "dashboard/settings.html")
+    return render(
+        request,
+        "dashboard/settings.html",
+        {
+            "campus_name": request.session.get("campus_name", "Smart Campus"),
+            "theme": request.session.get("theme", "Dark"),
+        }
+    )
 
 
 ================================================================================
 FILE: apps\authentication\views\student_views.py
 ================================================================================
 
+import os
+from django.conf import settings
 from bson import ObjectId
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -4204,11 +4700,31 @@ def add_student(request):
 
         create_student(student_data)
 
-        if profile_image:
-            with open(f"media/{profile_image.name}", "wb+") as destination:
+        if profile_image and profile_image.name:
+
+            students_folder = os.path.join(
+                settings.BASE_DIR,
+                "media",
+                "students"
+            )
+
+            os.makedirs(
+                students_folder,
+                exist_ok=True
+            )
+
+            image_path = os.path.join(
+                students_folder,
+                profile_image.name
+            )
+
+            with open(image_path, "wb+") as destination:
+
                 for chunk in profile_image.chunks():
+
                     destination.write(chunk)
 
+        messages.success(request, "Student added successfully.")
         return redirect("students_list")
 
     return render(request, "students/add_student.html")

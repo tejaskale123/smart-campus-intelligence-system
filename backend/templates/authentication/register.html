@@ -2,44 +2,103 @@
 
 {% block content %}
 
-<div style="display: flex; justify-content: center; align-items: center; min-height: calc(100vh - 80px);">
-
-    <div class="card" style="width: 100%; max-width: 450px; padding: 40px; border-top: 4px solid var(--neon-blue);">
-
-        <div style="text-align: center; margin-bottom: 30px;">
-            <div style="width: 80px; height: 80px; background: rgba(0, 102, 255, 0.05); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 15px auto; border: 1px dashed rgba(255, 255, 255, 0.2);">
-                <i class="fas fa-id-card-clip" style="font-size: 35px; color: var(--neon-blue);"></i>
-            </div>
-            <h2 style="font-size: 24px; margin-bottom: 5px; color: var(--text-primary);">Request Access</h2>
-            <p style="color: var(--text-secondary); font-size: 14px;">Register for the Smart Campus ERP System</p>
+<section class="auth-shell">
+    <aside class="auth-hero">
+        <div class="brand-mark">
+            <span class="brand-icon">
+                <i class="fas fa-building-columns"></i>
+            </span>
+            <span>Smart Campus Intelligence</span>
         </div>
 
-        <form method="POST">
+        <div class="brand-copy">
+            <h1>Create your campus access account.</h1>
+            <p>Request access to dashboards, attendance records, student services, analytics, and connected campus tools.</p>
+
+            <div class="auth-stats">
+                <div class="auth-stat">
+                    <strong>ERP</strong>
+                    <span>Unified portal</span>
+                </div>
+                <div class="auth-stat">
+                    <strong>AI</strong>
+                    <span>Smart attendance</span>
+                </div>
+                <div class="auth-stat">
+                    <strong>UX</strong>
+                    <span>Modern design</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="auth-card">
+        <div class="auth-card-head">
+            <span class="auth-icon">
+                <i class="fas fa-id-card-clip"></i>
+            </span>
+            <h2>Request Access</h2>
+            <p>Create an account for the Smart Campus ERP system.</p>
+        </div>
+
+        <form method="POST" id="registerForm">
             {% csrf_token %}
-            <div class="form-group" style="margin-bottom: 20px;">
-                <label><i class="fas fa-user" style="color: var(--neon-blue); margin-right: 5px;"></i> Choose Username</label>
-                <input type="text" name="username" required placeholder="Enter a unique username" style="padding-left: 20px;">
+
+            <div class="auth-field">
+                <label for="usernameInput">Choose Username</label>
+                <div class="input-wrap">
+                    <i class="fas fa-user"></i>
+                    <input id="usernameInput" type="text" name="username" required placeholder="Enter a unique username" autocomplete="username">
+                </div>
             </div>
 
-            <div class="form-group" style="margin-bottom: 25px;">
-                <label><i class="fas fa-lock" style="color: var(--neon-blue); margin-right: 5px;"></i> Create Password</label>
-                <input type="password" name="password" required placeholder="Enter a secure password" style="padding-left: 20px;">
+            <div class="auth-field">
+                <label for="passwordInput">Create Password</label>
+                <div class="input-wrap">
+                    <i class="fas fa-lock"></i>
+                    <input id="passwordInput" type="password" name="password" required placeholder="Enter a secure password" autocomplete="new-password">
+                    <span class="toggle-password" id="togglePassword" aria-label="Show password">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                </div>
             </div>
 
-            <button type="submit" class="btn" style="width: 100%; font-size: 15px; padding: 15px;">
-                <i class="fas fa-user-plus" style="margin-right: 8px;"></i> Create Account
+            <button type="submit" id="registerBtn" class="auth-submit">
+                <i class="fas fa-user-plus" id="registerIcon"></i>
+                <span id="registerText">Create Account</span>
             </button>
         </form>
 
-        <div style="text-align: center; margin-top: 30px; color: var(--text-secondary); font-size: 14px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
+        <div class="auth-footer">
             Already have an account?
-            <a href="/login/" style="margin-left: 5px; font-weight: 600; color: var(--neon-blue);">
-                <i class="fas fa-sign-in-alt"></i> Login Here
+            <a class="auth-link" href="/login/">
+                Login Here
             </a>
         </div>
-
     </div>
+</section>
 
-</div>
+<script>
+const togglePassword = document.getElementById("togglePassword");
+const passwordInput = document.getElementById("passwordInput");
+const registerForm = document.getElementById("registerForm");
+
+togglePassword.addEventListener("click", () => {
+    const isPassword = passwordInput.getAttribute("type") === "password";
+    passwordInput.setAttribute("type", isPassword ? "text" : "password");
+    togglePassword.innerHTML = isPassword ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+});
+
+registerForm.addEventListener("submit", () => {
+    const btn = document.getElementById("registerBtn");
+    const icon = document.getElementById("registerIcon");
+    const text = document.getElementById("registerText");
+
+    btn.style.opacity = "0.82";
+    btn.style.cursor = "not-allowed";
+    icon.className = "fas fa-spinner fa-spin";
+    text.textContent = "Creating account...";
+});
+</script>
 
 {% endblock %}
