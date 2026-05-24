@@ -9,6 +9,7 @@ from database.mongo import db
 
 LOGIN_LOGS = db["login_logs"]
 SECURITY_LOGS = db["security_logs"]
+USERS_COLLECTION = db["users"]
 
 
 def _log_login(request, user, role):
@@ -113,8 +114,27 @@ def login_page(request):
 def register_page(request):
     if request.method == "POST":
         username = request.POST.get("username")
+        email = (request.POST.get("email") or "").strip()
+        role = (request.POST.get("role") or "student").strip()
         password = request.POST.get("password")
-        User.objects.create_user(username=username, password=password)
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+
+        try:
+            USERS_COLLECTION.insert_one({
+                "username": username,
+                "email": email,
+                "role": role,
+                "user_id": str(user.id),
+                "created_at": datetime.now(),
+            })
+            print("USER SAVED IN MONGO")
+        except Exception as error:
+            print("User Mongo Save Error:", error)
+
         return redirect("login")
 
     return render(request, "authentication/register.html")

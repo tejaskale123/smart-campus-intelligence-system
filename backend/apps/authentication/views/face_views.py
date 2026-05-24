@@ -13,7 +13,8 @@ from apps.authentication.face_utils import recognize_faces
 
 CAMERA_LOGS = db["camera_logs"]
 SECURITY_LOGS = db["security_logs"]
-FACE_COLLECTION = db["face_encodings"]
+FACE_ENCODINGS_COLLECTION = db["face_encodings"]
+FACE_COLLECTION = db["face_data"]
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 FACES_DIR = os.path.join(BASE_DIR, "media", "faces")
@@ -56,7 +57,7 @@ def _log_security_event(request, event, **extra):
 def _save_face_documents(face_documents):
     try:
         if face_documents:
-            FACE_COLLECTION.insert_many(face_documents)
+            FACE_ENCODINGS_COLLECTION.insert_many(face_documents)
     except Exception as error:
         print("Face Collection Save Error:", error)
 
@@ -219,7 +220,7 @@ def _load_registered_students():
     students = []
     grouped_faces = {}
 
-    for face in FACE_COLLECTION.find():
+    for face in FACE_ENCODINGS_COLLECTION.find():
         student_name = (face.get("student_name") or "").strip()
         if not student_name:
             continue
@@ -445,6 +446,7 @@ def register_face(request):
         face_samples = []
         existing_students = list(db.students.find())
         duplicate_found = False
+        print("CAMERA START")
 
         for image_data in images:
             try:
@@ -458,6 +460,8 @@ def register_face(request):
                 encoding = _extract_face_encoding(face_recognition, image_np)
                 if encoding is None:
                     continue
+
+                print(encoding)
 
                 for student in existing_students:
                     stored_encodings = student.get("face_encodings", [])
@@ -498,7 +502,7 @@ def register_face(request):
                 "message": "Face encoding failed. Keep face clear inside the box and capture again."
             })
 
-        db.students.insert_one({
+        student_result = db.students.insert_one({
             "name": student_name,
             "student_name": student_name,
             "roll_number": roll_number,
@@ -506,6 +510,19 @@ def register_face(request):
             "face_encodings": encodings_list,
             "face_samples": face_samples
         })
+
+        face_encoding = encodings_list[0]
+        print(face_encoding)
+
+        FACE_COLLECTION.insert_one({
+            "student_name": student_name,
+            "student_id": str(student_result.inserted_id),
+            "roll_number": roll_number,
+            "course": course,
+            "face_encoding": face_encoding,
+            "created_at": datetime.now(),
+        })
+        print("FACE SAVED SUCCESS")
 
         face_documents = []
         for index, encoding in enumerate(encodings_list):
